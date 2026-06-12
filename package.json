@@ -1,0 +1,23 @@
+{
+  "name": "progetto-programmazione-avanzata",
+  "version": "1.0.0",
+  "description": "Progetto di programmazione avanzata 2025-2026",
+  "homepage": "https://github.com/Barca2002/Progetto-Programmazione-avanzata#readme",
+  "bugs": {
+    "url": "https://github.com/Barca2002/Progetto-Programmazione-avanzata/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Barca2002/Progetto-Programmazione-avanzata.git"
+  },
+  "license": "ISC",
+  "author": "Alessio D'Eugenio, Luca Barcaroli",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
