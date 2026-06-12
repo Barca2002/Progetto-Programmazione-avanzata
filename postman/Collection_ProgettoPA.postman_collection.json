@@ -1,0 +1,60 @@
+{
+  "info": {
+    "_postman_id": "918019e4-6405-4d82-a2b3-7484d452c373",
+    "name": "Collection_ProgettoPA",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53270562",
+    "_collection_link": "https://go.postman.co/collection/53270562-918019e4-6405-4d82-a2b3-7484d452c373?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GetUser",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "bearer"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}"
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/login",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Da_definire",
+      "item": []
+    }
+  ]
+}
