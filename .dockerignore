@@ -1,0 +1,10 @@
+.env
+node_modules
+.git
+.gitignore
+docker-compose.yaml
+Dockerfile
+README.md
+immagini
+postman
+.vscode
