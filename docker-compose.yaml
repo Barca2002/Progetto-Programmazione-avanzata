@@ -2,20 +2,21 @@
 services:
   db:
     container_name: mysql
-    image: mysql:latest
+    image: mysql:9.7
     restart: always
     env_file:
       - .env
     ports:
       - '3306:3306'  
     volumes: 
+    # Questo volume contiene una cartella speciale di MySql, la quale viene controllata all'avvio ed esegue gli script all'interno (in ordine alfabetico), in questo caso gli script d'inizializzazione e popolazione del db. È montato in modalità read-only (ro) per evitare che il container possa modificare i file.
       - ./backend/src/db:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s #non contare i fallimenti dell'healthcheck nei primi 30 secondi perche MYSQL è lento ad avviarsi
+      start_period: 30s # non contare i fallimenti dell'healthcheck nei primi 30 secondi perche MYSQL è lento ad avviarsi
   app:
     container_name: app
     depends_on:

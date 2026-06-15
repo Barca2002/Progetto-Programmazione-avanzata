@@ -18,7 +18,8 @@
     "build": "tsc",
     "start": "node ts-build/app.js",
     "dev": "nodemon",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:reset": "node db-reset.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
