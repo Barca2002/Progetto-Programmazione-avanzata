@@ -2,7 +2,7 @@
     "watch": ["backend/src"],
     "ext": "ts,json",
     "ignore": ["node_modules"],
-    "exec": "ts-node backend/src/app.ts",
+    "exec": "tsx backend/src/app.ts",
     "legacyWatch": true
 }
 

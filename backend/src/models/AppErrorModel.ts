@@ -1,4 +1,4 @@
-import { AppErrorName } from "../utils/StatusMessages";
+import { AppErrorName } from "../utils/StatusMessages.js";
 
 export class AppError extends Error {
     constructor(

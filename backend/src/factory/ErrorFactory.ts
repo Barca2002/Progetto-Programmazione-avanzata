@@ -1,5 +1,5 @@
-import { AppError } from "../models/AppErrorModel";
-import { ERROR_LIST, AppErrorName } from "../utils/StatusMessages";
+import { AppError } from "../models/AppErrorModel.js";
+import { ERROR_LIST, AppErrorName } from "../utils/StatusMessages.js";
 
 export class ErrorFactory {
     // Metodo statico per ottenere un'istanza di AppError (model degli errori) basata sul nome dell'errore.

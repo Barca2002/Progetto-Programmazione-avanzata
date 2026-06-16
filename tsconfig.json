@@ -2,7 +2,7 @@
   // Configurazione del compilatore tsc
   "compilerOptions": {
     // Configurazione dell'ambiente
-    "module": "esnext", // Utilizza il sistema di moduli ESNext, che supporta le funzionalità più recenti di JavaScript e TypeScript, come import/export dinamici e molto altro.
+    "module": "nodenext", // Utilizza il sistema di moduli ESNext, che supporta le funzionalità più recenti di JavaScript e TypeScript, come import/export dinamici e molto altro.
     "target": "es2022", // Compila il codice TypeScript in JavaScript compatibile con la versione ECMAScript 2022, consigliato per Node 22, evita problemi di compatibilità.
     "types": ["jest", "node"] , // Include definizioni per Jest (testing) e Node.js.
 
