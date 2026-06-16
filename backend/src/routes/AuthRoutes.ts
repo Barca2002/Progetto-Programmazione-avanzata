@@ -18,7 +18,7 @@ authRouter.post("/login", validateLogin, (req: Request, res: Response) => {
     //authController.login(req, res);
 });
 
-authRouter.post("/test", validateLogin, (req: Request, res: Response, next: NextFunction) => {
+authRouter.post("/test", (req: Request, res: Response, next: NextFunction) => {
     return next(ErrorFactory.getError(AppErrorNames.INVALID_EMAIL));
 });
 
