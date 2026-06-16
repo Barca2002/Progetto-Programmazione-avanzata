@@ -1,7 +1,7 @@
 import express from 'express';
 import { Response, Request, NextFunction } from "express";
 import dotenv from 'dotenv';
-// PROBLEMA CON GLI IMPORTS, NON RIESCE A TROVARLI PER QUALCHE MOTIVO!
+
 import { authRouter } from './routes/AuthRoutes.js';
 import { AppError } from './models/AppErrorModel.js';
 
