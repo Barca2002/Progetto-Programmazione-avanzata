@@ -1,5 +1,5 @@
 import { AppError } from "../models/AppErrorModel";
-import { ERROR_LIST, AppErrorName } from "../enums/StatusMessages";
+import { ERROR_LIST, AppErrorName } from "../utils/StatusMessages";
 
 export class ErrorFactory {
     // Metodo statico per ottenere un'istanza di AppError (model degli errori) basata sul nome dell'errore.

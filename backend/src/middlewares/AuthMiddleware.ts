@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory";
-import { AppErrorNames } from "../enums/StatusMessages";
+import { AppErrorNames } from "../utils/StatusMessages";
 
 // Queste costanti definiscono la pipeline di validazione per le rotte di login e registrazione. Esse specificano la catena di funzioni di validazione devono essere eseguite prima di raggiungere il controller effettivo.
 export const validateLogin = [checkEmail, checkPassword];

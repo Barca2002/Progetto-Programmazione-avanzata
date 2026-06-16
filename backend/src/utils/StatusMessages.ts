@@ -17,9 +17,9 @@ export const ERROR_LIST = {
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
-export type AppErrorName = keyof typeof ERROR_LIST; // Sarebbe "INTERNAL_ERROR" | "EMAIL_NOT_EXIST" | "INCORRECT_PASSWORD" | ...
+export type AppErrorName = keyof typeof ERROR_LIST; // Equivale a "INTERNAL_ERROR" | "EMAIL_NOT_EXIST" | "INCORRECT_PASSWORD" | ...
 
-// Questo oggetto mappa ogni nome di errore a se stesso, in modo da poter usare AppErrorNames.INVALID_EMAIL come un enum invece di "INVALID_EMAIL" come stringa.
+// La funzione fromEntries crea un oggetto mappando ogni nome di errore a se stesso, in modo da poter usare AppErrorNames.INVALID_EMAIL come un enum/oggetto invece di "INVALID_EMAIL" come stringa.
 export const AppErrorNames = Object.fromEntries(
     Object.keys(ERROR_LIST).map(k => [k, k])
 ) as { [K in AppErrorName]: K };

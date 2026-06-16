@@ -1,4 +1,4 @@
-import { AppErrorName } from "../enums/StatusMessages";
+import { AppErrorName } from "../utils/StatusMessages";
 
 export class AppError extends Error {
     constructor(
@@ -8,6 +8,6 @@ export class AppError extends Error {
     ) {
         // Bisogna inizializzare l'errore passandogli il messaggio al costruttore della classe base Error.
         super(message);
-        this.name = "AppError"; // best practice: sovrascrivere nome con uno più espressivo, di default è "Error".
+        this.name = "AppError"; // best practice: sovrascrivere nome con uno più contestuale, di default è "Error".
     }
 }
