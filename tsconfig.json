@@ -2,7 +2,7 @@
   // Configurazione del compilatore tsc
   "compilerOptions": {
     // Configurazione dell'ambiente
-    "module": "ESNext", // Utilizza il sistema di moduli ESNext, che supporta le funzionalità più recenti di JavaScript e TypeScript, come import/export dinamici e molto altro. 
+    "module": "esnext", // Utilizza il sistema di moduli ESNext, che supporta le funzionalità più recenti di JavaScript e TypeScript, come import/export dinamici e molto altro.
     "target": "es2022", // Compila il codice TypeScript in JavaScript compatibile con la versione ECMAScript 2022, consigliato per Node 22, evita problemi di compatibilità.
     "types": ["jest", "node"] , // Include definizioni per Jest (testing) e Node.js.
 
@@ -15,8 +15,8 @@
     "noUncheckedIndexedAccess": true, // Forza di gestire esplicitamente i casi in cui un accesso a un array o a un oggetto potrebbe restituire undefined, migliorando la sicurezza del codice.
     "exactOptionalPropertyTypes": true, // Tratta le proprietà opzionali (cioè con il ? davanti) come esattamente opzionali, evitando ambiguità tra undefined e il tipo specificato.
     "noUnusedLocals": true, // Genera errori per variabili dichiarate ma non utilizzate.
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force", // Forza il compilatore a trattare tutti i file come moduli, anche quelli senza import/export, per evitare problemi di ambiguità  .
+    "noUncheckedSideEffectImports": true, // Evita di importare moduli che sono utili solo per effetti collaterali, cioè evita import senza niente.
+    "moduleDetection": "force", // Forza il compilatore a trattare tutti i file come moduli, anche quelli senza import/export, per evitare problemi di ambiguità.
     "skipLibCheck": true, // Salta il controllo delle librerie in node_modules per migliorare le prestazioni.
   },
   // Definizione dei percorsi da includere ed escludere dal compilatore.
