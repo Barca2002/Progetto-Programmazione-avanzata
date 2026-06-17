@@ -1,5 +1,4 @@
 .env
 node_modules
 .vscode
-jwtRS256.key
-jwtRS256.key.pub
+keys/*
