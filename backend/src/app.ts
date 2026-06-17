@@ -2,6 +2,7 @@ import express from 'express';
 import { Response, Request, NextFunction } from "express";
 import dotenv from 'dotenv';
 import { authRouter } from './routes/AuthRoutes.js';
+import { testRouter } from './routes/TestRoutes.js';
 import { AppError } from './models/AppErrorModel.js';
 
 dotenv.config();
@@ -11,13 +12,16 @@ const PORT = process.env.LISTEN_PORT;
 const app = express();
 
 app.get('/', (req, res) => {
-  res.send({
-    ok: true, message: "Servizio funzionante"
-  });
+  res.send(`<h1>Servizio funzionante.
+    Esegui l'accesso tramite la rotta "/auth/login".</h1>`);
 });
 
 // Import rotta di test
+app.use("/test", testRouter);
+
+// Import rotta di autenticazione
 app.use("/auth", authRouter);
+
 
 // Error handler, va messo alla fine di tutte le rotte
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

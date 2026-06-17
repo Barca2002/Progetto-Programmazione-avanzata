@@ -1,8 +1,7 @@
 import { Router, Response, Request, NextFunction } from "express";
 // import { AuthController } from "../controllers/AuthController";
 import { validateLogin } from "../middlewares/AuthMiddleware.js";
-import { AppErrorNames } from "../utils/StatusMessages.js";
-import { ErrorFactory } from "../factory/ErrorFactory.js";
+
 
 // Istanziamo il router e il controller per gestire le rotte di autenticazione.
 export const authRouter = Router();
@@ -18,8 +17,5 @@ authRouter.post('/login', validateLogin, (req: Request, res: Response) => {
     //authController.login(req, res);
 });
 
-authRouter.post('/testerrore', (req: Request, res: Response, next: NextFunction) => {
-    let error = ErrorFactory.getError(AppErrorNames.INVALID_EMAIL);
-    return res.status(error.statusCode).json({"test": error});
-});
+
 
