@@ -1,7 +1,7 @@
 import { Router, Response, Request, NextFunction } from "express";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
-import { ErrorFactory } from "../factory/ErrorFactory.js";
-import { SuccessFactory } from "../factory/SuccessFactory.js";
+import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
+import { SuccessFactory } from "../patterns/factory/SuccessFactory.js";
 
 export const testRouter = Router();
 

@@ -8,20 +8,20 @@ import {
   deleteUtente
 } from "../controllers/UserController.js";
 
-export const UserRoutes = Router();
+export const userRoutes = Router();
 
 // GET tutti utenti
-UserRoutes.get("/utentiAll", getUtenti);
+userRoutes.get("/utentiAll", getUtenti);
 
 // GET utente per ID
-UserRoutes.get("/utenti/:id", getUtenteById);
+userRoutes.get("/utenti/:id", getUtenteById);
 
 // CREATE utente
-UserRoutes.post("/utente", createUtente);
+userRoutes.post("/utente", createUtente);
 
 // UPDATE utente
-UserRoutes.put("/utentiUpdate/:id", updateUtente);
+userRoutes.put("/utentiUpdate/:id", updateUtente);
 
 // DELETE utente
-UserRoutes.delete("/utentiDelete/:id", deleteUtente);
+userRoutes.delete("/utentiDelete/:id", deleteUtente);
 

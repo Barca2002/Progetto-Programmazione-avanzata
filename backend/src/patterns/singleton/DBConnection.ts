@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
-import { AppErrorNames } from '../../utils/StatusMessages.js';
+import { AppErrorEnum } from '../../utils/StatusMessages.js';
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ export class DatabaseConnection {
       } = process.env;
 
       if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER || !DB_PASSWORD) {
-        throw ErrorFactory.getError(AppErrorNames.ENV_VARIABLES_MISSING);
+        throw ErrorFactory.getError(AppErrorEnum.ENV_VARIABLES_MISSING);
       }
 
       this.connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {

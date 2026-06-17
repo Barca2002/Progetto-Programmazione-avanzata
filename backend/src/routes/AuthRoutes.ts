@@ -1,7 +1,7 @@
 import { Router, Response, Request, NextFunction } from "express";
 // import { AuthController } from "../controllers/AuthController";
 import { validateLogin } from "../middlewares/AuthMiddleware.js";
-import { AppErrorNames } from "../utils/StatusMessages.js";
+import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
 
 

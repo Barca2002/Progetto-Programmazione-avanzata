@@ -1,7 +1,7 @@
 import { UserDAO } from "../patterns/dao/UserDAO.js";
 import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
-import { AppErrorNames } from "../utils/StatusMessages.js";
+import { AppErrorEnum } from "../utils/StatusMessages.js";
 
 export const getUtenti = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -12,7 +12,7 @@ export const getUtenti = async (req: Request, res: Response, next: NextFunction)
     res.json(utenti);
 
   } catch (error) {
-    next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
   }
 };
 
@@ -25,13 +25,13 @@ export const getUtenteById = async (req: Request, res: Response, next: NextFunct
     const utente = await userDAO.findById(id);
 
     if (!utente) {
-      return next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+      return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
     }
 
     res.json(utente);
 
   } catch (error) {
-    next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
   }
 };
 
@@ -44,7 +44,7 @@ export const createUtente = async (req: Request, res: Response, next: NextFuncti
     res.json(nuovoUtente);
 
   } catch (error) {
-    next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
   }
 };
 
@@ -57,7 +57,7 @@ export const updateUtente = async (req: Request, res: Response, next: NextFuncti
     const updated = await userDAO.update(id, req.body);
 
     if (!updated) {
-      return next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+      return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
     }
 
     const utenteAggiornato = await userDAO.findById(id);
@@ -65,7 +65,7 @@ export const updateUtente = async (req: Request, res: Response, next: NextFuncti
     res.json(utenteAggiornato);
 
   } catch (error) {
-    next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
   }
 };
 
@@ -78,7 +78,7 @@ export const deleteUtente = async (req: Request, res: Response, next: NextFuncti
     const deleted = await userDAO.delete(id);
 
     if (!deleted) {
-      return next(ErrorFactory.getError(AppErrorNames.INTERNAL_ERROR));
+      return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
     }
 
     res.json({ message: "USER_DELETED" });
