@@ -20,7 +20,8 @@
     "dev": "nodemon",
     "run:ts": "ts-node --project tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "db:reset": "node db-reset.js"
+    "db:reset": "node db-reset.js",
+    "generate-keys": "tsx backend/src/utils/generateCryptoKeys.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
