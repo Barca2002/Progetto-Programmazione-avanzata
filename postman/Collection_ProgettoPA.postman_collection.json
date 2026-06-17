@@ -8,18 +8,32 @@
   },
   "item": [
     {
-      "name": "Users",
+      "name": "Auth",
       "item": [
         {
-          "name": "GetUser",
-          "request": {
-            "method": "GET",
-            "header": []
-          },
-          "response": []
-        },
-        {
-          "name": "Login",
+          "name": "LoginUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente JWT_TOKEN con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response.\r",
+                  "// Prima si controlla che lo status della risposta è 200, cioè è andata a buon fine.\r",
+                  "pm.test(\"Status code 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "// Poi salviamo il token nella variabile d'ambiente.\r",
+                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente di Postman\", function () {\r",
+                  "    pm.environment.set(\"JWT_TOKEN\", pm.response.json().token);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer"
@@ -37,14 +51,68 @@
               "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}"
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/login",
+              "raw": "http://{{HOST}}:{{PORT}}/check",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
               ],
               "port": "{{PORT}}",
               "path": [
-                "login"
+                "check"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LoginAdmin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente JWT_TOKEN con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response.\r",
+                  "// Prima si controlla che lo status della risposta è 200, cioè è andata a buon fine.\r",
+                  "pm.test(\"Status code 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "// Poi salviamo il token nella variabile d'ambiente.\r",
+                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente di Postman\", function () {\r",
+                  "    pm.environment.set(\"JWT_TOKEN\", pm.response.json().token);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}"
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/check",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "check"
               ]
             }
           },
@@ -53,8 +121,29 @@
       ]
     },
     {
-      "name": "Da_definire",
-      "item": []
+      "name": "Placeholder",
+      "item": [
+        {
+          "name": "New Request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/auth/testerrore",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "auth",
+                "testerrore"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
