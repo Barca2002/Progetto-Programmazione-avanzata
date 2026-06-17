@@ -19,12 +19,12 @@
                 "exec": [
                   "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente JWT_TOKEN con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response.\r",
                   "// Prima si controlla che lo status della risposta è 200, cioè è andata a buon fine.\r",
-                  "pm.test(\"Status code 200\", function () {\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "// Poi salviamo il token nella variabile d'ambiente.\r",
-                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente di Postman\", function () {\r",
-                  "    pm.environment.set(\"JWT_TOKEN\", pm.response.json().token);\r",
+                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente\", function () {\r",
+                  "    pm.environment.set(\"JWT_TOKEN_USER\", pm.response.json().token);\r",
                   "});\r",
                   ""
                 ],
@@ -73,12 +73,12 @@
                 "exec": [
                   "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente JWT_TOKEN con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response.\r",
                   "// Prima si controlla che lo status della risposta è 200, cioè è andata a buon fine.\r",
-                  "pm.test(\"Status code 200\", function () {\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "// Poi salviamo il token nella variabile d'ambiente.\r",
-                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente di Postman\", function () {\r",
-                  "    pm.environment.set(\"JWT_TOKEN\", pm.response.json().token);\r",
+                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente\", function () {\r",
+                  "    pm.environment.set(\"JWT_TOKEN_ADMIN\", pm.response.json().token);\r",
                   "});\r",
                   ""
                 ],
