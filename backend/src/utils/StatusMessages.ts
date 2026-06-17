@@ -1,5 +1,7 @@
 // Enumerativi degli errori e dei messaggi di successo dell'applicazione. Questi enum forniscono una struttura centralizzata per gestire i messaggi di errore e successo.
 export const ERROR_LIST = {
+    DB_CONNECTION_ERROR:          { statusCode: 500, message: "Errore interno del server. Non è possibile procedere con la richiesta." },
+    ENV_VARIABLES_MISSING: { statusCode: 500, message: "Variabili d'ambiente del database mancanti. Controlla il file .env." },
     INTERNAL_ERROR:          { statusCode: 500, message: "Errore interno del server. Non è possibile procedere con la richiesta." },
     EMAIL_NOT_EXIST:         { statusCode: 404, message: "L'email fornita non è associata a nessun utente." },
     INCORRECT_PASSWORD:      { statusCode: 401, message: "La password inserita non è corretta." },

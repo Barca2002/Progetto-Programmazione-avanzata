@@ -18,7 +18,7 @@
     "build": "tsc",
     "start": "node ts-build/app.js",
     "dev": "nodemon",
-    "run:ts": "ts-node --project tsconfig.json",
+    "run:ts": "tsx",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:reset": "node db-reset.js"
   },
@@ -26,6 +26,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.22.5",
+    "sequelize": "^6.37.8",
     "tsx": "^4.22.4"
   },
   "devDependencies": {
@@ -34,7 +36,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.19.21",
     "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }

@@ -2,7 +2,7 @@ import { Router, Response, Request, NextFunction } from "express";
 // import { AuthController } from "../controllers/AuthController";
 import { validateLogin } from "../middlewares/AuthMiddleware.js";
 import { AppErrorNames } from "../utils/StatusMessages.js";
-import { ErrorFactory } from "../factory/ErrorFactory.js";
+import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
 
 // Istanziamo il router e il controller per gestire le rotte di autenticazione.
 export const authRouter = Router();
