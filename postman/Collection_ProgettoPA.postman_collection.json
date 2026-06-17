@@ -24,6 +24,14 @@
                   "});\r",
                   "// Poi salviamo il token nella variabile d'ambiente.\r",
                   "pm.test(\"Salvataggio del token nelle variabili d'ambiente\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    // Controlliamo che il parametro 'token' esista nella risposta\r",
+                  "    pm.expect(jsonData).to.have.property('token');\r",
+                  "\r",
+                  "    // Controlliamo che il token non sia vuoto o nullo\r",
+                  "    pm.expect(jsonData.token).to.not.be.null;\r",
+                  "    pm.expect(jsonData.token).to.not.be.undefined;\r",
+                  "    \r",
                   "    pm.environment.set(\"JWT_TOKEN_USER\", pm.response.json().token);\r",
                   "});\r",
                   ""
@@ -51,14 +59,15 @@
               "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}"
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/check",
+              "raw": "http://{{HOST}}:{{PORT}}/auth/testerrore",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
               ],
               "port": "{{PORT}}",
               "path": [
-                "check"
+                "auth",
+                "testerrore"
               ]
             }
           },
@@ -78,6 +87,15 @@
                   "});\r",
                   "// Poi salviamo il token nella variabile d'ambiente.\r",
                   "pm.test(\"Salvataggio del token nelle variabili d'ambiente\", function () {\r",
+                  "    \r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    // Controlliamo che il parametro 'token' esista nella risposta\r",
+                  "    pm.expect(jsonData).to.have.property('token');\r",
+                  "\r",
+                  "    // Controlliamo che il token non sia vuoto o nullo\r",
+                  "    pm.expect(jsonData.token).to.not.be.null;\r",
+                  "    pm.expect(jsonData.token).to.not.be.undefined;\r",
+                  "\r",
                   "    pm.environment.set(\"JWT_TOKEN_ADMIN\", pm.response.json().token);\r",
                   "});\r",
                   ""
@@ -85,6 +103,13 @@
                 "type": "text/javascript",
                 "packages": {},
                 "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [],
+                "type": "text/javascript"
               }
             }
           ],
