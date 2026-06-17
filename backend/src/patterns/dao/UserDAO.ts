@@ -12,7 +12,6 @@ interface IUserDAO {
 }
 
 export class UserDAO implements IUserDAO{
-
   // Crea un nuovo utente, in base a UserCreation tutti i dati si devono inserire tranne idAdmin (opzionale) e user_id che non si può inserire nella creazione perché lo gestisce il db
   async create(data: UserCreation) {
     return await UserModel.create(data);
@@ -28,7 +27,7 @@ export class UserDAO implements IUserDAO{
     return await UserModel.findAll();
   }
 
-  // Aggiorna un utente per ID, tutti i dati da inserire sono opzionali tranne user_id
+  // Aggiorna un utente per ID, tutti i dati da inserire sono opzionali tranne user_id che non si può cambiare a prescindere
   async update(user_id: number, data: Partial<UserCreation>) {
     const [affectedCount] = await UserModel.update(data, { where: { user_id } });
     return affectedCount;

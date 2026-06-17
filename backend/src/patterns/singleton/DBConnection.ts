@@ -24,7 +24,7 @@ export class DatabaseConnection {
       }
 
       this.connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-        host: process.env.DB_HOST!,
+        host: DB_HOST!,
         port: parseInt(DB_PORT)!, //vuole per forza che lo parso ad int
         dialect: 'mysql'
       });

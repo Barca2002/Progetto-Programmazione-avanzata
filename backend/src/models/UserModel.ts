@@ -13,10 +13,10 @@ export interface UserAllData {
   created_at: Date;
 }
 
-// userId è autoincrement e isAdmin ha un default, idAdmin è opzionale e userId non si può inserire
-export interface UserCreation extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id'> {}
+// user_id è autoincrement e is_admin ha un default, is_admin è opzionale e user_id e il timestamp non si possono inserire
+export interface UserCreation extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id' | 'created_at'> {}
 
-// <Model<UserAllData, UserCreation>>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente
+// <Model<UserAllData, UserCreation>>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
 export const UserModel = db.define<Model<UserAllData, UserCreation>>('users', { //Voglio ottenere un UserModel definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
   user_id: {
     type: DataTypes.INTEGER,
@@ -50,7 +50,7 @@ export const UserModel = db.define<Model<UserAllData, UserCreation>>('users', { 
   }
 }, {
   tableName: 'users',
-  freezeTableName: true, //serve a dire a sequalize di non pluralizzare il nome della tabella quando lo deduce dal modello
+  freezeTableName: true, //serve a dire a sequelize di non pluralizzare il nome della tabella quando lo deduce dal modello
   timestamps: false
 });
 
