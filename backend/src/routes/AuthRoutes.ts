@@ -19,6 +19,7 @@ authRouter.post('/login', validateLogin, (req: Request, res: Response) => {
 });
 
 authRouter.post('/testerrore', (req: Request, res: Response, next: NextFunction) => {
-    return res.json({"boh": ErrorFactory.getError(AppErrorNames.INVALID_EMAIL)});
+    let error = ErrorFactory.getError(AppErrorNames.INVALID_EMAIL);
+    return res.status(error.statusCode).json({"test": error});
 });
 
