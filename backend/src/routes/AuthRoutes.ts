@@ -4,6 +4,7 @@ import { validateLogin } from "../middlewares/AuthMiddleware.js";
 import { AppErrorNames } from "../utils/StatusMessages.js";
 import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
 
+
 // Istanziamo il router e il controller per gestire le rotte di autenticazione.
 export const authRouter = Router();
 // const authController = new AuthController();
@@ -18,7 +19,5 @@ authRouter.post('/login', validateLogin, (req: Request, res: Response) => {
     //authController.login(req, res);
 });
 
-authRouter.post('/testerrore', (req: Request, res: Response, next: NextFunction) => {
-    return res.json({"boh": ErrorFactory.getError(AppErrorNames.INVALID_EMAIL)});
-});
+
 

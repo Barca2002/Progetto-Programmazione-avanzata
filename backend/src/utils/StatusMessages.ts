@@ -22,7 +22,7 @@ export const ERROR_LIST = {
 export type AppErrorName = keyof typeof ERROR_LIST; // Equivale a "INTERNAL_ERROR" | "EMAIL_NOT_EXIST" | "INCORRECT_PASSWORD" | ...
 
 // La funzione fromEntries crea un oggetto mappando ogni nome di errore a se stesso, in modo da poter usare AppErrorNames.INVALID_EMAIL come un enum/oggetto invece di "INVALID_EMAIL" come stringa.
-export const AppErrorNames = Object.fromEntries(
+export const AppErrorEnum = Object.fromEntries(
     Object.keys(ERROR_LIST).map(k => [k, k])
 ) as { [K in AppErrorName]: K };
 
@@ -35,6 +35,6 @@ export const SUCCESS_LIST = {
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;
 
-export const AppSuccessNames = Object.fromEntries(
+export const AppSuccessEnum = Object.fromEntries(
     Object.keys(SUCCESS_LIST).map(k => [k, k])
 ) as { [K in AppSuccessName]: K };

@@ -1,13 +1,19 @@
 import { AppErrorName } from "../utils/StatusMessages.js";
+import { Response } from "express";
 
 export class AppError extends Error {
     constructor(
         public readonly statusCode: number,
-        public readonly statusCodeString: AppErrorName,  // stringa leggibile invece di un numero
-        message: string
+        public readonly statusName: AppErrorName,
+        public readonly message: string
     ) {
         // Bisogna inizializzare l'errore passandogli il messaggio al costruttore della classe base Error.
         super(message);
-        this.name = "AppError"; // best practice: sovrascrivere nome con uno più contestuale, di default è "Error".
+        this.name = statusName; // best practice: sovrascrivere il nome con uno più contestuale, di default è "Error".
+    }
+
+    // Setta lo status code dell'errore e restituisce la risposta in JSON con il nome e messaggio dell'errore, da usare nell'error handler di Express.
+    send(res: Response) {
+        res.status(this.statusCode).json({"error_name": this.statusName, "message": this.message});
     }
 }

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
-import { AppErrorNames } from "../utils/StatusMessages.js";
+import { AppErrorEnum } from "../utils/StatusMessages.js";
 
 // Queste costanti definiscono la pipeline di validazione per le rotte di login e registrazione. Esse specificano la catena di funzioni di validazione devono essere eseguite prima di raggiungere il controller effettivo.
 export const validateLogin = [checkEmail, checkPassword];
@@ -12,7 +12,7 @@ function checkEmail(req: Request, res: Response, next: NextFunction) {
     // Questa regex controlla se l'email contiene almeno un carattere prima della chiocciola, un dominio e un TLD alla fine.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
-        return next(ErrorFactory.getError(AppErrorNames.INVALID_EMAIL));
+        return next(ErrorFactory.getError(AppErrorEnum.INVALID_EMAIL));
     }
 
     next(); // checkPassword()
