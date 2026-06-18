@@ -53,10 +53,10 @@ export class UserController{
   public createUtente = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if(await this.userDAO.findByEmail(req.body.email)){
-        res.json(ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS));
+        return res.json(ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS));
       }
       if(await this.userDAO.findByUsername(req.body.username)){
-        res.json(ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS));
+        return res.json(ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS));
       }
       const passwordHash = await bcrypt.hash(req.body.password.trim(), this.saltRounds);
       const userInfo: UserCreation = {

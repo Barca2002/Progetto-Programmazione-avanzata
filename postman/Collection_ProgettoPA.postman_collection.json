@@ -26,19 +26,26 @@
                   "pm.test(\"Salvataggio del token nelle variabili d'ambiente\", function () {\r",
                   "    const jsonData = pm.response.json();\r",
                   "    // Controlliamo che il parametro 'token' esista nella risposta\r",
-                  "    pm.expect(jsonData).to.have.property('token');\r",
+                  "    pm.expect(jsonData.data).to.have.property('token');\r",
                   "\r",
                   "    // Controlliamo che il token non sia vuoto o nullo\r",
-                  "    pm.expect(jsonData.token).to.not.be.null;\r",
-                  "    pm.expect(jsonData.token).to.not.be.undefined;\r",
+                  "    pm.expect(jsonData.data.token).to.not.be.null;\r",
+                  "    pm.expect(jsonData.data.token).to.not.be.undefined;\r",
                   "    \r",
-                  "    pm.environment.set(\"JWT_TOKEN_USER\", pm.response.json().token);\r",
+                  "    pm.environment.set(\"JWT_TOKEN_USER\", pm.response.json().data.token);\r",
                   "});\r",
                   ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
                 "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [],
+                "type": "text/javascript"
               }
             }
           ],
@@ -56,10 +63,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}"
+              "raw": "{\r\n    \"email\": \"admin@mail.com\",\r\n    \"password\": \"Admin1\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/testerrore",
+              "raw": "http://{{HOST}}:{{PORT}}/auth/login",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
@@ -67,7 +79,7 @@
               "port": "{{PORT}}",
               "path": [
                 "auth",
-                "testerrore"
+                "login"
               ]
             }
           },
@@ -108,8 +120,12 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [],
-                "type": "text/javascript"
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -127,7 +143,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}"
+              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
               "raw": "http://{{HOST}}:{{PORT}}/check",
@@ -146,7 +167,7 @@
       ]
     },
     {
-      "name": "Placeholder",
+      "name": "Testing",
       "item": [
         {
           "name": "New Request",
@@ -154,15 +175,84 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/auth/testerrore",
+              "raw": "http://{{HOST}}:{{PORT}}/test/success",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
               ],
               "port": "{{PORT}}",
               "path": [
-                "auth",
-                "testerrore"
+                "test",
+                "success"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "UtenteById",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"Test1\",\r\n    \"email\": \"email1@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/user/6",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "user",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateUser",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"ahssffdsdsdsffsdsdssdsddssdddgfgsddvvbdddabfc\",\r\n    \"email\": \"admisdsddsdsdssdsssdddfsdsdn@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/user/create",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "user",
+                "create"
               ]
             }
           },
