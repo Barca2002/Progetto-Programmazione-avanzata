@@ -47,11 +47,16 @@ export const UserModel = db.define<Model<UserAllData, UserCreation>>('users', {
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: DataTypes.NOW
+    defaultValue: DataTypes.NOW,
+    get(this: Model<UserAllData, UserCreation>) {
+      const raw = this.getDataValue('created_at') as unknown as Date;
+      return new Date(raw.getTime() + 2 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+    }
   }
 }, {
   tableName: 'users',
   freezeTableName: true, //serve a dire a sequelize di non pluralizzare il nome della tabella quando lo deduce dal modello
+  createdAt: 'created_at',
   timestamps: false
 });
 

@@ -60,7 +60,7 @@ export const createUtente = async (req: Request, res: Response, next: NextFuncti
 
 export const updateUtente = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id as string);
+    const id = Number(req.params.id);
     const userDAO = new UserDAO();
     const updated = await userDAO.update(id, req.body);
 
