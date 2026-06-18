@@ -48,7 +48,6 @@ export const createUtente = async (req: Request, res: Response, next: NextFuncti
   try {
     const userDAO = new UserDAO();
     const nuovoUtente = await userDAO.create(req.body);
-    console.log(nuovoUtente);
     res.json(removePassword(nuovoUtente));
 
   } catch (error) {

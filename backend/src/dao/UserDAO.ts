@@ -1,5 +1,7 @@
 import { UserModel } from '../models/UserModel.js';
 import type { UserCreation } from '../models/UserModel.js';
+import { AppErrorEnum } from '../utils/StatusMessages.js';
+import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 interface IUserDAO {
   create(data: UserCreation): Promise<UserModel>;
@@ -11,7 +13,13 @@ interface IUserDAO {
 
 export class UserDAO implements IUserDAO {
   async create(data: UserCreation): Promise<UserModel> {
-    return await UserModel.create(data);
+    try{
+      let utente = await UserModel.create(data);
+      return utente;
+    } catch (err){
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    }
+    
   }
 
   async findById(user_id: number): Promise<UserModel | null> {
