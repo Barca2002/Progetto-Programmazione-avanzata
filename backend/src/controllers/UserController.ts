@@ -3,10 +3,13 @@ import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
+import bcrypt from 'bcrypt';
+import { UserCreation } from "../models/UserModel.js";
 
 export class UserController{
 
   public readonly userDAO = new UserDAO();
+  public readonly saltRounds = 12;
   // Helper method per togliere la password al momento della risposta della creazione.
   public removePassword = (user: any) => {
     const userPlain = user.get({ plain: true });
@@ -40,7 +43,7 @@ export class UserController{
       }
 
       //Torna l'utente che voglio vedere
-      res.json(utente);
+      res.json(this.removePassword(utente));
 
     } catch (error) {
       return ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
@@ -55,7 +58,14 @@ export class UserController{
       if(await this.userDAO.findByUsername(req.body.username)){
         res.json(ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS));
       }
-      const nuovoUtente = await this.userDAO.create(req.body);
+      const passwordHash = await bcrypt.hash(req.body.password.trim(), this.saltRounds);
+      const userInfo: UserCreation = {
+        "username": req.body.username.trim(),
+        "email": req.body.email,
+        "password": passwordHash,
+        "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegato
+      }
+      const nuovoUtente = await this.userDAO.create(userInfo);
       res.json(this.removePassword(nuovoUtente));
 
     } catch (error) {
