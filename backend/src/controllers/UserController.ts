@@ -19,9 +19,9 @@ export const getUtenti = async (req: Request, res: Response, next: NextFunction)
 
 export const getUtenteById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = req.params.id; //Vuole per forza che sia 
+    const id = Number(req.params.id);
     const userDAO = new UserDAO();
-    const utente = await userDAO.findById(parseInt(id));
+    const utente = await userDAO.findById(id);
 
     if (!utente) {
       return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
@@ -49,7 +49,7 @@ export const createUtente = async (req: Request, res: Response, next: NextFuncti
 
 export const updateUtente = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id as string);
+    const id = Number(req.params.id);
     const userDAO = new UserDAO();
     const updated = await userDAO.update(id, req.body);
 
