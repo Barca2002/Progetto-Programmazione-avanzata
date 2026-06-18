@@ -1,5 +1,5 @@
-import { AppSuccess, SuccessDataStructure } from "../../models/AppSuccessModel.js";
-import { SUCCESS_LIST, AppSuccessName } from "../../utils/StatusMessages.js";
+import { AppSuccess, SuccessDataStructure } from "../models/AppSuccessModel.js";
+import { SUCCESS_LIST, AppSuccessName } from "../utils/StatusMessages.js";
 
 export class SuccessFactory {
     // Metodo statico per ottenere un'istanza di AppSuccess basata sul nome del success e i dati da restituire (eventualmente nulli).

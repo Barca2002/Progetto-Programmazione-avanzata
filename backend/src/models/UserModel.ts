@@ -1,5 +1,5 @@
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
-import { DatabaseConnection } from '../patterns/singleton/DBConnection.js';
+import { DatabaseConnection } from '../singleton/DBConnection.js';
 
 const db: Sequelize = DatabaseConnection.connect()  //Mi connetto al db
 
@@ -17,7 +17,8 @@ export interface UserAllData {
 export interface UserCreation extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id' | 'created_at'> {}
 
 // <Model<UserAllData, UserCreation>>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
-export const UserModel = db.define<Model<UserAllData, UserCreation>>('users', { //Voglio ottenere un UserModel definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
+//Voglio ottenere un UserModel definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
+export const UserModel = db.define<Model<UserAllData, UserCreation>>('users', { 
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

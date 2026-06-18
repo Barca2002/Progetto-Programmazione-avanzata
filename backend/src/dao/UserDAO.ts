@@ -1,6 +1,6 @@
-import { UserModel } from '../../models/UserModel.js';
+import { UserModel } from '../models/UserModel.js';
 import { Model } from 'sequelize';
-import type { UserAllData, UserCreation } from '../../models/UserModel.js'; //Serve per importare le interfacce 
+import type { UserAllData, UserCreation } from '../models/UserModel.js'; //Serve per importare le interfacce 
 
 // Definisce il contratto del DAO: quali operazioni deve offrire
 interface IUserDAO {

@@ -11,17 +11,17 @@ import {
 export const userRoutes = Router();
 
 // GET tutti utenti
-userRoutes.get("/utentiAll", getUtenti);
+userRoutes.get("/all", getUtenti);
 
 // GET utente per ID
-userRoutes.get("/utenti/:id", getUtenteById);
+userRoutes.get("/:id", getUtenteById);
 
 // CREATE utente
-userRoutes.post("/utente", createUtente);
+userRoutes.post("/crea", createUtente);
 
 // UPDATE utente
-userRoutes.put("/utentiUpdate/:id", updateUtente);
+userRoutes.put("/update/:id", updateUtente);
 
 // DELETE utente
-userRoutes.delete("/utentiDelete/:id", deleteUtente);
+userRoutes.delete("/delete/:id", deleteUtente);
 

@@ -1,7 +1,14 @@
-import { UserDAO } from "../patterns/dao/UserDAO.js";
+import { UserDAO } from "../dao/UserDAO.js";
 import { Request, Response, NextFunction } from "express";
-import { ErrorFactory } from "../patterns/factory/ErrorFactory.js";
+import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
+import { UserAllData, UserCreation } from "../models/UserModel.js";
+
+// Helper method per togliere la password al momento della risposta della creazione.
+const removePassword = (user: any) => {
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+};
 
 
 //Quando chiamo una qualsiasi di queste funzioni sotto, passo per il DAO (intermediario) che sa come tradurre le operazioni in operazioni di Sequelize, non uso direttamente quelle di Sequelize.
@@ -19,12 +26,15 @@ export const getUtenti = async (req: Request, res: Response, next: NextFunction)
 
 export const getUtenteById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = req.params.id; //Vuole per forza che sia 
+    const id = Number(req.params.id);
+    if (isNaN(id) || id <= 0){
+      return next(ErrorFactory.getError(AppErrorEnum.INVALID_USERID));
+    }
     const userDAO = new UserDAO();
-    const utente = await userDAO.findById(parseInt(id));
+    const utente = await userDAO.findById(id);
 
     if (!utente) {
-      return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      return next(ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND));
     }
 
     //Torna l'utente che voglio vedere
@@ -39,8 +49,9 @@ export const createUtente = async (req: Request, res: Response, next: NextFuncti
   try {
     const userDAO = new UserDAO();
     const nuovoUtente = await userDAO.create(req.body);
-
-    res.json(nuovoUtente);
+    console.log(nuovoUtente);
+    console.log(removePassword(nuovoUtente));
+    res.json(removePassword(nuovoUtente));
 
   } catch (error) {
     next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));

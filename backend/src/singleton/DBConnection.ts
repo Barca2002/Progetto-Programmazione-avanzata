@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
-import { AppErrorEnum } from '../../utils/StatusMessages.js';
+import { AppErrorEnum } from '../utils/StatusMessages.js';
 
 dotenv.config();
 

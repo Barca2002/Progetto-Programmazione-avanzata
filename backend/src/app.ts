@@ -31,7 +31,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.log("Errore imprevisto: " + err);
     return res.status(500).json({
       status: 'error_generic',
-      message: 'Errore interno del server'
+      message: 'Errore interno del server.'
     });
   }
 });
