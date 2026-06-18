@@ -33,6 +33,7 @@ export const SUCCESS_LIST = {
     USER_REGISTERED: { statusCode: 201, message: "Registrazione effettuata con successo." },
     USER_FOUND:      { statusCode: 200, message: "Utente trovato." },
     ROLE_UPDATED:    { statusCode: 200, message: "Il ruolo dell'utente è stato aggiornato." },
+    USER_DELETED:    { statusCode: 200, message: "L'utente è stato eliminato con successo." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

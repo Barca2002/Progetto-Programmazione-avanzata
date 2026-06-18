@@ -28,7 +28,6 @@ export class UserDAO implements IUserDAO {
     } catch (err){
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     }
-    
   }
 
   async findAll(): Promise<UserModel[]> {
@@ -37,7 +36,16 @@ export class UserDAO implements IUserDAO {
     } catch (err){
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
-    
+  }
+
+  async findByEmail(email: string): Promise<UserModel | null> {
+    // Siccome a noi serve che non trova l'email, non possiamo mettere l'errore metterlo
+      return await UserModel.findOne({ where: { email } });
+  }
+
+  async findByUsername(username: string): Promise<UserModel | null> {
+    // Stessa cosa per l'username
+      return await UserModel.findOne({ where: { username } });
   }
 
   async update(user_id: number, data: Partial<UserCreation>): Promise<number> {

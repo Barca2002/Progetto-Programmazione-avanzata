@@ -1,92 +1,100 @@
 import { UserDAO } from "../dao/UserDAO.js";
 import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
-import { AppErrorEnum } from "../utils/StatusMessages.js";
+import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
+import { SuccessFactory } from "../factory/SuccessFactory.js";
 
-// Helper method per togliere la password al momento della risposta della creazione.
-const removePassword = (user: any) => {
-  const userPlain = user.get({ plain: true });
-  const { password, ...userWithoutPassword } = userPlain;
-  return userWithoutPassword;
-};
+export class UserController{
 
-//Quando chiamo una qualsiasi di queste funzioni sotto, passo per il DAO (intermediario) che sa come tradurre le operazioni in operazioni di Sequelize, non uso direttamente quelle di Sequelize.
-export const getUtenti = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const userDAO = new UserDAO();
-    const utenti = await userDAO.findAll();
+  public readonly userDAO = new UserDAO();
+  // Helper method per togliere la password al momento della risposta della creazione.
+  public removePassword = (user: any) => {
+    const userPlain = user.get({ plain: true });
+    const { password, ...userWithoutPassword } = userPlain;
+    return userWithoutPassword;
+  };
 
-    res.json(utenti);
+  //Quando chiamo una qualsiasi di queste funzioni sotto, passo per il DAO (intermediario) che sa come tradurre le operazioni in operazioni di Sequelize, non uso direttamente quelle di Sequelize.
+  public getUtenti = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const utenti = await this.userDAO.findAll();
 
-  } catch (error) {
-    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-  }
-};
+      res.json(utenti);
 
-export const getUtenteById = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const id = Number(req.params.id);
-    if (isNaN(id) || id <= 0){
-      return next(ErrorFactory.getError(AppErrorEnum.INVALID_USERID));
+    } catch (error) {
+      return ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
-    const userDAO = new UserDAO();
-    const utente = await userDAO.findById(id);
+  };
 
-    if (!utente) {
-      return next(ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND));
+  public getUtenteById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Number(req.params.id);
+      if (isNaN(id) || id <= 0){
+        return ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
+      }
+      const userDAO = new UserDAO();
+      const utente = await userDAO.findById(id);
+
+      if (!utente) {
+        return next(ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND));
+      }
+
+      //Torna l'utente che voglio vedere
+      res.json(utente);
+
+    } catch (error) {
+      return ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
+  };
 
-    //Torna l'utente che voglio vedere
-    res.json(utente);
+  public createUtente = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if(await this.userDAO.findByEmail(req.body.email)){
+        res.json(ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS));
+      }
+      if(await this.userDAO.findByUsername(req.body.username)){
+        res.json(ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS));
+      }
+      const nuovoUtente = await this.userDAO.create(req.body);
+      res.json(this.removePassword(nuovoUtente));
 
-  } catch (error) {
-    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-  }
-};
-
-export const createUtente = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const userDAO = new UserDAO();
-    const nuovoUtente = await userDAO.create(req.body);
-    res.json(removePassword(nuovoUtente));
-
-  } catch (error) {
-    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-  }
-};
-
-export const updateUtente = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const id = Number(req.params.id);
-    const userDAO = new UserDAO();
-    const updated = await userDAO.update(id, req.body);
-
-    if (!updated) {
-      return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+    } catch (error) {
+      return ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
+  };
 
-    //mi ritorna l'user aggiornato dopo l'update
-    const utenteAggiornato = await userDAO.findById(id);
-    res.json(utenteAggiornato);
+  public updateUtente = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Number(req.params.id);
+      const updated = await this.userDAO.update(id, req.body);
 
-  } catch (error) {
-    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-  }
-};
+      if (!updated) {
+        res.json(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
 
-export const deleteUtente = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const id = parseInt(req.params.id as string);
-    const userDAO = new UserDAO();
-    const deleted = await userDAO.delete(id);
+      //mi ritorna l'user aggiornato dopo l'update
+      const utenteAggiornato = await this.userDAO.findById(id);
+      res.json(utenteAggiornato);
 
-    if (!deleted) {
-      return next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+    } catch (error) {
+      next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
     }
+  };
 
-    res.json({ message: "USER_DELETED" });
+  public deleteUtente = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = parseInt(req.params.id as string);
+      const deleted = await this.userDAO.delete(id);
 
-  } catch (error) {
-    next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-  }
-};
+      if (!deleted) {
+        res.json(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null));
+
+    } catch (error) {
+      next(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+    }
+  };
+}
+
