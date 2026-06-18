@@ -2,14 +2,13 @@ import { UserDAO } from "../dao/UserDAO.js";
 import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
-import { UserAllData, UserCreation } from "../models/UserModel.js";
 
 // Helper method per togliere la password al momento della risposta della creazione.
 const removePassword = (user: any) => {
-  const { password, ...userWithoutPassword } = user;
+  const userPlain = user.get({ plain: true });
+  const { password, ...userWithoutPassword } = userPlain;
   return userWithoutPassword;
 };
-
 
 //Quando chiamo una qualsiasi di queste funzioni sotto, passo per il DAO (intermediario) che sa come tradurre le operazioni in operazioni di Sequelize, non uso direttamente quelle di Sequelize.
 export const getUtenti = async (req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +49,7 @@ export const createUtente = async (req: Request, res: Response, next: NextFuncti
     const userDAO = new UserDAO();
     const nuovoUtente = await userDAO.create(req.body);
     console.log(nuovoUtente);
-    console.log(removePassword(nuovoUtente));
+    console.log("Prova: " + removePassword(nuovoUtente));
     res.json(removePassword(nuovoUtente));
 
   } catch (error) {
