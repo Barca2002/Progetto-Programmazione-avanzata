@@ -17,7 +17,7 @@ userRoutes.get("/all", getUtenti);
 userRoutes.get("/:id", getUtenteById);
 
 // CREATE utente
-userRoutes.post("/crea", createUtente);
+userRoutes.post("/create", createUtente);
 
 // UPDATE utente
 userRoutes.put("/update/:id", updateUtente);
