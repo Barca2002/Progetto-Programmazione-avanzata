@@ -16,7 +16,7 @@ export interface UserCreation extends Omit<Optional<UserAllData, 'is_admin'>, 'u
 // <Model<UserAllData, UserCreation>>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
 //Voglio ottenere un UserModel definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
 export class UserModel extends Model<UserAllData, UserCreation> implements UserAllData{
-  // Per evitare problemi, dichiariamo gli attributi
+  // Per evitare problemi, dichiariamo gli attributi, così non ci sono campi non dichiarati/non presenti.
   declare user_id: number;
   declare username: string;
   declare email: string;

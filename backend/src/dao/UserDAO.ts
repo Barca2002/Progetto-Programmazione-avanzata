@@ -23,20 +23,39 @@ export class UserDAO implements IUserDAO {
   }
 
   async findById(user_id: number): Promise<UserModel | null> {
-    return await UserModel.findByPk(user_id);
+    try{
+      return await UserModel.findByPk(user_id);
+    } catch (err){
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    }
+    
   }
 
   async findAll(): Promise<UserModel[]> {
-    return await UserModel.findAll();
+    try{
+      return await UserModel.findAll();
+    } catch (err){
+      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+    }
+    
   }
 
   async update(user_id: number, data: Partial<UserCreation>): Promise<number> {
-    const [affectedCount] = await UserModel.update(data, { where: { user_id } });
-    return affectedCount;
+    try{
+      const [affectedCount] = await UserModel.update(data, { where: { user_id } });
+      return affectedCount;
+    } catch (err){
+      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+    }
   }
 
   async delete(user_id: number): Promise<number> {
-    return await UserModel.destroy({ where: { user_id } });
+    try{
+      return await UserModel.destroy({ where: { user_id } });
+    } catch (err){
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    }
+    
   }
 }
 

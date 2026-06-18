@@ -9,7 +9,7 @@ export const ERROR_LIST = {
     INVALID_PASSWORD:        { statusCode: 400, message: "La password fornita non è in un formato valido." },
     INVALID_USERNAME:        { statusCode: 400, message: "Lo username fornito non è in un formato valido." },
     INVALID_USERID:        { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
-    INCORRECT_DATA:         { statusCode: 400, message: "I dati forniti non sono corretti." },
+    INCORRECT_DATA:         { statusCode: 400, message: "I dati forniti non sono corretti o sono già stati usati." },
     EMAIL_ALREADY_EXISTS:    { statusCode: 409, message: "L'email fornita è già esistente." },
     USERNAME_ALREADY_EXISTS: { statusCode: 409, message: "Lo username fornito è già esistente e associato ad un altro utente." },
     JWT_SECRET_MISSING:      { statusCode: 500, message: "Chiave privata JWT non configurata nel file env." },
