@@ -10,7 +10,7 @@ import { User } from './models/UserModel.js';
 
 dotenv.config();
 
-const PORT = process.env.LISTEN_PORT;
+const PORT = process.env.APP_PORT;
 const db: Sequelize = DatabaseConnection.connect();
 
 // Inizializzazione del model User
