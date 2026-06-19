@@ -1,6 +1,7 @@
+
 -- seeding della tabella users
 
-INSERT INTO db_app.users (username, email, password, is_admin) VALUES
+INSERT INTO users (username, email, password, is_admin) VALUES
 ('admin1', 'admin1@mail.com', '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', TRUE), -- password: Admin123
 ('admin2', 'admin2@mail.com', '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', TRUE), -- password: Admin234
 ('user1', 'user1@mail.com', '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE), -- password: User1234

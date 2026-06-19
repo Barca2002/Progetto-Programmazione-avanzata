@@ -7,12 +7,11 @@ import * as z from "zod";
 export const loginValidationPipeline = [checkEmail, checkPassword];
 export const registerValidationPipeline = [checkUsername, checkEmail, checkPassword];
 
-// Definizione dello schema di validazione dell'email tramite Zod. L'email deve essere lunga al massimo 255 caratteri.
-const emailSchema = z.email().max(255);
-
-// La password deve essere lunga tra 8 e 32 caratteri alfanumerici e deve comprendere almeno un numero.
-const passwordSchema = z.string().min(8).max(32).regex(/^(?=.*[A-Za-z])(?=.*\d).+$/);
+// Definizione dello schema di validazione dell'email, della password e dell'username tramite Zod. L'email deve essere lunga al massimo 255 caratteri. 
+// La password deve essere lunga tra 8 e 32 caratteri alfanumerici e deve comprendere almeno un numero. 
 // L'username deve essere lungo tra 4 e 50 caratteri, inoltre non ammette caratteri speciali.
+const emailSchema = z.email().max(255);
+const passwordSchema = z.string().min(8).max(32).regex(/^(?=.*[A-Za-z])(?=.*\d).+$/);
 const usernameSchema = z.string().min(4).max(50).regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]+$/);
 
 // Validazione username. Controlla se l'username è presente e segue lo schema definito con Zod.
@@ -45,5 +44,7 @@ function checkPassword(req: Request, res: Response, next: NextFunction) {
     }
     next(); // Passa il controllo alla funzione che ha chiamato la catena, in questo caso all'authController.
 }
+
+
 
 

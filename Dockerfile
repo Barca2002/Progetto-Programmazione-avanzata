@@ -10,7 +10,7 @@ RUN npm install
 
 COPY . .
 
-# Porta esposta dell'applicazione
+# Porta dell'applicazione
 EXPOSE 3000
 
 # Comando da eseguire all'avvio del container, in questo caso avvia l'applicazione.
