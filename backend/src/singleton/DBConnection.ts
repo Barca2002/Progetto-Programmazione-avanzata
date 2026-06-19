@@ -6,9 +6,8 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 dotenv.config();
 
 export class DatabaseConnection {
-    private static connDB: DatabaseConnection; //PATTERN SINGLETON: unica istanza di connessione (stesso nome della classe); 
-    // static: ne esiste solo una per tutta la classe, quindi se la chiamo sono sicuro di usare questa e non crearne un'altra 
-    private connection: Sequelize; //connessione di tipo Sequelize
+    private static connDB: DatabaseConnection; //PATTERN SINGLETON: unica istanza di connessione (attributo statico con lo stesso tipo della classe); 
+    private connection: Sequelize; //connessione con ORM Sequelize
     
     private constructor() {
       const {
@@ -18,11 +17,11 @@ export class DatabaseConnection {
         DB_USER,
         DB_PASSWORD,
       } = process.env;
-
+      // I parametri della connessione devono essere presenti nel .env
       if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER || !DB_PASSWORD) {
         throw ErrorFactory.getError(AppErrorEnum.ENV_VARIABLES_MISSING);
       }
-
+      // Istanziamo la connessione con Sequelize
       this.connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
         host: DB_HOST!,
         port: parseInt(DB_PORT)!,
@@ -32,7 +31,7 @@ export class DatabaseConnection {
 	}
 
   public static connect(): Sequelize {
-      if (!DatabaseConnection.connDB) { //se non esiste la crea
+      if (!DatabaseConnection.connDB) { //se non esiste la connessione la crea
           DatabaseConnection.connDB = new DatabaseConnection();
       }
       return DatabaseConnection.connDB.connection; //torna la connessione attiva
