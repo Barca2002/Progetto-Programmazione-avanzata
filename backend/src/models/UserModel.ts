@@ -17,12 +17,12 @@ export interface UserCreationData extends Omit<Optional<UserAllData, 'is_admin'>
 //Voglio ottenere un User definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
 export class User extends Model<UserAllData, UserCreationData> implements UserAllData{
   // Per evitare problemi, dichiariamo gli attributi, così non ci sono campi non dichiarati/non presenti.
-  user_id!: number;
-  username!: string;
-  email!: string;
-  password!: string;
-  is_admin!: boolean;
-  created_at!: Date;
+  declare user_id: number;
+  declare username: string;
+  declare email: string;
+  declare password: string;
+  declare is_admin: boolean;
+  declare created_at: Date;
 
   static inizializzaModel(sequelize: Sequelize): typeof User{
     return User.init({

@@ -41,6 +41,7 @@ export class AdminController{
 
       //Torna l'utente che voglio vedere
       const responseData = {"username": utente.username, "email": utente.email, "is_admin": utente.is_admin};
+
       res.json(responseData);
 
     } catch (err) {
