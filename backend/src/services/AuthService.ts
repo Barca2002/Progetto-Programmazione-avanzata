@@ -12,20 +12,26 @@ export class AuthService{
     private privateKey: string;
 
      constructor() {
-        // Lettura della chiave privata
-        const keyPath = process.env.JWT_SECRET_KEY_PATH || "./keys/jwtRS256.key";
-        if (!keyPath){
+        // Lettura della chiave privata dal .env
+        const privateKeyBase64 = process.env.JWT_PRIVATE_KEY;
+        if (!privateKeyBase64){
+            
             throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
         }
-        this.privateKey = fs.readFileSync(keyPath).toString();
+        try {
+        // Decodifica della chiave da Base64 a formato PEM originale
+        this.privateKey = Buffer.from(privateKeyBase64, 'base64').toString('utf8');
+        } catch (error) {
+        throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
+        }
     }
-
+    // Si prende l'utente, identificato univocamente dall'email, per comparare la password e poi prendere i suoi dati per generare il token JWT
     public async checkCreds(email:string, password:string): Promise<string>{
-        // Prendiamo l'utente per comparare la password e poi prendere i suoi dati per generare il token JWT
+        
         const user = await this.userDao.findByEmail(email);
-        const isMatch = await bcrypt.compare(password.trim(), user!.get("password") as string);
+        const pwdMatch = await bcrypt.compare(password.trim(), user!.get("password") as string);
 
-        if (!isMatch) {
+        if (!pwdMatch) {
             throw ErrorFactory.getError(AppErrorEnum.INCORRECT_PASSWORD);
         }
 
