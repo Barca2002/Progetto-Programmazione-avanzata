@@ -2,7 +2,5 @@
     "watch": ["backend/src"],
     "ext": "ts,json",
     "ignore": ["node_modules"],
-    "exec": "tsx --no-cache backend/src/app.ts",
-    "legacyWatch": true
+    "exec": "bun backend/src/app.ts"
 }
-

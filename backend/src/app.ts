@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 app.use("/test", testRouter);
 app.use("/auth", authRouter);
 app.use("/admin", adminRoutes);
-app.use("/area", geofenceareaRoutes);
+app.use("/geoarea", geofenceareaRoutes);
 app.use("/imbarcazione", imbarcazioneRoutes);
 
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR
