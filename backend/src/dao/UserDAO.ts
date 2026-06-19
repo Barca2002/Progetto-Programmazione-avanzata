@@ -1,18 +1,18 @@
 import { User } from '../models/UserModel.js';
-import type { UserCreation } from '../models/UserModel.js';
+import type { UserCreationData } from '../models/UserModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 interface IUserDAO {
-  create(data: UserCreation): Promise<User>;
+  create(data: UserCreationData): Promise<User>;
   findById(user_id: number): Promise<User | null>;
   findAll(): Promise<User[]>;
-  update(user_id: number, data: Partial<UserCreation>): Promise<number>;
+  update(user_id: number, data: Partial<UserCreationData>): Promise<number>;
   delete(user_id: number): Promise<number>; 
 }
 
 export class UserDAO implements IUserDAO {
-  async create(data: UserCreation): Promise<User> {
+  async create(data: UserCreationData): Promise<User> {
     try{
       let utente = await User.create(data);
       return utente;
@@ -48,7 +48,7 @@ export class UserDAO implements IUserDAO {
       return await User.findOne({ where: { username } });
   }
 
-  async update(user_id: number, data: Partial<UserCreation>): Promise<number> {
+  async update(user_id: number, data: Partial<UserCreationData>): Promise<number> {
     try{
       const [affectedCount] = await User.update(data, { where: { user_id } });
       return affectedCount;
