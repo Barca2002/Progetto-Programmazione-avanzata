@@ -76,7 +76,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"admin1@mail.com\",\r\n    \"password\": \"Admin123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"utentessshbsud@mail.com\",\r\n    \"password\": \"Admin123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -93,6 +93,44 @@
               "path": [
                 "auth",
                 "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "bearer"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{API_KEY}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"usernamefigo1\",\r\n    \"email\": \"utentessshbsud@mail.com\",\r\n    \"password\": \"Admin123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/auth/register",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "auth",
+                "register"
               ]
             }
           },
@@ -148,7 +186,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"Test1\",\r\n    \"email\": \"email1@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
+              "raw": "",
               "options": {
                 "raw": {
                   "language": "json"
@@ -156,15 +194,15 @@
               }
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/user/6",
+              "raw": "http://{{HOST}}:{{PORT}}/admin/4",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
               ],
               "port": "{{PORT}}",
               "path": [
-                "user",
-                "6"
+                "admin",
+                "4"
               ]
             }
           },
