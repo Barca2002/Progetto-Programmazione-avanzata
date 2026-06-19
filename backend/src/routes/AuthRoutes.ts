@@ -17,8 +17,8 @@ authRouter.post('/login', loginValidationPipeline, async (req: Request, res: Res
     await authController.login(req, res);
 });
 
-authRouter.post('/register', registerValidationPipeline, (req: Request, res: Response) => {
-    //authController.register(req, res);
+authRouter.post('/register', registerValidationPipeline, async (req: Request, res: Response) => {
+    await authController.register(req, res);
 });
 
 

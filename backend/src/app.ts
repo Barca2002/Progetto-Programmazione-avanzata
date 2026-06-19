@@ -2,7 +2,7 @@ import express, { Response, Request, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/AuthRoutes.js';
 import { testRouter } from './routes/TestRoutes.js';
-import { userRoutes } from './routes/UserRoutes.js';
+import { adminRoutes } from './routes/AdminRoutes.js';
 import { AppError } from './models/AppErrorModel.js';
 import { Sequelize } from 'sequelize';
 import { DatabaseConnection } from './singleton/DBConnection.js';
@@ -13,6 +13,7 @@ dotenv.config();
 const PORT = process.env.LISTEN_PORT;
 const db: Sequelize = DatabaseConnection.connect();
 
+// Inizializzazione del model User
 User.inizializzaModel(db);
 
 const app = express();
@@ -24,12 +25,12 @@ app.get('/', (req, res) => {
     Esegui l'accesso tramite la rotta "/auth/login".</h1>`);
 });
 
-// ROUTES
+// Rotte varie
 app.use("/test", testRouter);
 app.use("/auth", authRouter);
-app.use("/user", userRoutes);
+app.use("/admin", adminRoutes);
 
-// Error handler, va messo alla fine di tutte le rotte
+// Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {
     err.send(res);

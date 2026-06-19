@@ -14,6 +14,6 @@ export class AppError extends Error {
 
     // Setta lo status code dell'errore e restituisce la risposta in JSON con il nome e messaggio dell'errore, da usare nell'error handler di Express.
     send(res: Response) {
-        res.status(this.statusCode).json({"error_name": this.statusName, "message": this.message});
+        res.status(this.statusCode).json({"statusCode": this.statusCode, "statusName": this.statusName, "message": this.message});
     }
 }

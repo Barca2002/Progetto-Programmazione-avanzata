@@ -26,7 +26,7 @@ export class AuthService{
         const isMatch = await bcrypt.compare(password.trim(), user!.get("password") as string);
 
         if (!isMatch) {
-            throw ErrorFactory.getError(AppErrorEnum.INVALID_PASSWORD);
+            throw ErrorFactory.getError(AppErrorEnum.INCORRECT_PASSWORD);
         }
 
         return await this.generateJWT(user!);
