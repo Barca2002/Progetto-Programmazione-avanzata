@@ -5,7 +5,7 @@ import { AppError } from "../models/AppErrorModel.js";
 import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { UserDAO } from "../dao/UserDAO.js";
-import { UserCreation } from "../models/UserModel.js";
+import { UserCreationData } from "../models/UserModel.js";
 import bcrypt from 'bcrypt';
 
 export class AuthController {
@@ -56,7 +56,7 @@ export class AuthController {
             }
             // Creiamo il nuovo utente
             const passwordHash = await bcrypt.hash(req.body.password.trim(), this.saltRounds);
-            const userInfo: UserCreation = {
+            const userInfo: UserCreationData = {
                 "username": req.body.username.trim(),
                 "email": req.body.email,
                 "password": passwordHash,
