@@ -7,6 +7,10 @@ import { AppError } from './models/AppErrorModel.js';
 import { Sequelize } from 'sequelize';
 import { DatabaseConnection } from './singleton/DBConnection.js';
 import { User } from './models/UserModel.js';
+import { Geofencearea } from './models/GeofenceareaModel.js';
+import { geofenceareaRoutes } from './routes/GeofenceareaRoutes.js';
+import { Imbarcazione } from './models/ImbarcazioneModel.js';
+import { imbarcazioneRoutes } from './routes/ImbarcazioneRoutes.js';
 
 dotenv.config();
 
@@ -15,6 +19,8 @@ const db: Sequelize = DatabaseConnection.connect();
 
 // Inizializzazione del model User
 User.inizializzaModel(db);
+Geofencearea.inizializzaModel(db);
+Imbarcazione.inizializzaModel(db);
 
 const app = express();
 
@@ -29,6 +35,8 @@ app.get('/', (req, res) => {
 app.use("/test", testRouter);
 app.use("/auth", authRouter);
 app.use("/admin", adminRoutes);
+app.use("/area", geofenceareaRoutes);
+app.use("/imbarcazione", imbarcazioneRoutes);
 
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -1,0 +1,94 @@
+import { ImbarcazioneDAO } from "../dao/ImbarcazioneDAO.js";
+import { Request, Response, NextFunction } from "express";
+import { ErrorFactory } from "../factory/ErrorFactory.js";
+import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
+import { SuccessFactory } from "../factory/SuccessFactory.js";
+import { AppError } from "../models/AppErrorModel.js";
+
+export class ImbarcazioneController{
+
+  public readonly imbarcazioneDAO = new ImbarcazioneDAO();
+
+  //Quando chiamo una qualsiasi di queste funzioni sotto, passo per il DAO (intermediario) che sa come tradurre le operazioni in operazioni di Sequelize, non uso direttamente quelle di Sequelize.
+  public getImbarcazioni = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const imbarcazioni = await this.imbarcazioneDAO.findAll();
+
+      res.json(imbarcazioni);
+
+    } catch (err) {
+      if (err instanceof AppError){
+          (err as AppError).send(res)
+      } else {
+          res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
+  public getImbarcazioneById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const mmsi = Number(req.params.mmsi);
+      if (isNaN(mmsi) || mmsi <= 0){
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
+      
+      const imbarcazione = await this.imbarcazioneDAO.findById(mmsi);
+
+      if (!imbarcazione) {
+        return next(ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND));
+      }
+
+      //Torna l'imbarcazione che voglio vedere
+      res.json(imbarcazione);
+
+    } catch (err) {
+      if (err instanceof AppError){
+          (err as AppError).send(res)
+      } else {
+          res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
+  public updateImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const mmsi = Number(req.params.mmsi);
+      const updated = await this.imbarcazioneDAO.update(mmsi, req.body);
+
+      if (!updated) {
+        res.json(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+
+      //mi ritorna l'imbarcazione aggiornata dopo l'update
+      const imbarcazioneAggiornata = await this.imbarcazioneDAO.findById(mmsi);
+      res.json(imbarcazioneAggiornata);
+
+    } catch (err) {
+      if (err instanceof AppError){
+          (err as AppError).send(res)
+      } else {
+          res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
+  public deleteImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const mmsi = parseInt(req.params.mmsi as string);
+      const deleted = await this.imbarcazioneDAO.delete(mmsi);
+
+      if (!deleted) {
+        res.json(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_DELETED, null));
+
+    } catch (err) {
+      if (err instanceof AppError){
+          (err as AppError).send(res)
+      } else {
+          res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+}

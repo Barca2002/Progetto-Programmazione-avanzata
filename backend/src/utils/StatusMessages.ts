@@ -35,6 +35,10 @@ export const ERROR_LIST = {
     { statusCode: 401, message: "Token JWT non fornito." },
     USER_NOT_FOUND:
     { statusCode: 404, message: "Utente non trovato." },
+    GEOAREA_NOT_FOUND:
+    { statusCode: 404, message: "Geoarea non trovata." },
+    IMBARCAZIONE_NOT_FOUND:
+    { statusCode: 404, message: "Imbarcazione non trovata." },
     NOT_ADMIN:
     { statusCode: 403, message: "Accesso riservato agli amministratori." },
 } as const;
@@ -58,6 +62,10 @@ export const SUCCESS_LIST = {
     { statusCode: 200, message: "Il ruolo dell'utente è stato aggiornato." },
     USER_DELETED:
     { statusCode: 200, message: "L'utente è stato eliminato con successo." },
+    AREA_DELETED:
+    { statusCode: 200, message: "L'area è stata eliminata con successo." },
+    IMBARCAZIONE_DELETED:
+    { statusCode: 200, message: "L'imbarcazione è stata eliminata con successo." }
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

@@ -54,15 +54,7 @@ export class User extends Model<UserAllData, UserCreationData> implements UserAl
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-      // Questa funzione viene chiamata ogni volta che visualizziamo il campo, ma non modifica il valore
-      get(this: User) {
-      const raw = this.getDataValue('created_at');
-      if (!raw) return raw;
-        const date = new Date(raw);
-        date.setHours(date.getHours() + 2);
-        return date;
-        }
+      defaultValue: DataTypes.NOW
       }
   }, {
     sequelize, // Istanza di sequelize

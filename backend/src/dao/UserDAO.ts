@@ -1,5 +1,5 @@
 import { User } from '../models/UserModel.js';
-import type { UserCreationData } from '../models/UserModel.js';
+import { UserCreationData } from '../models/UserModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 
