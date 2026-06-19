@@ -4,8 +4,6 @@ services:
     container_name: postgres
     image: postgis/postgis:18-3.6
     restart: always
-    env_file:
-      - .env
     ports:
       - '${DB_PORT}:5432'
     environment:
