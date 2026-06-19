@@ -1,3 +1,6 @@
+-- Abilita l'estensione PostGIS
+-- Alcuni tipi utili sono GEOMETRY() E GEOGRAPHY(), il secondo permette di memorizzare la latitudine e longitudine.
+CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- Eliminazione tabella users se esiste
 DROP TABLE IF EXISTS users;
