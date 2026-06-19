@@ -11,13 +11,13 @@
       "name": "Auth",
       "item": [
         {
-          "name": "LoginUser",
+          "name": "Login",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente JWT_TOKEN con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response.\r",
+                  "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response. Se l'utente è admin, allora il token verrà salvato nella var. di ambiente per admin, altrimenti in quella per gli utenti normali\r",
                   "// Prima si controlla che lo status della risposta è 200, cioè è andata a buon fine.\r",
                   "pm.test(\"Status code is 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
@@ -27,12 +27,21 @@
                   "    const jsonData = pm.response.json();\r",
                   "    // Controlliamo che il parametro 'token' esista nella risposta\r",
                   "    pm.expect(jsonData.data).to.have.property('token');\r",
-                  "\r",
+                  "    const jwtToken = jsonData.data.token;\r",
                   "    // Controlliamo che il token non sia vuoto o nullo\r",
-                  "    pm.expect(jsonData.data.token).to.not.be.null;\r",
-                  "    pm.expect(jsonData.data.token).to.not.be.undefined;\r",
-                  "    \r",
-                  "    pm.environment.set(\"JWT_TOKEN_USER\", pm.response.json().data.token);\r",
+                  "    pm.expect(jwtToken).to.not.be.null;\r",
+                  "    pm.expect(jwtToken).to.not.be.undefined;\r",
+                  "    // Splittiamo il token per prendere il payload e controllare il ruolo.\r",
+                  "    let [jwtHeader, jwtPayload, jwtSignature] = jwtToken.split('.');\r",
+                  "    // Si decodifica da Base64 e poi si parsa in JSON per accedere al campo.\r",
+                  "    let jwtPayloadDecoded = JSON.parse(atob(jwtPayload));\r",
+                  "    // Controllo del ruolo dell'utente.\r",
+                  "    if (jwtPayloadDecoded.is_admin == true) {\r",
+                  "        pm.environment.set(\"JWT_TOKEN_ADMIN\", pm.response.json().data.token);\r",
+                  "    } else {\r",
+                  "        pm.environment.set(\"JWT_TOKEN_USER\", pm.response.json().data.token);\r",
+                  "    }\r",
+                  "\r",
                   "});\r",
                   ""
                 ],
@@ -44,8 +53,12 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [],
-                "type": "text/javascript"
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -63,7 +76,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"admin@mail.com\",\r\n    \"password\": \"Admin1\"\r\n}",
+              "raw": "{\r\n    \"email\": \"admin1@mail.com\",\r\n    \"password\": \"Admin123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -80,85 +93,6 @@
               "path": [
                 "auth",
                 "login"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "LoginAdmin",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Questo script viene eseguito dopo la response e setta la variabile d'ambiente JWT_TOKEN con il valore del parametro \"token\" del body (preso e trasofrmato in json da appunto .json()) della response.\r",
-                  "// Prima si controlla che lo status della risposta è 200, cioè è andata a buon fine.\r",
-                  "pm.test(\"Status code is 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "// Poi salviamo il token nella variabile d'ambiente.\r",
-                  "pm.test(\"Salvataggio del token nelle variabili d'ambiente\", function () {\r",
-                  "    \r",
-                  "    const jsonData = pm.response.json();\r",
-                  "    // Controlliamo che il parametro 'token' esista nella risposta\r",
-                  "    pm.expect(jsonData).to.have.property('token');\r",
-                  "\r",
-                  "    // Controlliamo che il token non sia vuoto o nullo\r",
-                  "    pm.expect(jsonData.token).to.not.be.null;\r",
-                  "    pm.expect(jsonData.token).to.not.be.undefined;\r",
-                  "\r",
-                  "    pm.environment.set(\"JWT_TOKEN_ADMIN\", pm.response.json().token);\r",
-                  "});\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "x-api-key",
-                "value": "{{API_KEY}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"pass\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/check",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}}",
-              "path": [
-                "check"
               ]
             }
           },
@@ -200,6 +134,16 @@
             "disableBodyPruning": true
           },
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_TOKEN_USER}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "body": {
@@ -225,18 +169,33 @@
             }
           },
           "response": []
-        },
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
         {
-          "name": "CreateUser",
+          "name": "UtenteById",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_TOKEN_ADMIN}}",
+                  "type": "string"
+                }
+              ]
             },
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"ahssffdsdsdsffsdsdssdsddssdddgfgsddvvbdddabfc\",\r\n    \"email\": \"admisdsddsdsdssdsssdddfsdsdn@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
+              "raw": "{\r\n    \"username\": \"Test1\",\r\n    \"email\": \"email1@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -244,7 +203,7 @@
               }
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/user/create",
+              "raw": "http://{{HOST}}:{{PORT}}/user/6",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
@@ -252,7 +211,7 @@
               "port": "{{PORT}}",
               "path": [
                 "user",
-                "create"
+                "6"
               ]
             }
           },

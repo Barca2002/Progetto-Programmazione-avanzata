@@ -11,18 +11,14 @@ export class AuthController {
     public readonly userDAO = new UserDAO();
     public readonly saltRounds = 12;
 
-    /**
-     * Costruttore che inizializza l'attributo contenente l'oggetto della classe AuthService
-     */
     constructor() {
         this.authService = new AuthService();
     }
 
     /**
-     * Metodo del controller per la gestione del login. Si occupa di recuperare i dati nel body della richiesta 
-     * per poi mandarli al service che si occupa di generare il token JWT
-     * @param req oggetto Request che contiene i dati della richiesta tra cui, nel body, l'email e la password
-     * @param res oggetto Response che serve per restituire in risposta, il token generato o, se la richiesta non va a buon fine, il rispettivo errore
+     * Metodo del controller per la gestione del login. Si occupa di recuperare i
+     * dati nel body della richiesta per poi mandarli al service che si occupa di
+     * generare il token JWT
      */
     public async login (req: Request, res: Response) {
         try {
@@ -45,11 +41,5 @@ export class AuthController {
         }
     }
 
-    /**
-     * Metodo del controller per la gestione della registrazioen di un nuovo utente. Si occupa di recuperare i dati nel body della richiesta 
-     * per poi mandarli al service che si occupa di creare un nuovo utente e generare il token JWT per l'accesso
-     * @param req oggetto Request che contiene i dati della richiesta tra cui, nel body, lo username, l'email e la password
-     * @param res oggetto Response che serve per restituire in risposta, il token generato o, se la richiesta non va a buon fine, il rispettivo errore
-     */
     
 }

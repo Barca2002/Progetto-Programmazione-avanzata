@@ -6,14 +6,14 @@ import { userRoutes } from './routes/UserRoutes.js';
 import { AppError } from './models/AppErrorModel.js';
 import { Sequelize } from 'sequelize';
 import { DatabaseConnection } from './singleton/DBConnection.js';
-import { UserModel } from './models/UserModel.js';
+import { User } from './models/UserModel.js';
 
 dotenv.config();
 
 const PORT = process.env.LISTEN_PORT;
 const db: Sequelize = DatabaseConnection.connect();
 
-UserModel.inizializzaModel(db);
+User.inizializzaModel(db);
 
 const app = express();
 

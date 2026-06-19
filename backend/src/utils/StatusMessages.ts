@@ -6,7 +6,7 @@ export const ERROR_LIST = {
     EMAIL_NOT_EXIST:         { statusCode: 404, message: "L'email fornita non è associata a nessun utente." },
     INCORRECT_PASSWORD:      { statusCode: 401, message: "La password inserita non è corretta." },
     INVALID_EMAIL:           { statusCode: 400, message: "L'email fornita non è in un formato valido (il formato deve essere test@dominio.com)." },
-    INVALID_PASSWORD:        { statusCode: 400, message: "La password fornita non è in un formato valido." },
+    INVALID_PASSWORD:        { statusCode: 400, message: "La password fornita non è in un formato valido (Deve essere lunga tra 8 e 32 caratteri, comprendere almeno un numero e sono ammessi caratteri alfanumerici)." },
     INVALID_USERNAME:        { statusCode: 400, message: "Lo username fornito non è in un formato valido." },
     INVALID_USERID:        { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
     INCORRECT_DATA:         { statusCode: 400, message: "I dati forniti non sono corretti o sono già stati usati." },

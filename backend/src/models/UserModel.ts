@@ -43,7 +43,7 @@ export class User extends Model<UserAllData, UserCreation> implements UserAllDat
       unique: 'users_email_key'
     },
     password: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING(32),
       allowNull: false
     },
     is_admin: {

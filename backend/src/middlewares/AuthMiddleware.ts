@@ -1,25 +1,49 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
+import * as z from "zod";
 
 // Queste costanti definiscono la pipeline di validazione per le rotte di login e registrazione. Esse specificano la catena di funzioni di validazione devono essere eseguite prima di raggiungere il controller effettivo.
-export const validateLogin = [checkEmail, checkPassword];
-//export const validateRegister = [checkUsername, checkEmail, checkPassword];
+export const loginValidationPipeline = [checkEmail, checkPassword];
+export const registerValidationPipeline = [checkUsername, checkEmail, checkPassword];
 
-// Funzione di validazione dell'email. Controlla se l'email è presente, è una stringa e rispetta un formato valido.
+// Definizione dello schema di validazione dell'email tramite Zod. L'email deve essere lunga al massimo 255 caratteri.
+const emailSchema = z.email().max(255);
+
+// La password deve essere lunga tra 8 e 32 caratteri alfanumerici e deve comprendere almeno un numero.
+const passwordSchema = z.string().min(6).max(32).regex(/^(?=.*[A-Za-z])(?=.*\d).+$/);
+// L'username deve essere lungo tra 4 e 50 caratteri, inoltre non ammette caratteri speciali.
+const usernameSchema = z.string().min(4).max(50).regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]+$/);
+
+// Validazione username. Controlla se l'username è presente e segue lo schema definito con Zod.
+function checkUsername(req: Request, res: Response, next: NextFunction) {
+    const username = req.body.username;
+    
+    if (!username || !usernameSchema.safeParse(username).success) {
+        return next(ErrorFactory.getError(AppErrorEnum.INVALID_USERNAME));
+    }
+    next(); // Passa il controllo a checkEmail
+}
+
+// Validazione email. Controlla se l'email è presente e segue lo schema definito con Zod.
 function checkEmail(req: Request, res: Response, next: NextFunction) {
     const email = req.body.email;
-    // Questa regex controlla se l'email contiene almeno un carattere prima della chiocciola, un dominio e un TLD alla fine.
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+    // Non serve controllare se è una stringa perché zod già lo fa
+    if (!email || !emailSchema.safeParse(email).success) {
         return next(ErrorFactory.getError(AppErrorEnum.INVALID_EMAIL));
     }
 
-    next(); // checkPassword()
+    next(); // Passa il controllo a checkPassword().
 }
 
-// Funzione di validazione della password. Controlla se la password è presente, è una stringa e rispetta un formato valido. 
+// Validazione password. Controlla se la password è presente e segue lo schema definito con Zod.
 function checkPassword(req: Request, res: Response, next: NextFunction) {
     const password = req.body.password;
-    // DA FARE!
+    
+    if (!password || !passwordSchema.safeParse(password).success) {
+        return next(ErrorFactory.getError(AppErrorEnum.INVALID_PASSWORD));
+    }
+    next(); // Passa il controllo alla funzione che ha chiamato la catena, in questo caso all'authController.
 }
+
+

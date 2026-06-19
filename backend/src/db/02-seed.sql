@@ -1,8 +1,8 @@
 -- seeding della tabella users
 
 INSERT INTO db_app.users (username, email, password, is_admin) VALUES
-('admin', 'admin@mail.com', '$2a$12$cAQPbJc2AT.8mK37uy0lhOviymjbOgUUlQgQ0iF2X3e7yNhpTTYiG', TRUE), -- password: Admin1
-('admin2', 'admin2@mail.com', '$2a$12$86/uS4HNswlKLUYRef1WqePM4vdWJka2jx42DephW7l.BScs0ln/G', FALSE), -- password: Admin2
-('user1', 'user1@mail.com', '$2a$12$r1opqg0/utZHmZRgTLGBCORK2ol8Xd1NupXNDRinLxfVikwQGtyw.', FALSE), -- password: User1
-('user2', 'user2@mail.com', '$2a$12$bzIu9FlaQVMk4SF/B8uz7.lUwsW478Rwd2GWoszzBm4xmZ1n0iKg2', FALSE), -- password: User2
-('user3', 'user3@mail.com', '$2a$12$kC7xu23bYH.kOruzvDc7x.UTbzwq8B9OLYBwEi7UTVyChLa7aq0jW', FALSE); -- password: User3
+('admin1', 'admin1@mail.com', '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', TRUE), -- password: Admin123
+('admin2', 'admin2@mail.com', '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', TRUE), -- password: Admin234
+('user1', 'user1@mail.com', '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE), -- password: User1234
+('user2', 'user2@mail.com', '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE), -- password: User2345
+('user3', 'user3@mail.com', '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE); -- password: User3456
