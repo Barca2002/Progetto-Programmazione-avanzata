@@ -14,8 +14,8 @@ export interface UserAllData {
 export interface UserCreation extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id' | 'created_at'> {}
 
 // <Model<UserAllData, UserCreation>>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
-//Voglio ottenere un UserModel definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
-export class UserModel extends Model<UserAllData, UserCreation> implements UserAllData{
+//Voglio ottenere un User definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
+export class User extends Model<UserAllData, UserCreation> implements UserAllData{
   // Per evitare problemi, dichiariamo gli attributi, così non ci sono campi non dichiarati/non presenti.
   declare user_id: number;
   declare username: string;
@@ -24,8 +24,8 @@ export class UserModel extends Model<UserAllData, UserCreation> implements UserA
   declare is_admin: boolean;
   declare created_at: Date;
 
-  static inizializzaModel(sequelize: Sequelize): typeof UserModel{
-    return UserModel.init({
+  static inizializzaModel(sequelize: Sequelize): typeof User{
+    return User.init({
       user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -56,7 +56,7 @@ export class UserModel extends Model<UserAllData, UserCreation> implements UserA
       allowNull: false,
       defaultValue: DataTypes.NOW,
       // Questa funzione viene chiamata ogni volta che visualizziamo il campo, ma non modifica il valore
-      get(this: UserModel) {
+      get(this: User) {
       const raw = this.getDataValue('created_at');
       if (!raw) return raw;
         const date = new Date(raw);

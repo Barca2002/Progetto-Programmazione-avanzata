@@ -4,7 +4,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
-import { UserModel } from '../models/UserModel.js';
+import { User } from '../models/UserModel.js';
 
 
 export class AuthService{
@@ -32,7 +32,7 @@ export class AuthService{
         return await this.generateJWT(user!);
     }
 
-    public async generateJWT(user: UserModel){
+    public async generateJWT(user: User){
 
         const payload = {
             "user_id": user?.get("user_id"), 
