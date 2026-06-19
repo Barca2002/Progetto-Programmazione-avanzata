@@ -18,3 +18,21 @@ CREATE TABLE users (
     CONSTRAINT users_username_key UNIQUE (username),
     CONSTRAINT users_email_key UNIQUE (email)
 );
+
+-- Creazione delle geofence areas
+CREATE TABLE geofence_areas (
+    area_id INT GENERATED ALWAYS AS IDENTITY,
+    area_name VARCHAR(255) NOT NULL,
+    area GEOMETRY(Polygon, 4326) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (area_id)
+);
+
+CREATE TABLE imbarcazioni (
+    mmsi INT GENERATED ALWAYS AS IDENTITY,
+    
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (mmsi)
+);
