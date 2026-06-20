@@ -51,12 +51,29 @@ export class ImbarcazioneController{
     }
   };
 
+
+  // FUNZIONE CHIAMATA DALLA ROTTA ADMIN PER TORNARE L'ELENCO COMPLETO FRA IMBARCAZIONI E GEOFENCE AREAS ASSOCIATE AD OGNUNA
   public getAllImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const imbarcazioni = await this.imbarcazioneDAO.findAllGeofences();
         res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni as any));
     } catch (err) {
           if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
+  // FUNZIONE CHIAMATA DALL'UTENTE LOGGATO PER VEDERE LE SUE IMBARCAZIONI CON GEOFENCE ASSOCIATE
+  public getMyImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user_id = (req as any).userLoggato.user_id; //è l'id dello user che avevo appeso dalla richiesta quando faccio il checkUser nel Middleware, chiamando la funzione checkToken da cui prende la req
+      const imbarcazioni = await this.imbarcazioneDAO.findAllByUserWithGeofences(user_id);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni as any));
+    } catch (err) {
+      if (err instanceof AppError) {
         (err as AppError).send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));

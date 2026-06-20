@@ -9,7 +9,7 @@ if (!JWT_PUBLIC_KEY){
     throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
 }
 
-let publicKeyBase64: string; //perchè const ovviamente protegge dal riassegnamento
+let publicKeyBase64: string;
 
 try {
   publicKeyBase64 = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
@@ -17,11 +17,12 @@ try {
   throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
 }
 
-export const JWTMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+// funzione per controllare struttura del token
+const checkToken = (req: Request, next: NextFunction): any => {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_ADMIN_MISSING));
+    return next(ErrorFactory.getError(AppErrorEnum.JWT_NOT_PROVIDED));
   }
 
   const isToken = authHeader.split(' ')[1];
@@ -32,16 +33,33 @@ export const JWTMiddleware = (req: Request, res: Response, next: NextFunction): 
 
   try {
     const jwtdecoded = jwt.verify(isToken, publicKeyBase64, { algorithms: ['RS256'] }) as any;
-
-    if (!jwtdecoded.is_admin) {
-      return next(ErrorFactory.getError(AppErrorEnum.NOT_ADMIN));
-    }
-
-    next();
+    (req as any).userLoggato = jwtdecoded; //MOLTO IMPORTANTE PERCHE' APPENDE LO USER NELLA REQUEST COSI SAPPIAMO QUALE UTENTE E' AUTENTICATO
+    //console.log((req as any).userLoggato);
+    return jwtdecoded;
   } catch (err) {
-    if (err instanceof jwt.TokenExpiredError) { //serve per vedere perche il token non va bene, è scaduto o malformato, non valido.
-      return next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_EXPIRED));
+    if (err instanceof jwt.TokenExpiredError) {
+      next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_EXPIRED));
+    } else {
+      next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_INVALID));
     }
-    return next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_INVALID));
+    return null;
   }
+};
+
+// utente qualsiasi autenticato
+export const checkUser = (req: Request, res: Response, next: NextFunction): void => {
+  const jwtdecoded = checkToken(req, next);
+  if (jwtdecoded) next();
+};
+
+// solo admin
+export const checkAdmin = (req: Request, res: Response, next: NextFunction): void => {
+  const jwtdecoded = checkToken(req, next);
+  if (!jwtdecoded) return;
+
+  if (!jwtdecoded.is_admin) {
+    return next(ErrorFactory.getError(AppErrorEnum.NOT_ADMIN));
+  }
+
+  next();
 };

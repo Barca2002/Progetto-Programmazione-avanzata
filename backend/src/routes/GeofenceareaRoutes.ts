@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
-import { JWTMiddleware } from "../middlewares/JWTMiddleware.js";
+import { checkAdmin } from "../middlewares/JWTMiddleware.js";
 
 export const geofenceareaRoutes = Router();
 const geofencearea = new GeofenceAreaController();
@@ -12,10 +12,10 @@ geofenceareaRoutes.get("/all", geofencearea.getAree);
 geofenceareaRoutes.get("/:id", geofencearea.getAreaById);
 
 // CREATE area (solo admin)
-geofenceareaRoutes.post("/create", JWTMiddleware, geofencearea.createArea);
+geofenceareaRoutes.post("/create", checkAdmin, geofencearea.createArea);
 
 // UPDATE area (solo admin)
-geofenceareaRoutes.put("/update/:id", JWTMiddleware, geofencearea.updateArea);
+geofenceareaRoutes.put("/update/:id", checkAdmin, geofencearea.updateArea);
 
 // DELETE area (solo admin)
-geofenceareaRoutes.delete("/delete/:id", JWTMiddleware, geofencearea.deleteArea);
+geofenceareaRoutes.delete("/delete/:id", checkAdmin, geofencearea.deleteArea);
