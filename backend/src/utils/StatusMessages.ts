@@ -76,6 +76,8 @@ export const SUCCESS_LIST = {
     { statusCode: 200, message: "L'area è stata eliminata con successo." },
     IMBARCAZIONE_DELETED:
     { statusCode: 200, message: "L'imbarcazione è stata eliminata con successo." },
+    IMBARCAZIONI_GEOFENCES_FOUND:
+    { statusCode: 200, message: "Imbarcazioni con geofence associate recuperate con successo." },
     GEOAREA_CREATED:
     { statusCode: 201, message: "L'area è stata creata con successo." },
     IMBARCAZIONE_CREATED:

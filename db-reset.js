@@ -7,9 +7,5 @@ import dotenv from "dotenv";
 dotenv.config();
 // -i serve per poter inserire l'input nel container. Il comando mysql viene eseguito all'interno del container e l'input del comando è il contenuto del file SQL che viene letto con fs.readFileSync.
 execSync(`docker exec -i mysql mysql -u root -p${process.env.MYSQL_ROOT_PASSWORD}`, {
-  input: fs.readFileSync("backend/src/db/01-init.sql")
-});
-
-execSync(`docker exec -i mysql mysql -u root -p${process.env.MYSQL_ROOT_PASSWORD}`, {
-  input: fs.readFileSync("backend/src/db/02-seed.sql")
+  input: fs.readFileSync("backend/src/db/init.sql")
 });

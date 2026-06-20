@@ -6,6 +6,9 @@ import { JWTMiddleware } from "../middlewares/JWTMiddleware.js";
 export const imbarcazioneRoutes = Router();
 const imbarcazione = new ImbarcazioneController();
 
+// GET tutte le imbarcazioni con le geofence associate (solo admin)
+imbarcazioneRoutes.get("/geofences", JWTMiddleware,imbarcazione.getAllImbarcazioniWithGeofences);
+
 // GET tutte le imbarcazioni
 imbarcazioneRoutes.get("/all", imbarcazione.getImbarcazioni);
 

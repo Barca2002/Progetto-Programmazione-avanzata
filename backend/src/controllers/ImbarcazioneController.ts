@@ -51,6 +51,19 @@ export class ImbarcazioneController{
     }
   };
 
+  public getAllImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const imbarcazioni = await this.imbarcazioneDAO.findAllGeofences();
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni as any));
+    } catch (err) {
+          if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
   public createImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { mmsi, name, type } = req.body;

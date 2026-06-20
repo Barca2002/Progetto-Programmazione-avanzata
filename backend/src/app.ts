@@ -11,6 +11,7 @@ import { Geofencearea } from './models/GeofenceareaModel.js';
 import { geofenceareaRoutes } from './routes/GeofenceareaRoutes.js';
 import { Imbarcazione } from './models/ImbarcazioneModel.js';
 import { imbarcazioneRoutes } from './routes/ImbarcazioneRoutes.js';
+import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
 
 dotenv.config();
 
@@ -21,6 +22,8 @@ const db: Sequelize = DatabaseConnection.connect();
 User.inizializzaModel(db);
 Geofencearea.inizializzaModel(db);
 Imbarcazione.inizializzaModel(db);
+
+inizializzaAssociazioni();
 
 const app = express();
 

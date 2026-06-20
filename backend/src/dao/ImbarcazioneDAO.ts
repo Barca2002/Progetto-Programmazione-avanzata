@@ -1,6 +1,8 @@
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
+import { Geofencearea } from '../models/GeofenceareaModel.js';
+
 
 interface IImbarcazioneDAO {
   create(data: ImbarcazioneCreationData): Promise<Imbarcazione>;
@@ -8,6 +10,7 @@ interface IImbarcazioneDAO {
   findAll(): Promise<Imbarcazione[]>;
   update(mmsi: number, data: Partial<ImbarcazioneCreationData>): Promise<number>;
   delete(mmsi: number): Promise<number>;
+  findAllGeofences(): Promise<Imbarcazione[]>;
 }
 
 export class ImbarcazioneDAO implements IImbarcazioneDAO {
@@ -27,6 +30,21 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
   }
+
+  // IMBARCAZIONI CON GEOFENCEAREAS ASSOCIATE (X ROTTA ADMIN)
+  async findAllGeofences(): Promise<Imbarcazione[]> {
+    try {
+        return await Imbarcazione.findAll({
+            include: [{
+                model: Geofencearea,
+                attributes: ['geoarea_id', 'name'], //quali colonne restituire di geofence areas
+                through: { attributes: [] } //esclude attributi della molti a molti fra i due models (mmsi e geoarea_id)
+            }]
+        });
+    } catch (err) {
+        throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+    }
+}
 
   async findAll(): Promise<Imbarcazione[]> {
     try{
