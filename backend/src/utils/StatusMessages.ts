@@ -82,6 +82,8 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "L'area è stata creata con successo." },
     IMBARCAZIONE_CREATED:
     { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
+    GEOAREAS_ADDED:
+    { statusCode: 200, message: "Geofence associate all'imbarcazione con successo." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

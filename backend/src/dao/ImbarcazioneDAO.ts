@@ -3,6 +3,7 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
+import { AppError } from '../models/AppErrorModel.js';
 
 interface IImbarcazioneDAO {
   create(data: ImbarcazioneCreationData): Promise<Imbarcazione>;
@@ -38,6 +39,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
       return await Imbarcazione.findAll({
         include: [{
           model: Geofencearea,
+          as: 'Geofenceareas',
           attributes: ['geoarea_id', 'name'], //quali colonne restituire di geofence areas
           through: { attributes: [] } //esclude attributi della molti a molti fra i due models (mmsi e geoarea_id)
         }]
@@ -60,6 +62,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
                 },
                 {
                     model: Geofencearea,
+                    as: 'Geofenceareas',
                     attributes: ['geoarea_id', 'name'],
                     through: { attributes: [] }
                 }
@@ -69,6 +72,80 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
   }
+
+  // ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI
+async addGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]): Promise<void> {
+    const sequelize = Imbarcazione.sequelize!;
+    const t = await sequelize.transaction(); // apro la transazione, da qui in poi tutto resta "in sospeso" finché non chiamo commit o rollback
+
+    try {
+      /*
+      sequelize: ogni model Sequelize ha una proprietà statica sequelize che punta all'istanza di connessione al database 
+      
+      models: è un dizionario (oggetto chiave-valore) che contiene tutti i model registrati su quella connessione, sia quelli che espliciti, sia quelli creati automaticamente da Sequelize per le tabelle ponte (come geofence_imbarcazioni, grazie all'opzione: through: 'geofence_imbarcazioni')
+      
+      geofence_imbarcazioni: prendo il model che rappresenta quella tabella ponte.
+
+      --> è il modello che rappresenta l'intera tabella geofence_imbarcazioni
+      */
+       
+      const GeofenceImbarcazioni = sequelize.models.geofence_imbarcazioni!;
+      
+      for (const { mmsi, geoarea_ids } of links) {
+        //mmsi e ogni geoarea_id devono essere numeri interi, altrimenti ricontrolla il formato dei dati inseriti
+        const valoriValidi =
+          typeof mmsi === 'number' && Number.isInteger(mmsi) &&
+          Array.isArray(geoarea_ids) &&
+          geoarea_ids.every(id => typeof id === 'number' && Number.isInteger(id));
+
+        if (!valoriValidi) {
+          throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        }
+
+        const imbarcazione = await Imbarcazione.findByPk(mmsi);
+        if (!imbarcazione)
+          throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+
+        
+
+        /*
+        mmsi fissato, per ogni geoarea_id creo la coppia { mmsi, geoarea_id }, che è la riga che bulkCreate inserirà nel db
+        
+        bulkCreate è utile quando devo fare più insert di fila come nel nostro caso, invece di lanciare piu .create (più insert separati) per ogni geoarea_ids, ne lancio una con una map
+
+                [
+        app       |   {
+        app       |     mmsi: 247123456,
+        app       |     geoarea_id: 6,
+        app       |   }, {
+        app       |     mmsi: 247123456,
+        app       |     geoarea_id: 4,
+        app       |   }, {
+        app       |     mmsi: 247123456,
+        app       |     geoarea_id: 5,
+        app       |   }
+        app       | ]
+
+        Executing (default): INSERT INTO "geofence_imbarcazioni" ("mmsi","geoarea_id") VALUES (247123456,6),(247123456,4),(247123456,5) ON CONFLICT DO NOTHING RETURNING "mmsi","geoarea_id";
+        */
+        await GeofenceImbarcazioni.bulkCreate(
+          geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })),
+          { ignoreDuplicates: true, transaction: t } // non duplica associazioni già esistenti ed esegue le query all'interno della transazione t, non direttamente sul database, cosi se ho un errore nel body, devo rifare la richiesta completamente giusta. Senza questa strategia le query con input giusto venivano eseguite e non si sapeva quali avesse fatto; adesso al primo errore bisogna rimandare la richiesta da capo ben formata.
+        );
+        
+        //console.log(geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })))
+      }
+      
+      await t.commit(); // tutti i link erano validi: rendo definitive le insert fatte finora
+
+    } catch (err) {
+        await t.rollback(); // anche con un solo link non valido: annullo TUTTE le insert fatte finora in questa chiamata
+        if (err instanceof AppError) {
+          throw err;
+        }
+        throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+    }
+}
 
   async findAll(): Promise<Imbarcazione[]> {
     try {

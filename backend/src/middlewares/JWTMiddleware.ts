@@ -33,8 +33,8 @@ const checkToken = (req: Request, next: NextFunction): any => {
 
   try {
     const jwtdecoded = jwt.verify(isToken, publicKeyBase64, { algorithms: ['RS256'] }) as any;
-    (req as any).userLoggato = jwtdecoded; //MOLTO IMPORTANTE PERCHE' APPENDE LO USER NELLA REQUEST COSI SAPPIAMO QUALE UTENTE E' AUTENTICATO
-    //console.log((req as any).userLoggato);
+    (req as any).userLoggato = jwtdecoded; //MOLTO IMPORTANTE PERCHE' APPENDE LO USER NELLA REQUEST, COSI SAPPIAMO QUALE UTENTE E' AUTENTICATO
+    //console.log((req as any));
     return jwtdecoded;
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {

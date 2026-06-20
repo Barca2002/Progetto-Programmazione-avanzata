@@ -10,13 +10,16 @@ const imbarcazione = new ImbarcazioneController();
 imbarcazioneRoutes.get("/geofences", checkAdmin, imbarcazione.getAllImbarcazioniWithGeofences);
 
 // GET imbarcazioni dell'utente loggato con geofence associate
-imbarcazioneRoutes.get("/my/geofences", checkUser, imbarcazione.getMyImbarcazioniWithGeofences);
+imbarcazioneRoutes.get("/my/geoareas", checkUser, imbarcazione.getMyImbarcazioniWithGeofences);
 
 // GET tutte le imbarcazioni
 imbarcazioneRoutes.get("/all", imbarcazione.getImbarcazioni);
 
 // GET imbarcazione per mmsi
 imbarcazioneRoutes.get("/:mmsi", imbarcazione.getImbarcazioneById);
+
+// ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI (solo admin)
+imbarcazioneRoutes.post("/geoareas/add", checkAdmin, imbarcazione.addGeoareasToImbarcazioni);
 
 // CREATE imbarcazione (solo admin)
 imbarcazioneRoutes.post("/create", checkAdmin, imbarcazione.createImbarcazione);
