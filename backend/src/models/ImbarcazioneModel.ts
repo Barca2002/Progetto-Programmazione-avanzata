@@ -26,7 +26,8 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
       },
       name: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: false,
+        unique: 'imbarcazioni_name_key'
       },
       type: {
         type: DataTypes.STRING(50),

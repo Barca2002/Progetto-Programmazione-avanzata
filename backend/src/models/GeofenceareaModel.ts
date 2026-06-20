@@ -34,7 +34,8 @@ export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreatio
       },
       name: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: false,
+        unique: 'geoarea_name_key'
       },
       area: {
         // Sequelize mappa GEOMETRY('POLYGON', 4326) sul tipo PostGIS geometry(Polygon,4326)

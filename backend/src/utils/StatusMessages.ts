@@ -29,10 +29,18 @@ export const ERROR_LIST = {
     { statusCode: 500, message: "Errore nella decodifica della chiave privata per JWT." },
     JWT_PUBLIC_MISSING:
     { statusCode: 500, message: "Chiave pubblica per JWT non configurata nel file env." },
+    JWT_TOKEN_ADMIN_MISSING:
+    { statusCode: 500, message: "Controlla JWT_TOKEN_ADMIN nelle variabili d'ambiente" },
+    JWT_TOKEN_EMPTY: 
+    { statusCode: 401, message: "Token di autenticazione vuoto." },
     INVALID_JWT:
     { statusCode: 401, message: "Il JWT fornito non è valido." },
     JWT_NOT_PROVIDED:
     { statusCode: 401, message: "Token JWT non fornito." },
+    JWT_TOKEN_EXPIRED:
+    { statusCode: 401, message: "Token di autenticazione scaduto." },
+    JWT_TOKEN_INVALID:
+    { statusCode: 401, message: "Token di autenticazione non valido o malformato." },
     USER_NOT_FOUND:
     { statusCode: 404, message: "Utente non trovato." },
     GEOAREA_NOT_FOUND:
@@ -65,7 +73,9 @@ export const SUCCESS_LIST = {
     AREA_DELETED:
     { statusCode: 200, message: "L'area è stata eliminata con successo." },
     IMBARCAZIONE_DELETED:
-    { statusCode: 200, message: "L'imbarcazione è stata eliminata con successo." }
+    { statusCode: 200, message: "L'imbarcazione è stata eliminata con successo." },
+    AREA_CREATED:
+    { statusCode: 201, message: "L'area è stata creata con successo." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

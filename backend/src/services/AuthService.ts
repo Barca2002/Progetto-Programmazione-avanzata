@@ -3,7 +3,6 @@ import { UserDAO } from "../dao/UserDAO.js";
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
 import { User } from '../models/UserModel.js';
 
 
@@ -45,7 +44,7 @@ export class AuthService{
             "email": user?.get("email"),
             "is_admin": user?.get("is_admin")
         }
-        const jwtToken: string = jwt.sign(payload, this.privateKey, { algorithm: "RS256" });
+        const jwtToken: string = jwt.sign(payload, this.privateKey, { algorithm: "RS256", expiresIn: "1m" }); //CAMBIARE COME VOGLIAMO, MI SERVE PER VEDERE SE ENTRA NELL'ERRORE
 
         return jwtToken;
     }

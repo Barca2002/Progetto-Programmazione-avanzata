@@ -26,13 +26,17 @@ CREATE TABLE geofence_areas (
     area GEOMETRY(Polygon, 4326) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (geoarea_id)
+    PRIMARY KEY (geoarea_id),
+    CONSTRAINT geoarea_name_key UNIQUE (name) --rivedere se è unico o no
 );
 
 -- Creazione delle imbarcazioni
 CREATE TABLE imbarcazioni (
-    mmsi            INT PRIMARY KEY,
+    mmsi INT GENERATED ALWAYS AS IDENTITY,
     name     VARCHAR(255) NOT NULL,
     type     VARCHAR(50)  NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (mmsi),
+    CONSTRAINT imbarcazioni_name_key UNIQUE (name) --rivedere se è unico o no
 );

@@ -20,7 +20,7 @@
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:reset": "node db-reset.js",
-    "generate-keys": "tsx backend/src/utils/generateCryptoKeysV2.ts"
+    "generate-keys": "bun backend/src/utils/generateCryptoKeysV2.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^6.0.0",

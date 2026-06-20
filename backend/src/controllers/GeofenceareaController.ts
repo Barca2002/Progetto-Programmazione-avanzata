@@ -4,6 +4,7 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
+import { Geofencearea } from "../models/GeofenceareaModel.js";
 
 export class GeofenceAreaController{
 
@@ -50,6 +51,27 @@ export class GeofenceAreaController{
     }
   };
 
+  public createArea = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, area } = req.body;
+    if (!name || !area) {
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    }
+
+    const nuovaArea: Geofencearea = await this.geofenceAreaDAO.create(req.body);
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_CREATED, nuovaArea as any));
+
+  } catch (err) {
+    if (err instanceof AppError) {
+      (err as AppError).send(res);
+    } else {
+      res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+    }
+    }
+  };
+  
+
+
   public updateArea = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
@@ -74,7 +96,7 @@ export class GeofenceAreaController{
 
   public deleteArea = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = parseInt(req.params.id as string);
+      const id = Number(req.params.id);
       const deleted = await this.geofenceAreaDAO.delete(id);
 
       if (!deleted) {

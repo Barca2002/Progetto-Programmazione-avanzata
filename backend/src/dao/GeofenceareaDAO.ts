@@ -14,14 +14,13 @@ interface IGeofenceareaDAO {
 
 export class GeofenceareaDAO implements IGeofenceareaDAO {
   async create(data: GeofenceareaCreationData): Promise<Geofencearea> {
-    try{
-      let area = await Geofencearea.create(data);
-      return area;
-    } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-    }
-
+  try {
+    let area = await Geofencearea.create(data);
+    return area;
+  } catch (err) {
+    throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
   }
+}
 
   async findById(geoarea_id: number): Promise<Geofencearea | null> {
     try{
