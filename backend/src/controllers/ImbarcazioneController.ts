@@ -4,6 +4,7 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
+import { Imbarcazione } from "../models/ImbarcazioneModel.js";
 
 export class ImbarcazioneController{
 
@@ -49,6 +50,30 @@ export class ImbarcazioneController{
       }
     }
   };
+
+  public createImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { mmsi, name, type } = req.body;
+
+    if (!mmsi || !name || !type) {
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    }
+
+    if (String(mmsi).length !== 9) { //standard dell'msi, numero 9 cifre
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
+    }
+
+    const nuovaImbarcazione: Imbarcazione = await this.imbarcazioneDAO.create(req.body);
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione  as any));
+
+  } catch (err) {
+    if (err instanceof AppError) {
+      (err as AppError).send(res);
+    } else {
+      res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+    }
+  }
+};
 
   public updateImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
     try {

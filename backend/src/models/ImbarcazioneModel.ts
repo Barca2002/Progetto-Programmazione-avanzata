@@ -20,7 +20,7 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
   static inizializzaModel(sequelize: Sequelize): typeof Imbarcazione {
     return Imbarcazione.init({
       mmsi: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: false,
         primaryKey: true
       },

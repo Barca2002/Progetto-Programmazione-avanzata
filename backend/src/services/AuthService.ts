@@ -44,7 +44,7 @@ export class AuthService{
             "email": user?.get("email"),
             "is_admin": user?.get("is_admin")
         }
-        const jwtToken: string = jwt.sign(payload, this.privateKey, { algorithm: "RS256", expiresIn: "1m" }); //CAMBIARE COME VOGLIAMO, MI SERVE PER VEDERE SE ENTRA NELL'ERRORE
+        const jwtToken: string = jwt.sign(payload, this.privateKey, { algorithm: "RS256", expiresIn: "1h" }); //CAMBIARE COME VOGLIAMO, MI SERVE PER VEDERE SE ENTRA NELL'ERRORE
 
         return jwtToken;
     }

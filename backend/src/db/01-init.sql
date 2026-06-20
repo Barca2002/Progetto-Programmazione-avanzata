@@ -32,11 +32,10 @@ CREATE TABLE geofence_areas (
 
 -- Creazione delle imbarcazioni
 CREATE TABLE imbarcazioni (
-    mmsi INT GENERATED ALWAYS AS IDENTITY,
-    name     VARCHAR(255) NOT NULL,
-    type     VARCHAR(50)  NOT NULL,
+    mmsi INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (mmsi),
-    CONSTRAINT imbarcazioni_name_key UNIQUE (name) --rivedere se è unico o no
+    CONSTRAINT imbarcazioni_name_key UNIQUE (name)
 );

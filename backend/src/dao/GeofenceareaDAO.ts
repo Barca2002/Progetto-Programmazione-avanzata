@@ -1,5 +1,4 @@
-import { Geofencearea } from '../models/GeofenceareaModel.js';
-import type { GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
+import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 

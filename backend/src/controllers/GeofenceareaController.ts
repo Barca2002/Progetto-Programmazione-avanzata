@@ -59,7 +59,7 @@ export class GeofenceAreaController{
     }
 
     const nuovaArea: Geofencearea = await this.geofenceAreaDAO.create(req.body);
-    res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_CREATED, nuovaArea as any));
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea as any));
 
   } catch (err) {
     if (err instanceof AppError) {

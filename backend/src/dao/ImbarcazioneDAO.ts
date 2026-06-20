@@ -1,26 +1,24 @@
-import { Imbarcazione } from '../models/ImbarcazioneModel.js';
-import { ImbarcazioneAllData } from '../models/ImbarcazioneModel.js';
+import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 interface IImbarcazioneDAO {
-  create(data: ImbarcazioneAllData): Promise<Imbarcazione>;
+  create(data: ImbarcazioneCreationData): Promise<Imbarcazione>;
   findById(mmsi: number): Promise<Imbarcazione | null>;
   findAll(): Promise<Imbarcazione[]>;
-  update(mmsi: number, data: Partial<ImbarcazioneAllData>): Promise<number>;
+  update(mmsi: number, data: Partial<ImbarcazioneCreationData>): Promise<number>;
   delete(mmsi: number): Promise<number>;
 }
 
 export class ImbarcazioneDAO implements IImbarcazioneDAO {
-  async create(data: ImbarcazioneAllData): Promise<Imbarcazione> {
-    try{
-      let imbarcazione = await Imbarcazione.create(data);
-      return imbarcazione;
-    } catch (err){
+  async create(data: ImbarcazioneCreationData): Promise<Imbarcazione> {
+  try {
+    let imbarcazione = await Imbarcazione.create(data);
+    return imbarcazione;
+  } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-    }
-
   }
+}
 
   async findById(mmsi: number): Promise<Imbarcazione | null> {
     try{
@@ -38,7 +36,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
     }
   }
 
-  async update(mmsi: number, data: Partial<ImbarcazioneAllData>): Promise<number> {
+  async update(mmsi: number, data: Partial<ImbarcazioneCreationData>): Promise<number> {
     try{
       const [affectedCount] = await Imbarcazione.update(data, { where: { mmsi } });
       return affectedCount;

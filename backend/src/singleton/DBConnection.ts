@@ -25,7 +25,8 @@ export class DatabaseConnection {
       this.connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
         host: DB_HOST!,
         port: Number(DB_PORT)!,
-        dialect: 'postgres'
+        dialect: 'postgres',
+        timezone: 'Europe/Rome'
       });
 	}
 

@@ -47,6 +47,8 @@ export const ERROR_LIST = {
     { statusCode: 404, message: "Geoarea non trovata." },
     IMBARCAZIONE_NOT_FOUND:
     { statusCode: 404, message: "Imbarcazione non trovata." },
+    INVALID_MMSI:
+    { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:
     { statusCode: 403, message: "Accesso riservato agli amministratori." },
 } as const;
@@ -74,8 +76,10 @@ export const SUCCESS_LIST = {
     { statusCode: 200, message: "L'area è stata eliminata con successo." },
     IMBARCAZIONE_DELETED:
     { statusCode: 200, message: "L'imbarcazione è stata eliminata con successo." },
-    AREA_CREATED:
+    GEOAREA_CREATED:
     { statusCode: 201, message: "L'area è stata creata con successo." },
+    IMBARCAZIONE_CREATED:
+    { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;
