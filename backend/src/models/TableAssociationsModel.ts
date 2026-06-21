@@ -1,7 +1,7 @@
 import { Imbarcazione } from './ImbarcazioneModel.js';
 import { Geofencearea } from './GeofenceareaModel.js';
 import { User } from './UserModel.js';
-import { GeofenceImbarcazioni } from './GeofenceImbarcazioni.js'; // modello della tabella di giunzione
+import { GeofenceImbarcazioni } from './GeofenceImbarcazioniModel.js'; // modello della tabella di giunzione
 
 export function inizializzaAssociazioni(): void {
     Imbarcazione.belongsToMany(Geofencearea, {

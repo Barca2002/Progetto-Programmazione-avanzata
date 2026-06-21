@@ -5,7 +5,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioni.js';
+import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {

@@ -59,7 +59,8 @@ CREATE TABLE user_imbarcazioni (
 
     PRIMARY KEY (user_id, mmsi),
     CONSTRAINT fk_ui_user FOREIGN KEY (user_id) REFERENCES users(user_id)      ON DELETE CASCADE,
-    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE CASCADE
+    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE CASCADE,
+    CONSTRAINT unique_mmsi UNIQUE (mmsi)
 );
 
 -- ------------------------------------------------------------
@@ -68,7 +69,7 @@ CREATE TABLE user_imbarcazioni (
 CREATE TABLE geofence_imbarcazioni (
     geoarea_id INT     NOT NULL,
     mmsi       INT     NOT NULL,
-
+    is_in      BOOLEAN      NOT NULL DEFAULT FALSE,
     PRIMARY KEY (geoarea_id, mmsi),
     CONSTRAINT fk_gi_area FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT fk_gi_mmsi FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE

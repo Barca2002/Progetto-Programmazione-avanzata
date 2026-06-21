@@ -13,7 +13,7 @@ export class UserController {
       const user_id = (req as any).userLoggato.user_id;
       const { mmsi, latitudine, longitudine, velocita_kmh, stato } = req.body;
 
-      await this.datiinviatiService.inviaDati(user_id, mmsi, latitudine, longitudine, velocita_kmh, stato);
+      await this.datiinviatiService.sendData(user_id, mmsi, latitudine, longitudine, velocita_kmh, stato);
 
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, {mmsi, latitudine, longitudine, velocita_kmh, stato}));
     } catch (err) {
