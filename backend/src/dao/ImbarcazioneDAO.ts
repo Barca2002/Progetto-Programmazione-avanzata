@@ -103,11 +103,23 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
           throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         }
 
-        const imbarcazione = await Imbarcazione.findByPk(mmsi);
+        //Controllo che l'imbarcazione esista
+        const imbarcazione = await Imbarcazione.findByPk(mmsi, { transaction: t });
         if (!imbarcazione)
           throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-        
+        //Controllo che lo user esista
+        const user = await User.findByPk(user_id, { transaction: t });
+        if (!user)
+          throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+
+        //Controllo che tutte le geoareas esistano
+        for (const geoarea_id of geoarea_ids) {
+          const geoarea = await Geofencearea.findByPk(geoarea_id, { transaction: t });
+          if (!geoarea)
+            throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+        }
+       
 
         /*
         mmsi fissato, per ogni geoarea_id creo la coppia { mmsi, geoarea_id }, che è la riga che bulkCreate inserirà nel db
