@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { UserDAO } from "../dao/UserDAO.js";
+import { AdminDAO } from "../dao/AdminDAO.js";
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import jwt from 'jsonwebtoken';
@@ -7,7 +7,7 @@ import { User } from '../models/UserModel.js';
 
 
 export class AuthService{
-    public readonly userDao = new UserDAO();
+    public readonly adminDao = new AdminDAO();
     private privateKey: string;
 
      constructor() {
@@ -27,7 +27,7 @@ export class AuthService{
     // Si prende l'utente, identificato univocamente dall'email, per comparare la password e poi prendere i suoi dati per generare il token JWT
     public async checkCreds(email:string, password:string): Promise<string>{
         
-        const user = await this.userDao.findByEmail(email);
+        const user = await this.adminDao.findByEmail(email);
         const pwdMatch = await bcrypt.compare(password.trim(), user!.get("password") as string);
 
         if (!pwdMatch) {

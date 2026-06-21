@@ -15,7 +15,7 @@ geofenceareaRoutes.get("/:id", geofencearea.getAreaById);
 geofenceareaRoutes.post("/create", checkAdmin, geofencearea.createArea);
 
 // UPDATE area (solo admin)
-geofenceareaRoutes.put("/update/:id", checkAdmin, geofencearea.updateArea);
+geofenceareaRoutes.patch("/update/:id", checkAdmin, geofencearea.updateArea);
 
 // DELETE area (solo admin)
 geofenceareaRoutes.delete("/delete/:id", checkAdmin, geofencearea.deleteArea);

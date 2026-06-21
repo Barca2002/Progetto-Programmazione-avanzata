@@ -23,7 +23,7 @@ User.inizializzaModel(db);
 Geofencearea.inizializzaModel(db);
 Imbarcazione.inizializzaModel(db);
 
-inizializzaAssociazioni();
+inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
 const app = express();
 

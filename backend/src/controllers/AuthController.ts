@@ -4,13 +4,13 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
-import { UserDAO } from "../dao/UserDAO.js";
+import { AdminDAO } from "../dao/AdminDAO.js";
 import { UserCreationData } from "../models/UserModel.js";
 import bcrypt from 'bcrypt';
 
 export class AuthController {
     private authService: AuthService;
-    public readonly userDAO = new UserDAO();
+    public readonly AdminDAO = new AdminDAO();
     public readonly saltRounds = 12;
 
     constructor() {
@@ -26,7 +26,7 @@ export class AuthController {
         try {
             const { email, password } = req.body;
             // Controlliamo se l'email esiste
-            if(!(await this.userDAO.findByEmail(email))){
+            if(!(await this.AdminDAO.findByEmail(email))){
                 throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
             }
             // Generazione del token
@@ -47,11 +47,11 @@ export class AuthController {
         try {
             const { username, email } = req.body;
             // Controlliamo se l'email già esiste
-            if(await this.userDAO.findByEmail(email)){
+            if(await this.AdminDAO.findByEmail(email)){
                 throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
             }
             // Controlliamo se l'username già esiste
-            if(await this.userDAO.findByUsername(username)){
+            if(await this.AdminDAO.findByUsername(username)){
                 throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
             }
             // Creiamo il nuovo utente
@@ -62,7 +62,7 @@ export class AuthController {
                 "password": passwordHash,
                 "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegato
             }
-            await this.userDAO.create(userInfo);
+            await this.AdminDAO.create(userInfo);
 
             const responseData = {"username": username, "email": email};
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));

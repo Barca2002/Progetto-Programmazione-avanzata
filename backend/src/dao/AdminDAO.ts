@@ -1,17 +1,18 @@
+import { Transaction } from 'sequelize';
 import { User } from '../models/UserModel.js';
 import { UserCreationData } from '../models/UserModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 
-interface IUserDAO {
+interface IAdminDAO {
   create(data: UserCreationData): Promise<User>;
-  findById(user_id: number): Promise<User | null>;
   findAll(): Promise<User[]>;
+  findById(user_id: number, t?: Transaction): Promise<User | null>;
   update(user_id: number, data: Partial<UserCreationData>): Promise<number>;
   delete(user_id: number): Promise<number>; 
 }
 
-export class UserDAO implements IUserDAO {
+export class AdminDAO implements IAdminDAO {
   async create(data: UserCreationData): Promise<User> {
     try{
       let utente = await User.create(data);
@@ -22,10 +23,13 @@ export class UserDAO implements IUserDAO {
     
   }
 
-  async findById(user_id: number): Promise<User | null> {
-    try{
+  async findById(user_id: number, t?: Transaction): Promise<User | null> {
+    try {
+      if (t) {
+        return await User.findByPk(user_id, { transaction: t });
+      }
       return await User.findByPk(user_id);
-    } catch (err){
+    } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     }
   }
@@ -67,4 +71,4 @@ export class UserDAO implements IUserDAO {
   }
 }
 
-export default UserDAO;
+export default AdminDAO;

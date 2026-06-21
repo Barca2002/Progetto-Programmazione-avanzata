@@ -1,4 +1,4 @@
-import { UserDAO } from "../dao/UserDAO.js";
+import { AdminDAO } from "../dao/AdminDAO.js";
 import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
@@ -7,13 +7,13 @@ import { AppError } from "../models/AppErrorModel.js";
 
 export class AdminController{
 
-  public readonly userDAO = new UserDAO();
+  public readonly AdminDAO = new AdminDAO();
   public readonly saltRounds = 12;
 
   //Quando chiamo una qualsiasi di queste funzioni sotto, passo per il DAO (intermediario) che sa come tradurre le operazioni in operazioni di Sequelize, non uso direttamente quelle di Sequelize.
   public getUtenti = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const utenti = await this.userDAO.findAll();
+      const utenti = await this.AdminDAO.findAll();
 
       res.json(utenti);
 
@@ -33,7 +33,7 @@ export class AdminController{
         throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
       }
       
-      const utente = await this.userDAO.findById(id);
+      const utente = await this.AdminDAO.findById(id);
 
       if (!utente) {
         return next(ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND));
@@ -56,14 +56,14 @@ export class AdminController{
   public updateUtente = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      const updated = await this.userDAO.update(id, req.body);
+      const updated = await this.AdminDAO.update(id, req.body);
 
       if (!updated) {
         res.json(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
 
       //mi ritorna l'user aggiornato dopo l'update
-      const utenteAggiornato = await this.userDAO.findById(id);
+      const utenteAggiornato = await this.AdminDAO.findById(id);
       res.json(utenteAggiornato);
 
     } catch (err) {
@@ -78,7 +78,7 @@ export class AdminController{
   public deleteUtente = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = parseInt(req.params.id as string);
-      const deleted = await this.userDAO.delete(id);
+      const deleted = await this.AdminDAO.delete(id);
 
       if (!deleted) {
         res.json(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));

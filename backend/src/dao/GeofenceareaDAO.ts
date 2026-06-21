@@ -1,10 +1,11 @@
+import { Transaction } from 'sequelize';
 import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 interface IGeofenceareaDAO {
   create(data: GeofenceareaCreationData): Promise<Geofencearea>;
-  findById(geoarea_id: number): Promise<Geofencearea | null>;
+  findById(geoarea_id: number, t?: Transaction): Promise<Geofencearea | null>;
   findAll(): Promise<Geofencearea[]>;
   findByName(name: string): Promise<Geofencearea | null>;
   update(geoarea_id: number, data: Partial<GeofenceareaCreationData>): Promise<number>;
@@ -21,13 +22,16 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
   }
 }
 
-  async findById(geoarea_id: number): Promise<Geofencearea | null> {
-    try{
-      return await Geofencearea.findByPk(geoarea_id);
-    } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+  async findById(geoarea_id: number, t?: Transaction): Promise<Geofencearea | null> {
+  try {
+    if (t) {
+      return await Geofencearea.findByPk(geoarea_id, { transaction: t });
     }
+    return await Geofencearea.findByPk(geoarea_id);
+  } catch (err) {
+    throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
   }
+}
 
   async findAll(): Promise<Geofencearea[]> {
     try{

@@ -12,14 +12,11 @@ imbarcazioneRoutes.get("/geofences", checkAdmin, imbarcazione.getAllImbarcazioni
 // GET imbarcazioni dell'utente loggato con geofence associate
 imbarcazioneRoutes.get("/my/geoareas", checkUser, imbarcazione.getMyImbarcazioniWithGeofences);
 
-// GET tutte le imbarcazioni
-imbarcazioneRoutes.get("/all", imbarcazione.getImbarcazioni);
-
 // GET imbarcazione per mmsi
 imbarcazioneRoutes.get("/:mmsi", imbarcazione.getImbarcazioneById);
 
 // ASSOCIA PIU GEOAREAS E USER A PIU IMBARCAZIONI (solo admin)
-imbarcazioneRoutes.post("/geoareas&user/add", checkAdmin, imbarcazione.addGeoareasEUserToImbarcazioni);
+imbarcazioneRoutes.post("/geoareas-user/add", checkAdmin, imbarcazione.linkGeoareasEUserToImbarcazioni);
 
 // DISSOCIA UNA GEOAREA DA UNA IMBARCAZIONE (solo admin)
 imbarcazioneRoutes.delete("/geoareas/delete", checkAdmin, imbarcazione.deleteGeoarea);
@@ -28,7 +25,7 @@ imbarcazioneRoutes.delete("/geoareas/delete", checkAdmin, imbarcazione.deleteGeo
 imbarcazioneRoutes.post("/create", checkAdmin, imbarcazione.createImbarcazione);
 
 // UPDATE imbarcazione
-imbarcazioneRoutes.put("/update/:mmsi", imbarcazione.updateImbarcazione);
+imbarcazioneRoutes.patch("/update/:mmsi", imbarcazione.updateImbarcazione);
 
 // DELETE imbarcazione
 imbarcazioneRoutes.delete("/delete/:mmsi", imbarcazione.deleteImbarcazione);
