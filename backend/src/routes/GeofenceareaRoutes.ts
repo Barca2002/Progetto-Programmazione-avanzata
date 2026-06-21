@@ -6,10 +6,10 @@ export const geofenceareaRoutes = Router();
 const geofencearea = new GeofenceAreaController();
 
 // GET tutte le aree
-geofenceareaRoutes.get("/all", geofencearea.getAree);
+geofenceareaRoutes.get("/all", checkAdmin, geofencearea.getAree);
 
 // GET area per ID
-geofenceareaRoutes.get("/:id", geofencearea.getAreaById);
+geofenceareaRoutes.get("/:id", checkAdmin, geofencearea.getAreaById);
 
 // CREATE area (solo admin)
 geofenceareaRoutes.post("/create", checkAdmin, geofencearea.createArea);

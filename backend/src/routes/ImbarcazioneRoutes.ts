@@ -13,7 +13,7 @@ imbarcazioneRoutes.get("/geofences", checkAdmin, imbarcazione.getAllImbarcazioni
 imbarcazioneRoutes.get("/my/geoareas", checkUser, imbarcazione.getMyImbarcazioniWithGeofences);
 
 // GET imbarcazione per mmsi
-imbarcazioneRoutes.get("/:mmsi", imbarcazione.getImbarcazioneById);
+imbarcazioneRoutes.get("/:mmsi", checkAdmin, imbarcazione.getImbarcazioneById);
 
 // ASSOCIA PIU GEOAREAS E USER A PIU IMBARCAZIONI (solo admin)
 imbarcazioneRoutes.post("/geoareas-user/add", checkAdmin, imbarcazione.linkGeoareasEUserToImbarcazioni);
