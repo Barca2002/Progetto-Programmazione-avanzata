@@ -5,6 +5,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
+import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioni.js';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
@@ -91,11 +92,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async linkGeoareas(mmsi: number, geoarea_ids: number[], t: Transaction): Promise<void> {
     try {
-      const db = DatabaseConnection.connect();
-
-      //geofence_imbarcazioni è un model che viene creato a runtime (quando lancio inizializzaAssociazioni(), grazie all'opzione through: 'geofence_imbarcazioni'), in questo modo mi ci connetto per eseguire query su di lui
       //bulkCreate è utile quando devo fare più insert contemporaneamente, come in questo caso. Uso map cosi ad ogni id associo l'oggetto { mmsi: mmsi, geoarea_id: geoarea_id } che bulkCreate inserirà nella tabella molti a molti di collegamento
-      const GeofenceImbarcazioni = db.models.geofence_imbarcazioni!;
       await GeofenceImbarcazioni.bulkCreate(
         geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })),
         { ignoreDuplicates: true, transaction: t }
@@ -108,6 +105,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
   async linkUser(mmsi: number, user_id: number, t: Transaction): Promise<void> {
     try {
       const db = DatabaseConnection.connect();
+      //user_imbarcazioni è un model che viene creato a runtime (quando lancio inizializzaAssociazioni(), grazie all'opzione through: 'user_imbarcazioni'), in questo modo mi ci connetto per eseguire query su di lui
       const UserImbarcazioni = db.models.user_imbarcazioni!;
       await UserImbarcazioni.create({ user_id: user_id, mmsi: mmsi }, { transaction: t });
     } catch (err) {
@@ -127,8 +125,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async findGeoareaAssociation(mmsi: number, geoarea_id: number, t: Transaction) {
     try {
-      const db = DatabaseConnection.connect();
-      const GeofenceImbarcazioni = db.models.geofence_imbarcazioni!;
       return await GeofenceImbarcazioni.findOne({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t });
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
@@ -137,8 +133,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async deleteGeoareaAssociation(mmsi: number, geoarea_id: number, t: Transaction): Promise<void> {
     try {
-      const db = DatabaseConnection.connect();
-      const GeofenceImbarcazioni = db.models.geofence_imbarcazioni!;
       await GeofenceImbarcazioni.destroy({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t });
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);

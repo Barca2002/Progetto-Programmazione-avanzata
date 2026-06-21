@@ -1,23 +1,25 @@
 import { Imbarcazione } from './ImbarcazioneModel.js';
 import { Geofencearea } from './GeofenceareaModel.js';
 import { User } from './UserModel.js';
+import { GeofenceImbarcazioni } from './GeofenceImbarcazioni.js'; // modello della tabella di giunzione
 
 export function inizializzaAssociazioni(): void {
     Imbarcazione.belongsToMany(Geofencearea, {
-        through: 'geofence_imbarcazioni',
+        through: GeofenceImbarcazioni,
         timestamps: false,
         foreignKey: 'mmsi',
         otherKey: 'geoarea_id',
-        as: 'Geofenceareas' //messo perchè altrimenti dava problemi quando si fanno query inter-relazionali fra tabelle diverse
+        as: 'Geofenceareas'
     });
 
     Geofencearea.belongsToMany(Imbarcazione, {
-        through: 'geofence_imbarcazioni',
+        through: GeofenceImbarcazioni,
         timestamps: false,
         foreignKey: 'geoarea_id',
         otherKey: 'mmsi'
     });
 
+    // le altre associazioni rimangono invariate...
     User.belongsToMany(Imbarcazione, {
         through: 'user_imbarcazioni',
         timestamps: false,

@@ -12,6 +12,7 @@ import { geofenceareaRoutes } from './routes/GeofenceareaRoutes.js';
 import { Imbarcazione } from './models/ImbarcazioneModel.js';
 import { imbarcazioneRoutes } from './routes/ImbarcazioneRoutes.js';
 import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
+import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioni.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ const db: Sequelize = DatabaseConnection.connect();
 User.inizializzaModel(db);
 Geofencearea.inizializzaModel(db);
 Imbarcazione.inizializzaModel(db);
+GeofenceImbarcazioni.inizializzaModel(db);
 
 inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
