@@ -19,7 +19,7 @@ imbarcazioneRoutes.get("/all", imbarcazione.getImbarcazioni);
 imbarcazioneRoutes.get("/:mmsi", imbarcazione.getImbarcazioneById);
 
 // ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI (solo admin)
-imbarcazioneRoutes.post("/geoareas/add", checkAdmin, imbarcazione.addGeoareasToImbarcazioni);
+imbarcazioneRoutes.post("/geoareas/add", checkAdmin, imbarcazione.addGeoareasEUserToImbarcazioni);
 
 // CREATE imbarcazione (solo admin)
 imbarcazioneRoutes.post("/create", checkAdmin, imbarcazione.createImbarcazione);

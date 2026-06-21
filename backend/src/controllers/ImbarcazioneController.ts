@@ -88,25 +88,27 @@ export class ImbarcazioneController{
     "links": [
         {
             "mmsi": 247112233,
-            "geoarea_ids": [1, 2]
+            "geoarea_ids": [1, 2],
+            "user_id": 4
         },
         {
             "mmsi": 247123456,
-            "geoarea_ids": [6, 4, 5]
+            "geoarea_ids": [6, 4, 2],
+            "user_id": 6
         }
     ]
   }
   */
   
   // AGGIUNGERE UNA O PIU GEOAREAS A UNA O PIU IMBARCAZIONI
-  public addGeoareasToImbarcazioni = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public addGeoareasEUserToImbarcazioni = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const links = req.body.links;
 
         if (!links || !Array.isArray(links)) {
           throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         }
-        await this.imbarcazioneDAO.addGeoareasToImbarcazioni(links);
+        await this.imbarcazioneDAO.addGeoareasEUserToImbarcazioni(links);
         res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_ADDED, links as any));
     } catch (err) {
         if (err instanceof AppError) {

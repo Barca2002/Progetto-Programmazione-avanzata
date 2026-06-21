@@ -73,8 +73,8 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
     }
   }
 
-  // ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI
-async addGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]): Promise<void> {
+  // ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI E UN IMBARCAZIONE AD UN UTENTE
+async addGeoareasEUserToImbarcazioni(links: { mmsi: number, geoarea_ids: number[], user_id: number }[]): Promise<void> {
     const sequelize = Imbarcazione.sequelize!;
     const t = await sequelize.transaction(); // apro la transazione, da qui in poi tutto resta "in sospeso" finché non chiamo commit o rollback
 
@@ -90,8 +90,9 @@ async addGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]
       */
        
       const GeofenceImbarcazioni = sequelize.models.geofence_imbarcazioni!;
+      const UserImbarcazioni = sequelize.models.user_imbarcazioni!;
       
-      for (const { mmsi, geoarea_ids } of links) {
+      for (const { mmsi, geoarea_ids, user_id } of links) {
         //mmsi e ogni geoarea_id devono essere numeri interi, altrimenti ricontrolla il formato dei dati inseriti
         const valoriValidi =
           typeof mmsi === 'number' && Number.isInteger(mmsi) &&
@@ -113,27 +114,15 @@ async addGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]
         
         bulkCreate è utile quando devo fare più insert di fila come nel nostro caso, invece di lanciare piu .create (più insert separati) per ogni geoarea_ids, ne lancio una con una map
 
-                [
-        app       |   {
-        app       |     mmsi: 247123456,
-        app       |     geoarea_id: 6,
-        app       |   }, {
-        app       |     mmsi: 247123456,
-        app       |     geoarea_id: 4,
-        app       |   }, {
-        app       |     mmsi: 247123456,
-        app       |     geoarea_id: 5,
-        app       |   }
-        app       | ]
-
-        Executing (default): INSERT INTO "geofence_imbarcazioni" ("mmsi","geoarea_id") VALUES (247123456,6),(247123456,4),(247123456,5) ON CONFLICT DO NOTHING RETURNING "mmsi","geoarea_id";
         */
         await GeofenceImbarcazioni.bulkCreate(
-          geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })),
+          geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })), // itera sull'array geoarea_ids e ad ogni iterazione geoarea_id è l'elemento corrente
           { ignoreDuplicates: true, transaction: t } // non duplica associazioni già esistenti ed esegue le query all'interno della transazione t, non direttamente sul database, cosi se ho un errore nel body, devo rifare la richiesta completamente giusta. Senza questa strategia le query con input giusto venivano eseguite e non si sapeva quali avesse fatto; adesso al primo errore bisogna rimandare la richiesta da capo ben formata.
         );
-        
+
         //console.log(geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })))
+
+        await UserImbarcazioni.create({ user_id: user_id, mmsi: mmsi }, { ignoreDuplicates: true, transaction: t }) //adesso associo un imbarcazione ad un utente, controllando sempre che non ci siano errori nel body della request
       }
       
       await t.commit(); // tutti i link erano validi: rendo definitive le insert fatte finora
