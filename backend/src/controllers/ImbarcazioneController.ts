@@ -109,7 +109,33 @@ export class ImbarcazioneController{
           throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         }
         await this.imbarcazioneDAO.addGeoareasEUserToImbarcazioni(links);
-        res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_ADDED, links as any));
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_E_USER_ADDED, links as any));
+    } catch (err) {
+        if (err instanceof AppError) {
+            (err as AppError).send(res);
+        } else {
+            res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        }
+    }
+  };
+
+  /*
+  Body della delete:
+  {
+    "mmsi": 247123456,
+    "geoarea_id": 1
+  }
+  */
+
+  public deleteGeoarea = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const links = req.body;
+
+        if (!links || typeof links.mmsi === 'undefined' || typeof links.geoarea_id === 'undefined') {
+          throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        }
+        await this.imbarcazioneDAO.deleteGeoarea(links);
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, links as any));
     } catch (err) {
         if (err instanceof AppError) {
             (err as AppError).send(res);

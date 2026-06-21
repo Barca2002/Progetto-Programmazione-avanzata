@@ -74,7 +74,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
   }
 
   // ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI E UN IMBARCAZIONE AD UN UTENTE
-async addGeoareasEUserToImbarcazioni(links: { mmsi: number, geoarea_ids: number[], user_id: number }[]): Promise<void> {
+  async addGeoareasEUserToImbarcazioni(links: { mmsi: number, geoarea_ids: number[], user_id: number }[]): Promise<void> {
     const sequelize = Imbarcazione.sequelize!;
     const t = await sequelize.transaction(); // apro la transazione, da qui in poi tutto resta "in sospeso" finché non chiamo commit o rollback
 
@@ -134,7 +134,44 @@ async addGeoareasEUserToImbarcazioni(links: { mmsi: number, geoarea_ids: number[
         }
         throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
-}
+  }
+
+  async deleteGeoarea(links: { mmsi: number, geoarea_id: number}): Promise<void> {
+    const { mmsi, geoarea_id } = links;
+    const sequelize = Imbarcazione.sequelize!;
+    const t = await sequelize.transaction(); // apro la transazione, da qui in poi tutto resta "in sospeso" finché non chiamo commit o rollback
+    try {
+      const GeofenceImbarcazioni = sequelize.models.geofence_imbarcazioni!;
+
+      const valoriValidi =
+          typeof mmsi === 'number' && Number.isInteger(mmsi) &&
+          typeof geoarea_id === 'number' && Number.isInteger(geoarea_id);
+
+      if (!valoriValidi) {
+          throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
+
+      //Controllo che la coppia mmsi, geoarea_id esiste prima, nel caso lo segnalo
+      const associazione = await GeofenceImbarcazioni.findOne({
+        where: { mmsi: mmsi, geoarea_id: geoarea_id },
+        transaction: t
+      });
+
+      if (!associazione) {
+        throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
+      }
+      
+      await GeofenceImbarcazioni.destroy({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t}); //adesso dissocio un imbarcazione ad una geoarea, controllando sempre che non ci siano errori nel body della request
+      await t.commit()
+    } catch (err) {
+      await t.rollback();
+      if (err instanceof AppError) {
+        throw err;
+      }
+      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+    }
+  }
+
 
   async findAll(): Promise<Imbarcazione[]> {
     try {

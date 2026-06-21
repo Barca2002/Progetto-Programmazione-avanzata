@@ -45,6 +45,8 @@ export const ERROR_LIST = {
     { statusCode: 404, message: "Utente non trovato." },
     GEOAREA_NOT_FOUND:
     { statusCode: 404, message: "Geoarea non trovata." },
+    ASSOCIAZIONE_NOT_FOUND:
+    { statusCode: 404, message: "L'associazione inserita non è stata trovata, ricontrolla i dati inseriti" },
     IMBARCAZIONE_NOT_FOUND:
     { statusCode: 404, message: "Imbarcazione non trovata." },
     INVALID_MMSI:
@@ -82,7 +84,7 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "L'area è stata creata con successo." },
     IMBARCAZIONE_CREATED:
     { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
-    GEOAREAS_ADDED:
+    GEOAREAS_E_USER_ADDED:
     { statusCode: 200, message: "Geofence associate all'imbarcazione con successo." },
 } as const;
 
