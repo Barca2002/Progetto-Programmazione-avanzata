@@ -55,6 +55,14 @@ export const ERROR_LIST = {
     { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:
     { statusCode: 403, message: "Accesso riservato agli amministratori." },
+    INVALID_LATITUDINE:
+    { statusCode: 400, message: "La latitudine deve essere un numero compreso tra -90 e 90." },
+    INVALID_LONGITUDINE:
+    { statusCode: 400, message: "La longitudine deve essere un numero compreso tra -180 e 180." },
+    INVALID_STATO:
+    { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIO." },
+    INVALID_VELOCITA:
+    { statusCode: 400, message: "La velocità deve essere un numero positivo e non superiore a 200 km/h." },
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
@@ -88,6 +96,8 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
     GEOAREAS_E_USER_ADDED:
     { statusCode: 200, message: "Geofence associate all'imbarcazione con successo." },
+    SEND_DATA:
+    { statusCode: 201, message: "Dati inviati con successo." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

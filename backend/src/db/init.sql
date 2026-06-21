@@ -1,11 +1,12 @@
 -- Abilita l'estensione PostGIS
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+DROP TABLE IF EXISTS dati_inviati;      
 DROP TABLE IF EXISTS segnalazioni;
 DROP TABLE IF EXISTS geofence_imbarcazioni;
 DROP TABLE IF EXISTS user_imbarcazioni;
 DROP TABLE IF EXISTS geofence_areas;
-DROP TABLE IF EXISTS imbarcazioni;
+DROP TABLE IF EXISTS imbarcazioni;      
 DROP TABLE IF EXISTS users;
 
 -- ------------------------------------------------------------
@@ -84,10 +85,28 @@ CREATE TABLE segnalazioni (
     stato              VARCHAR(10)  NOT NULL DEFAULT 'IN CORSO',
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (segnalazione_id),
+    PRIMARY KEY (id),
     CONSTRAINT fk_seg_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
     CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT chk_stato      CHECK (stato IN ('IN CORSO', 'RIENTRATA'))
+);
+
+-- ------------------------------------------------------------
+--  TABELLA: dati_inviati
+-- ------------------------------------------------------------
+
+CREATE TABLE dati_inviati (
+    id        INT GENERATED ALWAYS AS IDENTITY,
+    mmsi           INT             NOT NULL,
+    latitudine     DECIMAL(9,6)    NOT NULL,
+    longitudine    DECIMAL(9,6)    NOT NULL,
+    velocita_kmh   DECIMAL(6,2)    NOT NULL,
+    timestamp      BIGINT          NOT NULL,
+    stato          VARCHAR(15)     NOT NULL,
+    
+    PRIMARY KEY (id),
+    CONSTRAINT fk_dati_mmsi FOREIGN KEY (mmsi) REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE,
+    CONSTRAINT chk_stato_dati CHECK (stato IN ('IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'))
 );
 
 -- ============================================================

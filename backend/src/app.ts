@@ -13,6 +13,8 @@ import { Imbarcazione } from './models/ImbarcazioneModel.js';
 import { imbarcazioneRoutes } from './routes/ImbarcazioneRoutes.js';
 import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
 import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioni.js';
+import { Datiinviati } from './models/DatiInviatiModel.js';
+import { userRoutes } from './routes/UserRoutes.js';
 
 dotenv.config();
 
@@ -24,6 +26,7 @@ User.inizializzaModel(db);
 Geofencearea.inizializzaModel(db);
 Imbarcazione.inizializzaModel(db);
 GeofenceImbarcazioni.inizializzaModel(db);
+Datiinviati.inizializzaModel(db);
 
 inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
@@ -42,6 +45,8 @@ app.use("/auth", authRouter);
 app.use("/admin", adminRoutes);
 app.use("/geoarea", geofenceareaRoutes);
 app.use("/imbarcazione", imbarcazioneRoutes);
+app.use("/user", userRoutes);
+
 
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

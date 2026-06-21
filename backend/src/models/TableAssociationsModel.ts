@@ -25,6 +25,7 @@ export function inizializzaAssociazioni(): void {
         timestamps: false,
         foreignKey: 'user_id',
         otherKey: 'mmsi',
+        as: 'Imbarcazioni'
     });
 
     Imbarcazione.belongsToMany(User, {
@@ -32,5 +33,6 @@ export function inizializzaAssociazioni(): void {
         timestamps: false,
         foreignKey: 'mmsi',
         otherKey: 'user_id',
+        as: 'Users'
     });
 }
