@@ -132,8 +132,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
           { ignoreDuplicates: true, transaction: t } // non duplica associazioni già esistenti ed esegue le query all'interno della transazione t, non direttamente sul database, cosi se ho un errore nel body, devo rifare la richiesta completamente giusta. Senza questa strategia le query con input giusto venivano eseguite e non si sapeva quali avesse fatto; adesso al primo errore bisogna rimandare la richiesta da capo ben formata.
         );
 
-        //console.log(geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })))
-
         //Controllo se l'imbarcazione è gia associata ad un utente, nel caso lo segnalo. Non metto user_id perche mi basta sapere che gia è associata, quindi c'è una riga nella tabella (CHIEDERE AL PROF)
         const associazioneEsistente = await UserImbarcazioni.findOne({
           where: { mmsi: mmsi },

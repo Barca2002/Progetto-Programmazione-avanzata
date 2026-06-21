@@ -56,7 +56,7 @@ export class ImbarcazioneController{
   public getAllImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const imbarcazioni = await this.imbarcazioneDAO.findAllGeofences();
-        res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni as any));
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni ));
     } catch (err) {
           if (err instanceof AppError) {
         (err as AppError).send(res);
@@ -71,7 +71,7 @@ export class ImbarcazioneController{
     try {
       const user_id = (req as any).userLoggato.user_id; //è l'id dello user che avevo appeso dalla richiesta quando faccio il checkUser nel Middleware, chiamando la funzione checkToken
       const imbarcazioni = await this.imbarcazioneDAO.findAllByUserWithGeofences(user_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni as any));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni ));
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);
@@ -133,7 +133,7 @@ export class ImbarcazioneController{
           throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         }
         await this.imbarcazioneDAO.deleteGeoarea(links);
-        res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, links as any));
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, links));
     } catch (err) {
         if (err instanceof AppError) {
             (err as AppError).send(res);
@@ -156,7 +156,7 @@ export class ImbarcazioneController{
     }
 
     const nuovaImbarcazione: Imbarcazione = await this.imbarcazioneDAO.create(req.body);
-    res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione  as any));
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione));
 
   } catch (err) {
     if (err instanceof AppError) {
