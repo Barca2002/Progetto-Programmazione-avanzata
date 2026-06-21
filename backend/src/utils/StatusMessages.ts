@@ -47,6 +47,8 @@ export const ERROR_LIST = {
     { statusCode: 404, message: "Geoarea non trovata." },
     ASSOCIAZIONE_NOT_FOUND:
     { statusCode: 404, message: "L'associazione inserita non è stata trovata, ricontrolla i dati inseriti" },
+    IMBARCAZIONE_ALREADY_ASSOCIATED:
+    { statusCode: 409, message: "L'imbarcazione è già associata ad un utente, ricontrolla i dati inseriti" },
     IMBARCAZIONE_NOT_FOUND:
     { statusCode: 404, message: "Imbarcazione non trovata." },
     INVALID_MMSI:

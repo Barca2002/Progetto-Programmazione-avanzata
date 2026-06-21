@@ -122,6 +122,16 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
         //console.log(geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })))
 
+        //Controllo se l'imbarcazione è gia associata ad un utente, nel caso lo segnalo. Non metto user_id perche mi basta sapere che gia è associata, quindi c'è una riga nella tabella (CHIEDERE AL PROF)
+        const associazioneEsistente = await UserImbarcazioni.findOne({
+          where: { mmsi: mmsi },
+          transaction: t
+        });
+
+        if (associazioneEsistente) {
+          throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_ALREADY_ASSOCIATED);
+        }
+
         await UserImbarcazioni.create({ user_id: user_id, mmsi: mmsi }, { ignoreDuplicates: true, transaction: t }) //adesso associo un imbarcazione ad un utente, controllando sempre che non ci siano errori nel body della request
       }
       
@@ -136,7 +146,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
     }
   }
 
-  async deleteGeoarea(links: { mmsi: number, geoarea_id: number}): Promise<void> {
+  async deleteGeoarea(links: { mmsi: number, geoarea_id: number }): Promise<void> {
     const { mmsi, geoarea_id } = links;
     const sequelize = Imbarcazione.sequelize!;
     const t = await sequelize.transaction(); // apro la transazione, da qui in poi tutto resta "in sospeso" finché non chiamo commit o rollback

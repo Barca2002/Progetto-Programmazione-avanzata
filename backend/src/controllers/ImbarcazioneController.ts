@@ -69,7 +69,7 @@ export class ImbarcazioneController{
   // FUNZIONE CHIAMATA DALL'UTENTE LOGGATO PER VEDERE LE SUE IMBARCAZIONI CON GEOFENCE ASSOCIATE
   public getMyImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const user_id = (req as any).userLoggato.user_id; //è l'id dello user che avevo appeso dalla richiesta quando faccio il checkUser nel Middleware, chiamando la funzione checkToken da cui prende la req
+      const user_id = (req as any).userLoggato.user_id; //è l'id dello user che avevo appeso dalla richiesta quando faccio il checkUser nel Middleware, chiamando la funzione checkToken
       const imbarcazioni = await this.imbarcazioneDAO.findAllByUserWithGeofences(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni as any));
     } catch (err) {
