@@ -6,6 +6,6 @@ export class SuccessFactory {
     static getSuccess<T>(successName: AppSuccessName, data: T): AppSuccess {
         // Si estrae lo status e il messaggio da SUCCESS_LIST usando il nome del success.
         const { statusCode, message } = SUCCESS_LIST[successName]; 
-        return new AppSuccess(statusCode, successName, message, data as unknown as SuccessDataStructure | null);
+        return new AppSuccess(statusCode, successName, message, data as unknown as SuccessDataStructure | null); //visto che data puo essere qualunque (T), passo per unkwown perché TypeScript non permette di castare direttamente da un tipo generico T a SuccessDataStructure | null se non c'è una relazione tra i due
     }
 }

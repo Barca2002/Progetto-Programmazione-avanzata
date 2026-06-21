@@ -1,4 +1,3 @@
-// models/associations.ts
 import { Imbarcazione } from './ImbarcazioneModel.js';
 import { Geofencearea } from './GeofenceareaModel.js';
 import { User } from './UserModel.js';
@@ -9,7 +8,7 @@ export function inizializzaAssociazioni(): void {
         timestamps: false,
         foreignKey: 'mmsi',
         otherKey: 'geoarea_id',
-        as: 'Geofenceareas'
+        as: 'Geofenceareas' //messo perchè altrimenti dava problemi quando si fanno query inter-relazionali fra tabelle diverse
     });
 
     Geofencearea.belongsToMany(Imbarcazione, {
