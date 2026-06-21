@@ -83,27 +83,25 @@ export class ImbarcazioneController{
 
 
   /*
-  Body della request:
-  {
-    "links": [
-        {
-            "mmsi": 247112233,
-            "geoarea_ids": [1, 2],
-            "user_id": 4
-        },
-        {
-            "mmsi": 247123456,
-            "geoarea_ids": [6, 4, 2],
-            "user_id": 6
-        }
-    ]
-  }
+  Body della add (vettore di associazioni):
+  [
+      {
+          "mmsi": 247112233,
+          "geoarea_ids": [1, 2],
+          "user_id": 4
+      },
+      {
+          "mmsi": 247123456,
+          "geoarea_ids": [6, 4, 2],
+          "user_id": 2
+      }
+  ]
   */
   
-  // AGGIUNGERE UNA O PIU GEOAREAS A UNA O PIU IMBARCAZIONI
+  // AGGIUNGERE UNA O PIU GEOAREAS E USER A UNA O PIU IMBARCAZIONI
   public addGeoareasEUserToImbarcazioni = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const links = req.body.links;
+        const links = req.body;
 
         if (!links || !Array.isArray(links)) {
           throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
