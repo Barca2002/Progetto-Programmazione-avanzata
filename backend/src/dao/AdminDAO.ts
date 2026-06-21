@@ -2,11 +2,12 @@ import { User } from '../models/UserModel.js';
 import { UserCreationData } from '../models/UserModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
+import { Transaction } from 'sequelize';
 
 interface IAdminDAO {
   create(data: UserCreationData): Promise<User>;
   findAll(): Promise<User[]>;
-  findById(user_id: number): Promise<User | null>;
+  findById(user_id: number, t?: Transaction): Promise<User | null>;
   update(user_id: number, data: Partial<UserCreationData>): Promise<number>;
   delete(user_id: number): Promise<number>; 
 }
@@ -22,8 +23,11 @@ export class AdminDAO implements IAdminDAO {
     
   }
 
-  async findById(user_id: number): Promise<User | null> {
+  async findById(user_id: number, t?: Transaction): Promise<User | null> {
     try {
+      if(t)
+        return await User.findByPk(user_id, { transaction: t });
+
       return await User.findByPk(user_id);
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
