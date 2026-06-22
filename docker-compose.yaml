@@ -19,7 +19,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s # non contare i fallimenti dell'healthcheck nei primi 30 secondi perche Postgres è lento ad avviarsi
   app:
     container_name: app
     depends_on:

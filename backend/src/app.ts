@@ -1,10 +1,8 @@
 import express, { Response, Request, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/AuthRoutes.js';
-import { testRouter } from './routes/TestRoutes.js';
 import { adminRoutes } from './routes/AdminRoutes.js';
 import { AppError } from './models/AppErrorModel.js';
-import { Sequelize } from 'sequelize';
 import { DatabaseConnection } from './singleton/DBConnection.js';
 import { User } from './models/UserModel.js';
 import { Geofencearea } from './models/GeofenceareaModel.js';
@@ -19,14 +17,13 @@ import { userRoutes } from './routes/UserRoutes.js';
 dotenv.config();
 
 const PORT = process.env.APP_PORT;
-const db: Sequelize = DatabaseConnection.connect();
 
-// Inizializzazione del model User
-User.inizializzaModel(db);
-Geofencearea.inizializzaModel(db);
-Imbarcazione.inizializzaModel(db);
-GeofenceImbarcazioni.inizializzaModel(db);
-Datiinviati.inizializzaModel(db);
+// Inizializzazione dei model tramite il singleton del database
+User.inizializzaModel(DatabaseConnection.getInstance());
+Geofencearea.inizializzaModel(DatabaseConnection.getInstance());
+Imbarcazione.inizializzaModel(DatabaseConnection.getInstance());
+GeofenceImbarcazioni.inizializzaModel(DatabaseConnection.getInstance());
+Datiinviati.inizializzaModel(DatabaseConnection.getInstance());
 
 inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
@@ -40,7 +37,6 @@ app.get('/', (req, res) => {
 });
 
 // Rotte varie
-app.use("/test", testRouter);
 app.use("/auth", authRouter);
 app.use("/admin", adminRoutes);
 app.use("/geoarea", geofenceareaRoutes);

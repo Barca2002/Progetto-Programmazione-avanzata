@@ -1,6 +1,7 @@
 -- Abilita l'estensione PostGIS
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+DROP TABLE IF EXISTS violazioni;
 DROP TABLE IF EXISTS dati_inviati;      
 DROP TABLE IF EXISTS segnalazioni;
 DROP TABLE IF EXISTS geofence_imbarcazioni;

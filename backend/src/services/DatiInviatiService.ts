@@ -1,12 +1,14 @@
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 import { AppError } from '../models/AppErrorModel.js';
+import { DatabaseConnection } from '../singleton/DBConnection.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
+  
+  private readonly UserImbarcazioni = DatabaseConnection.getInstance().models.user_imbarcazioni!;
 
   async sendData(user_id: number, mmsi: number, latitudine: number, longitudine: number, velocita_kmh: number, stato: string): Promise<void> {
     
@@ -24,21 +26,19 @@ export class DatiInviatiService {
 
     if (!stato || !['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'].includes(stato))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
-
-    const db = DatabaseConnection.connect();
-    const UserImbarcazioni = db.models.user_imbarcazioni!;
-    const imbarcazione = await UserImbarcazioni.findOne({ where: { user_id, mmsi } });
+    
+    const imbarcazione = await this.UserImbarcazioni.findOne({ where: { user_id, mmsi } });
 
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-    const t = await db.transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati
+    const t = await DatabaseConnection.getInstance().transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati
 
     try {
       //Inserisco i dati nel db, con una transaction metto in sospeso
       await this.datiinviatiDAO.create({ mmsi, latitudine, longitudine, velocita_kmh, stato }, t);
 
-      const geoaree_found = await this.datiinviatiDAO.checkLocationInGeoarea(db, mmsi, latitudine, longitudine); //uso mmsi e non user_id perche una mmsi è associata ad un user quindi è uguale
+      const geoaree_found = await this.datiinviatiDAO.checkLocationInGeoarea(DatabaseConnection.getInstance(), mmsi, latitudine, longitudine); //uso mmsi e non user_id perche una mmsi è associata ad un user quindi è uguale
 
       //Aggiorno per quella imbarcazione la posizione resettando le altre, perche conta l'ultima posizione inserita (sempre con una transaction)
       await GeofenceImbarcazioni.update(

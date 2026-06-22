@@ -48,8 +48,7 @@ export class ImbarcazioneService {
   }
 
   async linkGeoareasEUserToImbarcazioni(links: { mmsi: number, geoarea_ids: number[], user_id: number }[]): Promise<void> {
-    const db = DatabaseConnection.connect();
-    const t = await db.transaction(); //si è fatto cosi altrimenti un singolo errore nel body non annullava la richiesta ma quelle corrette venivano mandate nonostante l'errore e non si sapeva quali venissero fatte o no. Cosi in questo modo al primo errore viene fatto il rollback e segnalato l'errore
+    const t = await DatabaseConnection.getInstance().transaction(); //si è fatto cosi altrimenti un singolo errore nel body non annullava la richiesta ma quelle corrette venivano mandate nonostante l'errore e non si sapeva quali venissero fatte o no. Cosi in questo modo al primo errore viene fatto il rollback e segnalato l'errore
 
     try {
       for (const { mmsi, geoarea_ids, user_id } of links) {
@@ -73,11 +72,9 @@ export class ImbarcazioneService {
 
         //Controllo che l'imbarcazione non sia già associata ad un utente
         const associazioneEsistente = await this.imbarcazioneDAO.findUserAssociation(mmsi, t);
-        if (associazioneEsistente)
+        if (associazioneEsistente){
           throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_ALREADY_ASSOCIATED);
-
-        
-
+        }
         await this.imbarcazioneDAO.linkGeoareas(mmsi, geoarea_ids, t);
         await this.imbarcazioneDAO.linkUser(mmsi, user_id, t);
       }
@@ -91,8 +88,7 @@ export class ImbarcazioneService {
   }
 
   async deleteGeoarea(mmsi: number, geoarea_id: number): Promise<void> {
-    const db = DatabaseConnection.connect();
-    const t = await db.transaction();
+    const t = await DatabaseConnection.getInstance().transaction();
 
     try {
       //Controllo che l'imbarcazione esista

@@ -7,7 +7,7 @@ dotenv.config();
 
 export class DatabaseConnection {
     private static connDB: DatabaseConnection; //PATTERN SINGLETON: unica istanza di connessione (attributo statico con lo stesso tipo della classe); 
-    private connection: Sequelize; //connessione con ORM Sequelize
+    private instance: Sequelize; //connessione con ORM Sequelize
     
     private constructor() {
       const {
@@ -22,7 +22,7 @@ export class DatabaseConnection {
         throw ErrorFactory.getError(AppErrorEnum.ENV_VARIABLES_MISSING);
       }
       // Istanziamo la connessione con Sequelize
-      this.connection = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+      this.instance = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
         host: DB_HOST!,
         port: Number(DB_PORT)!,
         dialect: 'postgres',
@@ -30,11 +30,11 @@ export class DatabaseConnection {
       });
 	}
 
-  public static connect(): Sequelize {
+  public static getInstance(): Sequelize {
       if (!DatabaseConnection.connDB) { //se non esiste la connessione la crea
           DatabaseConnection.connDB = new DatabaseConnection();
       }
-      return DatabaseConnection.connDB.connection; //torna la connessione attiva
+      return DatabaseConnection.connDB.instance; //torna la connessione attiva
   }
       
 } 
