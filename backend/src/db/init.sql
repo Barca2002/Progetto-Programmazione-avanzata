@@ -80,7 +80,7 @@ CREATE TABLE geofence_imbarcazioni (
 -- ------------------------------------------------------------
 CREATE TABLE segnalazioni (
     id    INT GENERATED ALWAYS AS IDENTITY,
-    numero_violazioni  INT          NOT NULL DEFAULT 1,
+    numero_violazioni  INT          NOT NULL DEFAULT 0,
     mmsi               INT          NOT NULL,
     geoarea_id         INT          NOT NULL,
     stato              VARCHAR(10)  NOT NULL DEFAULT 'IN CORSO',
