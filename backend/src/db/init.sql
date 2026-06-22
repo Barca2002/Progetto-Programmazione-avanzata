@@ -29,10 +29,12 @@ CREATE TABLE users (
 --  TABELLA: imbarcazioni
 -- ------------------------------------------------------------
 CREATE TABLE imbarcazioni (
-    mmsi       INT          PRIMARY KEY,
-    name       VARCHAR(255) NOT NULL,
-    type       VARCHAR(50)  NOT NULL,
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    mmsi          INT          PRIMARY KEY,
+    name          VARCHAR(255) NOT NULL,
+    type          VARCHAR(50)  NOT NULL,
+    desc          VARCHAR(255) NOT NULL,
+    max_capacity  INT          NOT NULL,
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT imbarcazioni_name_key UNIQUE (name)
 );
@@ -59,8 +61,8 @@ CREATE TABLE user_imbarcazioni (
     mmsi    INT NOT NULL,
 
     PRIMARY KEY (user_id, mmsi),
-    CONSTRAINT fk_ui_user FOREIGN KEY (user_id) REFERENCES users(user_id)      ON DELETE CASCADE,
-    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE CASCADE,
+    CONSTRAINT fk_ui_user FOREIGN KEY (user_id) REFERENCES users(user_id)      ON DELETE SET NULL,
+    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE SET NULL,
     CONSTRAINT unique_mmsi UNIQUE (mmsi)
 );
 
@@ -72,25 +74,43 @@ CREATE TABLE geofence_imbarcazioni (
     mmsi       INT     NOT NULL,
     is_in      BOOLEAN      NOT NULL DEFAULT FALSE,
     PRIMARY KEY (geoarea_id, mmsi),
-    CONSTRAINT fk_gi_area FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
-    CONSTRAINT fk_gi_mmsi FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE
+    CONSTRAINT fk_gi_area FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE SET NULL,
+    CONSTRAINT fk_gi_mmsi FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE SET NULL
 );
 
 -- ------------------------------------------------------------
 --  TABELLA: segnalazioni
+-- Una segnazione avviene quando entro due giorni da una violazione, se ne verificano in totale 5. Però, se una violazione successiva avviene entro un'ora dalla precedente, essa non viene conteggiata.
 -- ------------------------------------------------------------
 CREATE TABLE segnalazioni (
     id    INT GENERATED ALWAYS AS IDENTITY,
-    numero_violazioni  INT          NOT NULL DEFAULT 0,
     mmsi               INT          NOT NULL,
     geoarea_id         INT          NOT NULL,
     stato              VARCHAR(10)  NOT NULL DEFAULT 'IN CORSO',
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    CONSTRAINT fk_seg_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
-    CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
+    CONSTRAINT fk_seg_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE SET NULL,
+    CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE SET NULL,
     CONSTRAINT chk_stato      CHECK (stato IN ('IN CORSO', 'RIENTRATA'))
+);
+
+-- ------------------------------------------------------------
+--  TABELLA: violazioni
+-- Se un'imbarcazione commette 5 violazioni in un arco di 2 giorni in una certa geoarea, verrà emessa una segnalazione.
+-- Però se dalla prima violazione viene commessa un'altra entro 1h, essa non viene conteggiata. 
+-- ------------------------------------------------------------
+CREATE TABLE violazioni (
+    id    INT GENERATED ALWAYS AS IDENTITY,
+    tipo  VARCHAR(255)          NOT NULL,
+    mmsi               INT          NOT NULL,
+    geoarea_id         INT          NOT NULL,
+    created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    CONSTRAINT fk_viol_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE SET NULL,
+    CONSTRAINT fk_viol_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE SET NULL,
+    CONSTRAINT chk_tipo     CHECK (tipo IN ('ECCESSO VELOCITA', 'ACCESSO AREA NON AUTORIZZATA'))
 );
 
 -- ------------------------------------------------------------
@@ -107,7 +127,7 @@ CREATE TABLE dati_inviati (
     stato          VARCHAR(15)     NOT NULL,
     
     PRIMARY KEY (id),
-    CONSTRAINT fk_dati_mmsi FOREIGN KEY (mmsi) REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE,
+    CONSTRAINT fk_dati_mmsi FOREIGN KEY (mmsi) REFERENCES imbarcazioni(mmsi) ON DELETE SET NULL,
     CONSTRAINT chk_stato_dati CHECK (stato IN ('IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'))
 );
 
@@ -133,27 +153,27 @@ INSERT INTO users (username, email, password, is_admin) VALUES
 -- ------------------------------------------------------------
 --  imbarcazioni
 -- ------------------------------------------------------------
-INSERT INTO imbarcazioni (mmsi, name, type) VALUES
-(247123456, 'Adriatica Uno',      'cargo'),
-(247234567, 'Conero Explorer',    'ferry'),
-(247345678, 'San Ciriaco',        'tanker'),
-(215456789, 'Marche Star',        'container'),
-(247567890, 'Riviera Blu',        'yacht'),
-(247789012, 'Don Bosco II',       'fishing'),
-(247890123, 'Bora Bora',          'sailing_yacht'),
-(247901234, 'Eurocargo Ancona',   'ro_ro'),
-(247012345, 'Falco Marino',       'coast_guard'),
-(247112233, 'Medusa',             'research'),
-(247113344, 'Stella del Mare',    'cargo'),
-(247114455, 'Vento di Levante',   'ferry'),
-(247115566, 'Porto Recanati',     'tanker'),
-(247116677, 'Sirena Adriatica',   'yacht'),
-(247117788, 'Orizzonte Blu',      'fishing'),
-(247118899, 'Punta Trave',        'sailing_yacht'),
-(247119900, 'Mare Nostrum',       'container'),
-(247120011, 'Costa Conero',       'ro_ro'),
-(247121122, 'Albatros Due',       'coast_guard'),
-(247122233, 'Tritone',            'research');
+INSERT INTO imbarcazioni (mmsi, name, type, desc, max_capacity) VALUES
+(247123456, 'Adriatica Uno',      'cargo',         'Cargo multipurpose per merci varie',             1800),
+(247234567, 'Conero Explorer',    'ferry',         'Traghetto passeggeri costiero',                  850),
+(247345678, 'San Ciriaco',        'tanker',        'Petroliera per trasporto carburanti',           12000),
+(215456789, 'Marche Star',        'container',     'Portacontainer regionale',                       3500),
+(247567890, 'Riviera Blu',        'yacht',         'Yacht privato di lusso',                           12),
+(247789012, 'Don Bosco II',       'fishing',       'Peschereccio per pesca d’altura',                 35),
+(247890123, 'Bora Bora',          'sailing_yacht', 'Yacht a vela per crociere',                        10),
+(247901234, 'Eurocargo Ancona',   'ro_ro',         'Nave Ro-Ro per veicoli e rimorchi',             2500),
+(247012345, 'Falco Marino',       'coast_guard',   'Motovedetta per pattugliamento',                  25),
+(247112233, 'Medusa',             'research',      'Nave per ricerca oceanografica',                  40),
+(247113344, 'Stella del Mare',    'cargo',         'Cargo costiero per merci secche',              1500),
+(247114455, 'Vento di Levante',   'ferry',         'Traghetto per collegamenti regionali',           650),
+(247115566, 'Porto Recanati',     'tanker',        'Cisterna per prodotti chimici',                 8500),
+(247116677, 'Sirena Adriatica',   'yacht',         'Yacht da diporto moderno',                         14),
+(247117788, 'Orizzonte Blu',      'fishing',       'Peschereccio per pesca costiera',                 22),
+(247118899, 'Punta Trave',        'sailing_yacht', 'Imbarcazione a vela da regata',                    8),
+(247119900, 'Mare Nostrum',       'container',     'Portacontainer per rotte adriatiche',          4200),
+(247120011, 'Costa Conero',       'ro_ro',         'Trasporto veicoli e mezzi pesanti',            1800),
+(247121122, 'Albatros Due',       'coast_guard',   'Unità di soccorso marittimo',                     18),
+(247122233, 'Tritone',            'research',      'Nave per monitoraggio ambientale',                30);
 
 -- ------------------------------------------------------------
 --  geofence_areas
@@ -331,30 +351,178 @@ INSERT INTO geofence_imbarcazioni (geoarea_id, mmsi) VALUES
 
 -- ------------------------------------------------------------
 --  segnalazioni
+-- DA RIVEDERE
 -- ------------------------------------------------------------
-INSERT INTO segnalazioni (numero_violazioni, mmsi, geoarea_id, stato, created_at) VALUES
-(3, 247123456, 1, 'RIENTRATA',  '2025-01-10 08:15:00'),  -- Adriatica Uno      in Zona Nord Ancona
-(1, 247234567, 1, 'IN CORSO',   '2025-01-15 10:30:00'),  -- Conero Explorer    in Zona Nord Ancona
-(5, 247345678, 2, 'RIENTRATA',  '2025-01-20 14:00:00'),  -- San Ciriaco        in Zona Est Porto
-(2, 215456789, 2, 'IN CORSO',   '2025-02-01 09:00:00'),  -- Marche Star        in Zona Est Porto
-(1, 247567890, 3, 'RIENTRATA',  '2025-02-05 16:45:00'),  -- Riviera Blu        in Offshore Conero Nord
-(4, 247890123, 3, 'IN CORSO',   '2025-02-10 11:20:00'),  -- Bora Bora          in Offshore Conero Nord
-(2, 247789012, 4, 'RIENTRATA',  '2025-02-14 07:30:00'),  -- Don Bosco II       in Offshore Portonovo
-(6, 247112233, 4, 'IN CORSO',   '2025-02-20 13:00:00'),  -- Medusa             in Offshore Portonovo
-(1, 247567890, 5, 'RIENTRATA',  '2025-03-01 09:15:00'),  -- Riviera Blu        in Offshore Sirolo
-(3, 247112233, 5, 'IN CORSO',   '2025-03-05 15:00:00'),  -- Medusa             in Offshore Sirolo
-(2, 247789012, 6, 'RIENTRATA',  '2025-03-10 08:00:00'),  -- Don Bosco II       in Offshore Numana
-(1, 247112233, 6, 'IN CORSO',   '2025-03-15 12:30:00'),  -- Medusa             in Offshore Numana
-(4, 247123456, 7, 'RIENTRATA',  '2025-03-20 10:00:00'),  -- Adriatica Uno      in Adriatico Centrale 1
-(2, 247345678, 7, 'IN CORSO',   '2025-03-25 14:45:00'),  -- San Ciriaco        in Adriatico Centrale 1
-(3, 215456789, 7, 'RIENTRATA',  '2025-04-01 09:30:00'),  -- Marche Star        in Adriatico Centrale 1
-(1, 247901234, 7, 'IN CORSO',   '2025-04-05 11:00:00'),  -- Eurocargo Ancona   in Adriatico Centrale 1
-(5, 247123456, 8, 'RIENTRATA',  '2025-04-10 08:45:00'),  -- Adriatica Uno      in Adriatico Centrale 2
-(2, 215456789, 8, 'IN CORSO',   '2025-04-15 13:15:00'),  -- Marche Star        in Adriatico Centrale 2
-(1, 247114455, 9, 'RIENTRATA',  '2025-04-20 10:30:00'),  -- Vento di Levante   in Canale di Fano
-(3, 247117788, 9, 'IN CORSO',   '2025-04-25 15:00:00'),  -- Orizzonte Blu      in Canale di Fano
-(2, 247115566, 10, 'RIENTRATA', '2025-05-01 09:00:00'),  -- Porto Recanati     in Acque Pesaro
-(4, 247118899, 10, 'IN CORSO',  '2025-05-05 11:30:00'),  -- Punta Trave        in Acque Pesaro
-(1, 247113344, 1,  'RIENTRATA', '2025-05-10 08:00:00'),  -- Stella del Mare    in Zona Nord Ancona
-(3, 247119900, 8,  'IN CORSO',  '2025-05-15 14:00:00'),  -- Mare Nostrum       in Adriatico Centrale 2
-(2, 247120011, 2,  'RIENTRATA', '2025-05-20 10:15:00');  -- Costa Conero       in Zona Est Porto
+INSERT INTO segnalazioni (mmsi, geoarea_id, stato, created_at) VALUES
+(247123456, 1, 'RIENTRATA',  '2025-01-10 08:15:00'),  -- Adriatica Uno      in Zona Nord Ancona
+(247234567, 1, 'IN CORSO',   '2025-01-15 10:30:00'),  -- Conero Explorer    in Zona Nord Ancona
+(247345678, 2, 'RIENTRATA',  '2025-01-20 14:00:00'),  -- San Ciriaco        in Zona Est Porto
+(215456789, 2, 'IN CORSO',   '2025-02-01 09:00:00'),  -- Marche Star        in Zona Est Porto
+(247567890, 3, 'RIENTRATA',  '2025-02-05 16:45:00'),  -- Riviera Blu        in Offshore Conero Nord
+(247890123, 3, 'IN CORSO',   '2025-02-10 11:20:00'),  -- Bora Bora          in Offshore Conero Nord
+(247789012, 4, 'RIENTRATA',  '2025-02-14 07:30:00'),  -- Don Bosco II       in Offshore Portonovo
+(247112233, 4, 'IN CORSO',   '2025-02-20 13:00:00'),  -- Medusa             in Offshore Portonovo
+(247567890, 5, 'RIENTRATA',  '2025-03-01 09:15:00'),  -- Riviera Blu        in Offshore Sirolo
+(247112233, 5, 'IN CORSO',   '2025-03-05 15:00:00'),  -- Medusa             in Offshore Sirolo
+(247789012, 6, 'RIENTRATA',  '2025-03-10 08:00:00'),  -- Don Bosco II       in Offshore Numana
+(247112233, 6, 'IN CORSO',   '2025-03-15 12:30:00'),  -- Medusa             in Offshore Numana
+(247123456, 7, 'RIENTRATA',  '2025-03-20 10:00:00'),  -- Adriatica Uno      in Adriatico Centrale 1
+(247345678, 7, 'IN CORSO',   '2025-03-25 14:45:00'),  -- San Ciriaco        in Adriatico Centrale 1
+(215456789, 7, 'RIENTRATA',  '2025-04-01 09:30:00'),  -- Marche Star        in Adriatico Centrale 1
+(247901234, 7, 'IN CORSO',   '2025-04-05 11:00:00'),  -- Eurocargo Ancona   in Adriatico Centrale 1
+(247123456, 8, 'RIENTRATA',  '2025-04-10 08:45:00'),  -- Adriatica Uno      in Adriatico Centrale 2
+(215456789, 8, 'IN CORSO',   '2025-04-15 13:15:00'),  -- Marche Star        in Adriatico Centrale 2
+(247114455, 9, 'RIENTRATA',  '2025-04-20 10:30:00'),  -- Vento di Levante   in Canale di Fano
+(247117788, 9, 'IN CORSO',   '2025-04-25 15:00:00'),  -- Orizzonte Blu      in Canale di Fano
+(247115566, 10, 'RIENTRATA', '2025-05-01 09:00:00'),  -- Porto Recanati     in Acque Pesaro
+(247118899, 10, 'IN CORSO',  '2025-05-05 11:30:00'),  -- Punta Trave        in Acque Pesaro
+(247113344, 1,  'RIENTRATA', '2025-05-10 08:00:00'),  -- Stella del Mare    in Zona Nord Ancona
+(247119900, 8,  'IN CORSO',  '2025-05-15 14:00:00'),  -- Mare Nostrum       in Adriatico Centrale 2
+(247120011, 2,  'RIENTRATA', '2025-05-20 10:15:00');  -- Costa Conero       in Zona Est Porto
+
+-- ------------------------------------------------------------
+--  violazioni
+-- DA RIVEDERE (VEDI LA CONDIZIONE DELL'ORA DOPO UNA VIOLAZIONE)
+-- ------------------------------------------------------------
+INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-01-30 17:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-01-31 05:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-01-31 17:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-01-31 17:25:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-02-01 03:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-02-01 09:00:00'),
+('ECCESSO VELOCITA', 215456789, 7, '2025-03-30 17:30:00'),
+('ECCESSO VELOCITA', 215456789, 7, '2025-03-31 05:30:00'),
+('ECCESSO VELOCITA', 215456789, 7, '2025-03-31 17:30:00'),
+('ECCESSO VELOCITA', 215456789, 7, '2025-04-01 03:30:00'),
+('ECCESSO VELOCITA', 215456789, 7, '2025-04-01 09:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 8, '2025-04-13 21:15:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 8, '2025-04-14 09:15:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 8, '2025-04-14 21:15:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 8, '2025-04-15 07:15:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 8, '2025-04-15 13:15:00'),
+('ACCESSO AREA NON AUTORIZZATA', 215456789, 9, '2025-06-05 07:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 4, '2025-02-18 21:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 4, '2025-02-19 09:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 4, '2025-02-19 21:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 4, '2025-02-20 07:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 4, '2025-02-20 13:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 5, '2025-03-03 23:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 5, '2025-03-04 11:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 5, '2025-03-04 23:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 5, '2025-03-04 23:25:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 5, '2025-03-05 09:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 5, '2025-03-05 15:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 6, '2025-03-13 20:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 6, '2025-03-14 08:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 6, '2025-03-14 20:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 6, '2025-03-15 06:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247112233, 6, '2025-03-15 12:30:00'),
+('ECCESSO VELOCITA', 247113344, 1, '2025-05-08 16:00:00'),
+('ECCESSO VELOCITA', 247113344, 1, '2025-05-09 04:00:00'),
+('ECCESSO VELOCITA', 247113344, 1, '2025-05-09 16:00:00'),
+('ECCESSO VELOCITA', 247113344, 1, '2025-05-10 02:00:00'),
+('ECCESSO VELOCITA', 247113344, 1, '2025-05-10 08:00:00'),
+('ECCESSO VELOCITA', 247114455, 9, '2025-04-18 18:30:00'),
+('ECCESSO VELOCITA', 247114455, 9, '2025-04-19 06:30:00'),
+('ECCESSO VELOCITA', 247114455, 9, '2025-04-19 18:30:00'),
+('ECCESSO VELOCITA', 247114455, 9, '2025-04-19 18:55:00'),
+('ECCESSO VELOCITA', 247114455, 9, '2025-04-20 04:30:00'),
+('ECCESSO VELOCITA', 247114455, 9, '2025-04-20 10:30:00'),
+('ECCESSO VELOCITA', 247115566, 10, '2025-04-29 17:00:00'),
+('ECCESSO VELOCITA', 247115566, 10, '2025-04-30 05:00:00'),
+('ECCESSO VELOCITA', 247115566, 10, '2025-04-30 17:00:00'),
+('ECCESSO VELOCITA', 247115566, 10, '2025-05-01 03:00:00'),
+('ECCESSO VELOCITA', 247115566, 10, '2025-05-01 09:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247116677, 3, '2025-06-08 16:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247116677, 3, '2025-06-08 19:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247117788, 9, '2025-04-23 23:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247117788, 9, '2025-04-24 11:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247117788, 9, '2025-04-24 23:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247117788, 9, '2025-04-25 09:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247117788, 9, '2025-04-25 15:00:00'),
+('ECCESSO VELOCITA', 247117788, 9, '2025-06-12 08:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247118899, 10, '2025-05-03 19:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247118899, 10, '2025-05-04 07:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247118899, 10, '2025-05-04 19:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247118899, 10, '2025-05-04 19:55:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247118899, 10, '2025-05-05 05:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247118899, 10, '2025-05-05 11:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247119900, 8, '2025-05-13 22:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247119900, 8, '2025-05-14 10:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247119900, 8, '2025-05-14 22:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247119900, 8, '2025-05-15 08:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247119900, 8, '2025-05-15 14:00:00'),
+('ECCESSO VELOCITA', 247120011, 2, '2025-05-18 18:15:00'),
+('ECCESSO VELOCITA', 247120011, 2, '2025-05-19 06:15:00'),
+('ECCESSO VELOCITA', 247120011, 2, '2025-05-19 18:15:00'),
+('ECCESSO VELOCITA', 247120011, 2, '2025-05-19 18:40:00'),
+('ECCESSO VELOCITA', 247120011, 2, '2025-05-20 04:15:00'),
+('ECCESSO VELOCITA', 247120011, 2, '2025-05-20 10:15:00'),
+('ECCESSO VELOCITA', 247121122, 6, '2025-06-10 10:00:00'),
+('ECCESSO VELOCITA', 247123456, 1, '2025-01-08 16:15:00'),
+('ECCESSO VELOCITA', 247123456, 1, '2025-01-09 04:15:00'),
+('ECCESSO VELOCITA', 247123456, 1, '2025-01-09 16:15:00'),
+('ECCESSO VELOCITA', 247123456, 1, '2025-01-09 16:40:00'),
+('ECCESSO VELOCITA', 247123456, 1, '2025-01-10 02:15:00'),
+('ECCESSO VELOCITA', 247123456, 1, '2025-01-10 08:15:00'),
+('ECCESSO VELOCITA', 247123456, 7, '2025-03-18 18:00:00'),
+('ECCESSO VELOCITA', 247123456, 7, '2025-03-19 06:00:00'),
+('ECCESSO VELOCITA', 247123456, 7, '2025-03-19 18:00:00'),
+('ECCESSO VELOCITA', 247123456, 7, '2025-03-19 18:25:00'),
+('ECCESSO VELOCITA', 247123456, 7, '2025-03-20 04:00:00'),
+('ECCESSO VELOCITA', 247123456, 7, '2025-03-20 10:00:00'),
+('ECCESSO VELOCITA', 247123456, 8, '2025-04-08 16:45:00'),
+('ECCESSO VELOCITA', 247123456, 8, '2025-04-09 04:45:00'),
+('ECCESSO VELOCITA', 247123456, 8, '2025-04-09 16:45:00'),
+('ECCESSO VELOCITA', 247123456, 8, '2025-04-10 02:45:00'),
+('ECCESSO VELOCITA', 247123456, 8, '2025-04-10 08:45:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247234567, 1, '2025-01-13 18:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247234567, 1, '2025-01-14 06:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247234567, 1, '2025-01-14 18:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247234567, 1, '2025-01-15 04:30:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247234567, 1, '2025-01-15 10:30:00'),
+('ECCESSO VELOCITA', 247345678, 2, '2025-01-18 22:00:00'),
+('ECCESSO VELOCITA', 247345678, 2, '2025-01-19 10:00:00'),
+('ECCESSO VELOCITA', 247345678, 2, '2025-01-19 22:00:00'),
+('ECCESSO VELOCITA', 247345678, 2, '2025-01-20 08:00:00'),
+('ECCESSO VELOCITA', 247345678, 2, '2025-01-20 14:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247345678, 7, '2025-03-23 22:45:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247345678, 7, '2025-03-24 10:45:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247345678, 7, '2025-03-24 22:45:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247345678, 7, '2025-03-25 08:45:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247345678, 7, '2025-03-25 14:45:00'),
+('ECCESSO VELOCITA', 247567890, 3, '2025-02-04 00:45:00'),
+('ECCESSO VELOCITA', 247567890, 3, '2025-02-04 12:45:00'),
+('ECCESSO VELOCITA', 247567890, 3, '2025-02-05 00:45:00'),
+('ECCESSO VELOCITA', 247567890, 3, '2025-02-05 10:45:00'),
+('ECCESSO VELOCITA', 247567890, 3, '2025-02-05 16:45:00'),
+('ECCESSO VELOCITA', 247567890, 5, '2025-02-27 17:15:00'),
+('ECCESSO VELOCITA', 247567890, 5, '2025-02-28 05:15:00'),
+('ECCESSO VELOCITA', 247567890, 5, '2025-02-28 17:15:00'),
+('ECCESSO VELOCITA', 247567890, 5, '2025-03-01 03:15:00'),
+('ECCESSO VELOCITA', 247567890, 5, '2025-03-01 09:15:00'),
+('ECCESSO VELOCITA', 247789012, 4, '2025-02-12 15:30:00'),
+('ECCESSO VELOCITA', 247789012, 4, '2025-02-13 03:30:00'),
+('ECCESSO VELOCITA', 247789012, 4, '2025-02-13 15:30:00'),
+('ECCESSO VELOCITA', 247789012, 4, '2025-02-13 15:55:00'),
+('ECCESSO VELOCITA', 247789012, 4, '2025-02-14 01:30:00'),
+('ECCESSO VELOCITA', 247789012, 4, '2025-02-14 07:30:00'),
+('ECCESSO VELOCITA', 247789012, 6, '2025-03-08 16:00:00'),
+('ECCESSO VELOCITA', 247789012, 6, '2025-03-09 04:00:00'),
+('ECCESSO VELOCITA', 247789012, 6, '2025-03-09 16:00:00'),
+('ECCESSO VELOCITA', 247789012, 6, '2025-03-10 02:00:00'),
+('ECCESSO VELOCITA', 247789012, 6, '2025-03-10 08:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247890123, 3, '2025-02-08 19:20:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247890123, 3, '2025-02-09 07:20:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247890123, 3, '2025-02-09 19:20:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247890123, 3, '2025-02-10 05:20:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247890123, 3, '2025-02-10 11:20:00'),
+('ECCESSO VELOCITA', 247901234, 1, '2025-06-02 09:00:00'),
+('ECCESSO VELOCITA', 247901234, 1, '2025-06-02 12:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-03 19:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-04 07:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-04 19:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-04 19:25:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 05:00:00'),
+('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 11:00:00');
