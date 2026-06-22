@@ -297,6 +297,53 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "SendData",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_TOKEN_USER}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 13.52000,\r\n    \"velocita_kmh\": 65.34243234234223434232,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}} /user/sendData",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}} ",
+              "path": [
+                "user",
+                "sendData"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
