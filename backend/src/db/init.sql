@@ -44,6 +44,7 @@ CREATE TABLE geofence_areas (
     geoarea_id INT GENERATED ALWAYS AS IDENTITY,
     name       VARCHAR(255)            NOT NULL,
     area       GEOMETRY(Polygon, 4326) NOT NULL,
+    max_speed  INT, -- La velocità max è opzionale  
     created_at TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (geoarea_id),
@@ -157,7 +158,7 @@ INSERT INTO imbarcazioni (mmsi, name, type) VALUES
 -- ------------------------------------------------------------
 --  geofence_areas
 -- ------------------------------------------------------------
-INSERT INTO geofence_areas (name, area) VALUES
+INSERT INTO geofence_areas (name, area, max_speed) VALUES
 
 ('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((
   13.4700 43.7000,
@@ -165,7 +166,7 @@ INSERT INTO geofence_areas (name, area) VALUES
   13.5600 43.6700,
   13.4900 43.6600,
   13.4700 43.7000
-))', 4326)),
+))', 4326), 20),
 
 ('Zona Marittima Est Porto', ST_GeomFromText('POLYGON((
   13.5600 43.6600,
@@ -173,7 +174,7 @@ INSERT INTO geofence_areas (name, area) VALUES
   13.6500 43.6300,
   13.5800 43.6200,
   13.5600 43.6600
-))', 4326)),
+))', 4326), 20),
 
 ('Area Offshore Conero Nord', ST_GeomFromText('POLYGON((
   13.6200 43.6000,
@@ -181,7 +182,7 @@ INSERT INTO geofence_areas (name, area) VALUES
   13.7100 43.5600,
   13.6400 43.5500,
   13.6200 43.6000
-))', 4326)),
+))', 4326), 50),
 
 ('Area Offshore Portonovo', ST_GeomFromText('POLYGON((
   13.6500 43.5600,
@@ -189,7 +190,7 @@ INSERT INTO geofence_areas (name, area) VALUES
   13.7400 43.5200,
   13.6700 43.5100,
   13.6500 43.5600
-))', 4326)),
+))', 4326), 50),
 
 ('Area Offshore Sirolo', ST_GeomFromText('POLYGON((
   13.6800 43.5200,
@@ -197,7 +198,7 @@ INSERT INTO geofence_areas (name, area) VALUES
   13.7700 43.4800,
   13.7000 43.4700,
   13.6800 43.5200
-))', 4326)),
+))', 4326), 50),
 
 ('Area Offshore Numana', ST_GeomFromText('POLYGON((
   13.7000 43.4700,
@@ -205,7 +206,7 @@ INSERT INTO geofence_areas (name, area) VALUES
   13.8000 43.4300,
   13.7200 43.4200,
   13.7000 43.4700
-))', 4326)),
+))', 4326), 50),
 
 ('Adriatico Centrale 1', ST_GeomFromText('POLYGON((
   13.8000 43.6500,

@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model } from 'sequelize';
+import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 
 
 interface GeoJsonPolygon {
@@ -13,15 +13,17 @@ export interface GeofenceareaAllData {
   geoarea_id: number;
   name: string;
   area: GeoJsonPolygon;
+  max_speed: number;
   created_at: Date;
 }
 
-export interface GeofenceareaCreationData extends Omit<GeofenceareaAllData, 'geoarea_id' | 'created_at'> {}
+export interface GeofenceareaCreationData extends Omit<Optional<GeofenceareaAllData, 'max_speed'>, 'geoarea_id' | 'created_at'> {}
 
 export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreationData> implements GeofenceareaAllData {
   declare geoarea_id: number;
   declare name: string;
   declare area: GeoJsonPolygon;
+  declare max_speed: number;
   declare created_at: Date;
 
   static inizializzaModel(sequelize: Sequelize): typeof Geofencearea {
@@ -41,6 +43,10 @@ export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreatio
         // Sequelize mappa GEOMETRY('POLYGON', 4326) sul tipo PostGIS geometry(Polygon,4326)
         type: DataTypes.GEOMETRY('POLYGON', 4326),
         allowNull: false
+      },
+      max_speed: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       created_at: {
       type: DataTypes.DATE,
