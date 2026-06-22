@@ -32,7 +32,7 @@ CREATE TABLE imbarcazioni (
     mmsi          INT          PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
     type          VARCHAR(50)  NOT NULL,
-    desc          VARCHAR(255) NOT NULL,
+    descr          VARCHAR(255) NOT NULL,
     max_capacity  INT          NOT NULL,
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -46,7 +46,7 @@ CREATE TABLE geofence_areas (
     geoarea_id INT GENERATED ALWAYS AS IDENTITY,
     name       VARCHAR(255)            NOT NULL,
     area       GEOMETRY(Polygon, 4326) NOT NULL,
-    max_speed  INT, -- La velocità max è opzionale  
+    max_speed  INT NULL, -- La velocità max è opzionale  
     created_at TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (geoarea_id),
@@ -153,7 +153,7 @@ INSERT INTO users (username, email, password, is_admin) VALUES
 -- ------------------------------------------------------------
 --  imbarcazioni
 -- ------------------------------------------------------------
-INSERT INTO imbarcazioni (mmsi, name, type, desc, max_capacity) VALUES
+INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity) VALUES
 (247123456, 'Adriatica Uno',      'cargo',         'Cargo multipurpose per merci varie',             1800),
 (247234567, 'Conero Explorer',    'ferry',         'Traghetto passeggeri costiero',                  850),
 (247345678, 'San Ciriaco',        'tanker',        'Petroliera per trasporto carburanti',           12000),
@@ -234,7 +234,7 @@ INSERT INTO geofence_areas (name, area, max_speed) VALUES
   13.9500 43.5000,
   13.8000 43.5000,
   13.8000 43.6500
-))', 4326)),
+))', 4326), NULL),
 
 ('Adriatico Centrale 2', ST_GeomFromText('POLYGON((
   13.8500 43.4800,
@@ -242,7 +242,7 @@ INSERT INTO geofence_areas (name, area, max_speed) VALUES
   14.0000 43.3500,
   13.8500 43.3500,
   13.8500 43.4800
-))', 4326)),
+))', 4326), NULL),
 
 ('Canale di Fano', ST_GeomFromText('POLYGON((
   13.8000 43.8500,
@@ -250,7 +250,7 @@ INSERT INTO geofence_areas (name, area, max_speed) VALUES
   13.9500 43.7500,
   13.8000 43.7500,
   13.8000 43.8500
-))', 4326)),
+))', 4326), NULL),
 
 ('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((
   12.8000 43.9500,
@@ -258,7 +258,7 @@ INSERT INTO geofence_areas (name, area, max_speed) VALUES
   13.0000 43.8500,
   12.8000 43.8500,
   12.8000 43.9500
-))', 4326));
+))', 4326), NULL);
 
 -- ------------------------------------------------------------
 --  user_imbarcazioni
