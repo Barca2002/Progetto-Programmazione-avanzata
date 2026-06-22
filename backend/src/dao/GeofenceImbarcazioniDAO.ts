@@ -5,7 +5,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 // Interfaccia del DAO per l'associazione Geofence-Imbarcazione
 interface IGeofenceImbarcazioniDAO {
-  create(geoarea_id: number, mmsi: number, t?: Transaction): Promise<GeofenceImbarcazioni>;
+  create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni>;
   findAssociation(geoarea_id: number, mmsi: number, t?: Transaction): Promise<GeofenceImbarcazioni | null>;
   findAllByMmsi(mmsi: number, t?: Transaction): Promise<GeofenceImbarcazioni[]>;
   updateLocation(mmsi: number, geoarea_id: number, t: Transaction): Promise<number>;
@@ -15,12 +15,9 @@ interface IGeofenceImbarcazioniDAO {
 
 export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
 
-  async create(geoarea_id: number, mmsi: number, t?: Transaction): Promise<GeofenceImbarcazioni> {
+  async create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
     try {
-      return await GeofenceImbarcazioni.create(
-        { geoarea_id, mmsi },
-        t ? { transaction: t } : undefined
-      );
+        return await GeofenceImbarcazioni.create({ geoarea_id, mmsi }, {transaction:t});
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     }

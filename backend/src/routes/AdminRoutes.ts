@@ -13,7 +13,7 @@ adminRoutes.get("/all", checkAdmin, adminController.getUtenti);
 adminRoutes.get("/:id", checkAdmin, adminController.getUtenteById);
 
 // UPDATE utente
-adminRoutes.patch("/update/:id", checkAdmin, adminController.updateUtente); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perchè put sostituisce l'intera istanza con i dati nuovi che inserisco
+adminRoutes.patch("/update/:id", checkAdmin, adminController.updateUtente); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perchè put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
 // DELETE utente
 adminRoutes.delete("/delete/:id", checkAdmin, adminController.deleteUtente);

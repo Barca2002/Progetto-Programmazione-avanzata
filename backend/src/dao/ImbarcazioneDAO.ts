@@ -9,8 +9,8 @@ import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
-  create(data: ImbarcazioneCreationData): Promise<Imbarcazione>;
-  findById(mmsi: number, t?: Transaction): Promise<Imbarcazione | null>;
+  create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione>;
+  findById(mmsi: number): Promise<Imbarcazione | null>;
   findAll(): Promise<Imbarcazione[]>;
   update(mmsi: number, data: Partial<ImbarcazioneCreationData>): Promise<number>;
   delete(mmsi: number): Promise<number>;
@@ -25,19 +25,16 @@ interface IImbarcazioneDAO {
 
 export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
-  async create(data: ImbarcazioneCreationData): Promise<Imbarcazione> {
+  async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione> {
     try {
-      return await Imbarcazione.create(data);
+      return await Imbarcazione.create(data, {transaction: t});
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     }
   }
 
-  async findById(mmsi: number, t?: Transaction): Promise<Imbarcazione | null> {
+  async findById(mmsi: number): Promise<Imbarcazione | null> {
     try {
-      if (t) { //va fatto il controllo altrimenti da problemi
-        return await Imbarcazione.findByPk(mmsi, { transaction: t });
-      }
       return await Imbarcazione.findByPk(mmsi);
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);

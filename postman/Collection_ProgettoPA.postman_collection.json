@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "bae65ab7-7d93-43ba-bbd3-55e73cfab9e7",
+    "_postman_id": "0539ea81-b29a-4474-9c6e-fd4dc2b0551a",
     "name": "Collection_ProgettoPA",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "54073076",
-    "_collection_link": "https://go.postman.co/collection/54073076-bae65ab7-7d93-43ba-bbd3-55e73cfab9e7?source=collection_link"
+    "_exporter_id": "53270562",
+    "_collection_link": "https://go.postman.co/collection/53270562-0539ea81-b29a-4474-9c6e-fd4dc2b0551a?source=collection_link"
   },
   "item": [
     {
@@ -164,7 +164,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"user1@mail.com\",\r\n    \"password\": \"User1234\"\r\n}",
+              "raw": "{\r\n    \"email\": \"user2@mail.com\",\r\n    \"password\": \"User2345\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -227,35 +227,10 @@
       ]
     },
     {
-      "name": "Testing",
-      "item": [
-        {
-          "name": "New Request",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/test/success",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}}",
-              "path": [
-                "test",
-                "success"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
       "name": "Admin",
       "item": [
         {
-          "name": "UtenteById",
+          "name": "GetUtenteById",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -291,6 +266,76 @@
               "path": [
                 "admin",
                 "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EditUtenteById",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_TOKEN_ADMIN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"adminsdsdsdsdswewdftars\",\r\n    \"email\": \"admisdssdsdsdsn2@mail.com\",\r\n    \"password\": \"dsjgfjhsvd\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/admin/update/3",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "admin",
+                "update",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetAllUtenti",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_TOKEN_USER}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}}/admin/all",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}}",
+              "path": [
+                "admin",
+                "all"
               ]
             }
           },

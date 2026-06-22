@@ -5,44 +5,38 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 // Interfaccia del layer DAO per l'associazione User-Imbarcazione
 interface IUserImbarcazioniDAO {
-  create(user_id: number, mmsi: number, t?: Transaction): Promise<UserImbarcazioni>;
-  findAssociation(user_id: number, mmsi: number, t?: Transaction): Promise<UserImbarcazioni | null>;
-  findByMmsi(mmsi: number, t?: Transaction): Promise<UserImbarcazioni | null>;
+  create(user_id: number, mmsi: number, t: Transaction): Promise<UserImbarcazioni>;
+  findAssociation(user_id: number, mmsi: number): Promise<UserImbarcazioni | null>;
+  findByMmsi(mmsi: number): Promise<UserImbarcazioni | null>;
   findAllByUserId(user_id: number): Promise<UserImbarcazioni[]>;
-  delete(user_id: number, mmsi: number, t?: Transaction): Promise<number>;
+  delete(user_id: number, mmsi: number): Promise<number>;
 }
 
 export class UserImbarcazioniDAO implements IUserImbarcazioniDAO {
 
-  async create(user_id: number, mmsi: number, t?: Transaction): Promise<UserImbarcazioni> {
+  async create(user_id: number, mmsi: number, t: Transaction): Promise<UserImbarcazioni> {
     try {
       return await UserImbarcazioni.create(
-        { user_id, mmsi }, 
-        t ? { transaction: t } : undefined
-      );
+        { user_id, mmsi }, { transaction: t });
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     }
   }
 
   // Funzione per trovare l'associazione tramite user id e mmsi
-  async findAssociation(user_id: number, mmsi: number, t?: Transaction): Promise<UserImbarcazioni | null> {
+  async findAssociation(user_id: number, mmsi: number): Promise<UserImbarcazioni | null> {
     try {
       return await UserImbarcazioni.findOne({
-        where: { user_id, mmsi },
-        ...(t && { transaction: t })
-      });
+        where: { user_id, mmsi }});
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
   }
 
-  async findByMmsi(mmsi: number, t?: Transaction): Promise<UserImbarcazioni | null> {
+  async findByMmsi(mmsi: number): Promise<UserImbarcazioni | null> {
     try {
       return await UserImbarcazioni.findOne({
-        where: { mmsi },
-        ...(t && { transaction: t })
-      });
+        where: { mmsi }});
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
@@ -58,12 +52,10 @@ export class UserImbarcazioniDAO implements IUserImbarcazioniDAO {
     }
   }
 
-  async delete(user_id: number, mmsi: number, t?: Transaction): Promise<number> {
+  async delete(user_id: number, mmsi: number): Promise<number> {
     try {
       return await UserImbarcazioni.destroy({
-        where: { user_id, mmsi },
-        ...(t && { transaction: t })
-      });
+        where: { user_id, mmsi }});
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }

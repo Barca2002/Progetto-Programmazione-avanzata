@@ -1,7 +1,6 @@
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { UserImbarcazioniDAO } from '../dao/UserImbarcazioniDAO.js';
@@ -29,9 +28,6 @@ export class DatiInviatiService {
 
     if (!stato || !['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'].includes(stato))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
-
-    console.log(user_id);
-    console.log(mmsi);
     
     const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user_id, mmsi);
 

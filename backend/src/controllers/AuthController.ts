@@ -6,12 +6,11 @@ import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AdminDAO } from "../dao/AdminDAO.js";
 import { UserCreationData } from "../models/UserModel.js";
-import bcrypt from 'bcrypt';
+import { DatabaseConnection } from "../singleton/DBConnection.js";
 
 export class AuthController {
     private authService: AuthService;
     public readonly AdminDAO = new AdminDAO();
-    public readonly saltRounds = 12;
 
     constructor() {
         this.authService = new AuthService();
@@ -54,15 +53,16 @@ export class AuthController {
             if(await this.AdminDAO.findByUsername(username)){
                 throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
             }
+            const passwordHash = await this.authService.hashPassword(req.body.password);
             // Creiamo il nuovo utente
-            const passwordHash = await bcrypt.hash(req.body.password.trim(), this.saltRounds);
             const userInfo: UserCreationData = {
                 "username": req.body.username.trim(),
                 "email": req.body.email,
                 "password": passwordHash,
                 "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegato
             }
-            await this.AdminDAO.create(userInfo);
+            const t = await DatabaseConnection.getInstance().transaction();
+            await this.AdminDAO.create(userInfo, t);
 
             const responseData = {"username": username, "email": email};
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));

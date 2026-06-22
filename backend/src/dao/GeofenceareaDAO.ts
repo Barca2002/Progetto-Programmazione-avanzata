@@ -4,19 +4,18 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 interface IGeofenceareaDAO {
-  create(data: GeofenceareaCreationData): Promise<Geofencearea>;
-  findById(geoarea_id: number, t?: Transaction): Promise<Geofencearea | null>;
+  create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea>;
+  findById(geoarea_id: number, t: Transaction): Promise<Geofencearea | null>;
   findAll(): Promise<Geofencearea[]>;
   findByName(name: string): Promise<Geofencearea | null>;
-  update(geoarea_id: number, data: Partial<GeofenceareaCreationData>): Promise<number>;
+  update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<number>;
   delete(geoarea_id: number): Promise<number>;
 }
 
 export class GeofenceareaDAO implements IGeofenceareaDAO {
-  async create(data: GeofenceareaCreationData): Promise<Geofencearea> {
+  async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
   try {
-    let area = await Geofencearea.create(data);
-    return area;
+    return await Geofencearea.create(data, {transaction: t});
   } catch (err) {
     throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
   }
@@ -46,9 +45,9 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
     return await Geofencearea.findOne({ where: { name } });
   }
 
-  async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>): Promise<number> {
+  async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<number> {
     try{
-      const [affectedCount] = await Geofencearea.update(data, { where: { geoarea_id } });
+      const [affectedCount] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t });
       return affectedCount;
     } catch (err){
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);

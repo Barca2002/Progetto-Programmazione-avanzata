@@ -6,9 +6,11 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/UserModel.js';
 
 
+
 export class AuthService{
     public readonly adminDao = new AdminDAO();
     private privateKey: string;
+    public readonly saltRounds = 12;
 
      constructor() {
         // Lettura della chiave privata dal .env
@@ -49,5 +51,8 @@ export class AuthService{
         return jwtToken;
     }
 
+    public async hashPassword(pwd: string){
+        return await bcrypt.hash(pwd.trim(), this.saltRounds);
+    }
     
 }

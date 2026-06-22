@@ -27,7 +27,9 @@ export class AdminController {
     try {
       const id = Number(req.params.id);
       const responseData = await this.adminService.getUtenteById(id);
-      res.json(responseData);
+      // Ritorno le informazioni dell'utente togliendo info sensibili come la password
+      const { username, email, is_admin } = responseData;
+      res.json({username, email, is_admin});
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);

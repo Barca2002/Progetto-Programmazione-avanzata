@@ -5,32 +5,27 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { Transaction } from 'sequelize';
 
 interface IAdminDAO {
-  create(data: UserCreationData): Promise<User>;
+  create(data: UserCreationData, t: Transaction): Promise<User>;
   findAll(): Promise<User[]>;
-  findById(user_id: number, t?: Transaction): Promise<User | null>;
-  update(user_id: number, data: Partial<UserCreationData>): Promise<number>;
-  delete(user_id: number): Promise<number>; 
+  findById(user_id: number): Promise<User | null>;
+  update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User>;
+  delete(user_id: number, t: Transaction): Promise<number>; 
 }
 
 export class AdminDAO implements IAdminDAO {
-  async create(data: UserCreationData): Promise<User> {
+  async create(data: UserCreationData, t: Transaction): Promise<User> {
     try{
-      let utente = await User.create(data);
-      return utente;
+      return await User.create(data, {transaction: t});
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
-    
   }
 
-  async findById(user_id: number, t?: Transaction): Promise<User | null> {
+  async findById(user_id: number): Promise<User | null> {
     try {
-      if(t)
-        return await User.findByPk(user_id, { transaction: t });
-
       return await User.findByPk(user_id);
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 
@@ -38,7 +33,7 @@ export class AdminDAO implements IAdminDAO {
     try{
       return await User.findAll();
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 
@@ -52,20 +47,23 @@ export class AdminDAO implements IAdminDAO {
       return await User.findOne({ where: { username: username } });
   }
 
-  async update(user_id: number, data: Partial<UserCreationData>): Promise<number> {
+  async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User> {
     try{
-      const [affectedCount] = await User.update(data, { where: { user_id: user_id } });
-      return affectedCount;
+      // Ritorna la riga interessata dall'update (qui è sempre una sola riga visto
+      // che si passa l'id di un utente).
+      const [affecterdCount, affectedRows] = await User.update(data, { where: { user_id: user_id }, transaction: t, returning: true });
+      return affectedRows[0]!;
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   }
 
-  async delete(user_id: number): Promise<number> {
+  async delete(user_id: number, t: Transaction): Promise<number> {
     try{
-      return await User.destroy({ where: { user_id: user_id } });
+      // Ritorna il numero di righe interessate dalla delete
+      return await User.destroy({ where: { user_id: user_id }, transaction: t });
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
     
   }
