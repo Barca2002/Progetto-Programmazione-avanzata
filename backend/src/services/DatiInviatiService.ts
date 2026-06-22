@@ -4,11 +4,14 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
+import { UserImbarcazioniDAO } from '../dao/UserImbarcazioniDAO.js';
+import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
-  
-  private readonly UserImbarcazioni = DatabaseConnection.getInstance().models.user_imbarcazioni!;
+  private userImbarcazioniDAO = new UserImbarcazioniDAO();
+  private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
+
 
   async sendData(user_id: number, mmsi: number, latitudine: number, longitudine: number, velocita_kmh: number, stato: string): Promise<void> {
     
@@ -26,8 +29,11 @@ export class DatiInviatiService {
 
     if (!stato || !['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'].includes(stato))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
+
+    console.log(user_id);
+    console.log(mmsi);
     
-    const imbarcazione = await this.UserImbarcazioni.findOne({ where: { user_id, mmsi } });
+    const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user_id, mmsi);
 
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
@@ -38,25 +44,20 @@ export class DatiInviatiService {
       //Inserisco i dati nel db, con una transaction metto in sospeso
       await this.datiinviatiDAO.create({ mmsi, latitudine, longitudine, velocita_kmh, stato }, t);
 
-      const geoaree_found = await this.datiinviatiDAO.checkLocationInGeoarea(DatabaseConnection.getInstance(), mmsi, latitudine, longitudine); //uso mmsi e non user_id perche una mmsi è associata ad un user quindi è uguale
+      const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(DatabaseConnection.getInstance(), mmsi, latitudine, longitudine); //uso mmsi e non user_id perche una mmsi è associata ad un user quindi è uguale
 
-      //Aggiorno per quella imbarcazione la posizione resettando le altre, perche conta l'ultima posizione inserita (sempre con una transaction)
-      await GeofenceImbarcazioni.update(
-        { is_in: false },
-        { where: { mmsi }, transaction: t }
-      );
+      // Si resetta tutte le posizioni di quella barca
+      await this.geofenceImbarcazioniDAO.resetLocation(mmsi, t);
 
-      //Metto true solo dove si trova adesso (sempre con una transaction)
-      // (Puo essere che alcune geoaree si sovrappongono parzialmente o totalmente e il verifica me le caccia entrambe, quindi l'utente è in entrambe le geoaree)
-      for (const geoarea of geoaree_found) {
-        await GeofenceImbarcazioni.update(
-          { is_in: true },
-          { where: { mmsi, geoarea_id: geoarea.geoarea_id }, transaction: t }
-        );
+      if(!geoarea_found){
+      // Si aggiorna la posizione della barca settando is_in a true in base a dove si trova attualmente
+      await this.geofenceImbarcazioniDAO.updateLocation(mmsi, geoarea_found!.geoarea_id, t);
       }
+      
 
       await t.commit();
     } catch (err) {
+      console.log(err);
       await t.rollback();
       if (err instanceof AppError) throw err;
         throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);

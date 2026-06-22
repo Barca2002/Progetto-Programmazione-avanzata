@@ -22,11 +22,9 @@ export function inizializzaAssociazioni(): void {
         otherKey: 'mmsi'
     });
 
-    User.belongsToMany(Imbarcazione, {
-        through: 'user_imbarcazioni',
-        timestamps: false,
+    // Relazione 1:N. Un utente ha più imbarcazioni, ma un'imbarcazione è posseduta da un solo utente.
+    User.hasMany(Imbarcazione, {
         foreignKey: 'user_id',
-        otherKey: 'mmsi',
         as: 'Imbarcazioni'
     });
 
@@ -35,6 +33,6 @@ export function inizializzaAssociazioni(): void {
         timestamps: false,
         foreignKey: 'mmsi',
         otherKey: 'user_id',
-        as: 'Users'
+        as: 'Proprietario'
     });
 }

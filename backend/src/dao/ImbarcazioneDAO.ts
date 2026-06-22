@@ -104,7 +104,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async linkUser(mmsi: number, user_id: number, t: Transaction): Promise<void> {
     try {
-      const db = DatabaseConnection.connect();
+      const db = DatabaseConnection.getInstance();
       //user_imbarcazioni è un model che viene creato a runtime (quando lancio inizializzaAssociazioni(), grazie all'opzione through: 'user_imbarcazioni'), in questo modo mi ci connetto per eseguire query su di lui
       const UserImbarcazioni = db.models.user_imbarcazioni!;
       await UserImbarcazioni.create({ user_id: user_id, mmsi: mmsi }, { transaction: t });
@@ -115,7 +115,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async findUserAssociation(mmsi: number, t: Transaction) {
     try {
-      const db = DatabaseConnection.connect();
+      const db = DatabaseConnection.getInstance();
       const UserImbarcazioni = db.models.user_imbarcazioni!;
       return await UserImbarcazioni.findOne({ where: { mmsi: mmsi }, transaction: t });
     } catch (err) {
@@ -156,5 +156,3 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
     }
   }
 }
-
-export default ImbarcazioneDAO;

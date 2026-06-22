@@ -64,5 +64,3 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
 
   }
 }
-
-export default GeofenceareaDAO;

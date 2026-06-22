@@ -3,11 +3,12 @@ import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { Geofencearea } from '../models/GeofenceareaModel.js';
 
 interface IDatiinviatiDAO {
   create(data: DatiinviatiCreationData, t?: Transaction): Promise<Datiinviati>;
   findByMmsi(mmsi: number): Promise<Datiinviati[]>;
-  checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<{ geoarea_id: number }[]>
+  checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null>
 }
 
 export class DatiinviatiDAO implements IDatiinviatiDAO {
@@ -45,17 +46,21 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
     }
   }
 
-  async checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<{ geoarea_id: number }[]> {
+  // Estrae la geofence area di un'imbarcazione in base alla sua posizione
+  async checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null> {
     try {
-        return await db.query(`SELECT ga.geoarea_id FROM geofence_areas ga INNER JOIN geofence_imbarcazioni gi ON ga.geoarea_id = gi.geoarea_id WHERE gi.mmsi = :mmsi AND ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
+        const results = await db.query(`SELECT ga.* FROM geofence_areas ga INNER JOIN geofence_imbarcazioni gi ON ga.geoarea_id = gi.geoarea_id WHERE gi.mmsi = :mmsi AND ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
         {
             replacements: { mmsi: mmsi, latitudine: latitudine, longitudine: longitudine },
-            type: QueryTypes.SELECT
-        }) as unknown as { geoarea_id: number }[];
+            type: QueryTypes.SELECT,
+            model: Geofencearea,
+            mapToModel: true
+        });
+        // Per estrarre un solo oggetto, vediamo la lunghezza del risultato della query.
+        // Se è > 0, prendiamo la prima geofencearea, altrimenti restituiamo null.
+        return results.length > 0 ? results[0]! : null;
     } catch (err) {
         throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
+  }
 }
-}
-
-export default DatiinviatiDAO;

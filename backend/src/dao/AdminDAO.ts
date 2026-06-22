@@ -70,5 +70,3 @@ export class AdminDAO implements IAdminDAO {
     
   }
 }
-
-export default AdminDAO;
