@@ -4,6 +4,8 @@ export interface ImbarcazioneAllData {
   mmsi: number;
   name: string;
   type: string;
+  descr: string;
+  max_capacity: number;
   created_at: Date;
 }
 
@@ -14,6 +16,8 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
   declare mmsi: number;
   declare name: string;
   declare type: string;
+  declare descr: string;
+  declare max_capacity: number;
   declare created_at: Date;
 
 
@@ -31,6 +35,14 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
       },
       type: {
         type: DataTypes.STRING(50),
+        allowNull: false
+      },
+      descr: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+      },
+      max_capacity: {
+        type: DataTypes.INTEGER,
         allowNull: false
       },
       created_at: {

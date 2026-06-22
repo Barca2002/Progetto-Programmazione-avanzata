@@ -61,8 +61,8 @@ CREATE TABLE user_imbarcazioni (
     mmsi    INT NOT NULL,
 
     PRIMARY KEY (user_id, mmsi),
-    CONSTRAINT fk_ui_user FOREIGN KEY (user_id) REFERENCES users(user_id)      ON DELETE SET NULL,
-    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE SET NULL,
+    CONSTRAINT fk_ui_user FOREIGN KEY (user_id) REFERENCES users(user_id)      ON DELETE CASCADE,
+    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE CASCADE,
     CONSTRAINT unique_mmsi UNIQUE (mmsi)
 );
 
@@ -74,8 +74,8 @@ CREATE TABLE geofence_imbarcazioni (
     mmsi       INT     NOT NULL,
     is_in      BOOLEAN      NOT NULL DEFAULT FALSE,
     PRIMARY KEY (geoarea_id, mmsi),
-    CONSTRAINT fk_gi_area FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE SET NULL,
-    CONSTRAINT fk_gi_mmsi FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE SET NULL
+    CONSTRAINT fk_gi_area FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
+    CONSTRAINT fk_gi_mmsi FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE
 );
 
 -- ------------------------------------------------------------
@@ -90,8 +90,8 @@ CREATE TABLE segnalazioni (
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    CONSTRAINT fk_seg_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE SET NULL,
-    CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE SET NULL,
+    CONSTRAINT fk_seg_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
+    CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT chk_stato      CHECK (stato IN ('IN CORSO', 'RIENTRATA'))
 );
 
@@ -108,8 +108,8 @@ CREATE TABLE violazioni (
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    CONSTRAINT fk_viol_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE SET NULL,
-    CONSTRAINT fk_viol_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE SET NULL,
+    CONSTRAINT fk_viol_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
+    CONSTRAINT fk_viol_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT chk_tipo     CHECK (tipo IN ('ECCESSO VELOCITA', 'ACCESSO AREA NON AUTORIZZATA'))
 );
 
@@ -123,11 +123,11 @@ CREATE TABLE dati_inviati (
     latitudine     DECIMAL(9,6)    NOT NULL,
     longitudine    DECIMAL(9,6)    NOT NULL,
     velocita_kmh   DECIMAL(6,2)    NOT NULL,
-    timestamp      BIGINT          NOT NULL,
+    timestamp      BIGINT          NOT NULL, -- Formato linux epoch
     stato          VARCHAR(15)     NOT NULL,
     
     PRIMARY KEY (id),
-    CONSTRAINT fk_dati_mmsi FOREIGN KEY (mmsi) REFERENCES imbarcazioni(mmsi) ON DELETE SET NULL,
+    CONSTRAINT fk_dati_mmsi FOREIGN KEY (mmsi) REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE,
     CONSTRAINT chk_stato_dati CHECK (stato IN ('IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'))
 );
 
