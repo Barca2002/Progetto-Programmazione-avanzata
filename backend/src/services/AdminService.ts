@@ -10,17 +10,6 @@ export class AdminService {
   private readonly adminDAO = new AdminDAO();
   private readonly authService = new AuthService();
 
-  public checkId = async(id: number) => {
-    if (isNaN(id) || id <= 0) {
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
-    }
-    const utente = await this.adminDAO.findById(id);
-    if (!utente) {
-      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
-    }
-    return utente;
-  }
-
   public findByEmail = async (email: string) => {
     const utente = await this.adminDAO.findByEmail(email);
     if (!utente)
@@ -36,17 +25,26 @@ export class AdminService {
   };
 
   public getUtenti = async () => {
-      return await this.adminDAO.findAll();
+    const utenti = await this.adminDAO.findAll();
+    if (!utenti){
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
+    }
+      return utenti;
   };
 
   public getUtenteById = async (id: number) => {
-    // Torna l'utente che voglio vedere
-    return await this.checkId(id);
+    // Controllo se l'id è corretto
+    await this.authService.checkUserId(id);
+    const utente = await this.adminDAO.findById(id);
+    if (!utente) {
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    }
+    return utente;
   };
 
   public updateUtente = async (id: number, data: Partial<UserCreationData>) => {
     // Controllo se l'id è corretto
-    await this.checkId(id);
+    await this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono
     if(data.username && await this.adminDAO.findByUsername(data.username)){
       throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
@@ -72,7 +70,8 @@ export class AdminService {
   };
 
   public deleteUtente = async (id: number) => {
-    await this.checkId(id);
+    // Controllo se l'id è corretto
+    await this.authService.checkUserId(id);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       await this.adminDAO.delete(id, t);

@@ -54,5 +54,11 @@ export class AuthService{
     public async hashPassword(pwd: string){
         return await bcrypt.hash(pwd.trim(), this.saltRounds);
     }
+
+    public checkUserId = async(id: number) => {
+    if (isNaN(id) || id <= 0) {
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
+    }
+  }
     
 }
