@@ -33,38 +33,31 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
   }
 
   async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
-
-  const geoJson = {
-    type: "Polygon",
-    coordinates: coords 
-    /*
-    coords     = 
-    [ 
-      [ 
-        [125.6, 10.1], [124.6, 10], [124, 9.5], [125.6, 10.1] 
-      ] 
-    ] 
-    → Position[][]
-    */
-  };
-
-  const results = await DatabaseConnection.getInstance().query<Geofencearea>(
-    `
-    SELECT *
-    FROM geofence_areas
-    WHERE ST_Covers(
-      area,
-      ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)
-    )
-    LIMIT 1;
-    `,
-    {
-      bind: [JSON.stringify(geoJson)], //vuole un Position[][]
-      type: QueryTypes.SELECT
-    }
-  );
-
-  return results[0] ?? null;
+    const geoJson = {
+      type: "Polygon",
+      coordinates: coords 
+      /*
+      coords     = 
+      [                                                                                 
+        [                                                           --
+          [125.6, 10.1], [124.6, 10], [124, 9.5], [125.6, 10.1]     -- <- Position[]        
+        ]                                                           --
+      ] → Position[][]
+      */
+    };
+    const db = DatabaseConnection.getInstance();
+    const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Covers(ga.area, ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326)) LIMIT 1`,
+      {
+        replacements: 
+        {
+          geojson: JSON.stringify(geoJson)
+        },
+        type: QueryTypes.SELECT,
+        model: Geofencearea,
+        mapToModel: true
+      }
+    );
+    return results.length > 0 ? results[0]! : null;
   }
 
   async findAll(): Promise<Geofencearea[]> {
