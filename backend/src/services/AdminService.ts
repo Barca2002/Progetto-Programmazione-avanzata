@@ -10,7 +10,7 @@ export class AdminService {
   private readonly adminDAO = new AdminDAO();
   private readonly authService = new AuthService();
 
-  public createUtente = async (data: UserCreationData) => {
+  public async createUtente (data: UserCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.adminDAO.create(data, t);
@@ -22,21 +22,21 @@ export class AdminService {
     }
   };
 
-  public findByEmail = async (email: string) => {
+  public async findByEmailasync (email: string) {
     const utente = await this.adminDAO.findByEmail(email);
     if (!utente)
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     return utente;
   };
 
-  public findByUsername = async (username: string) => {
+  public async findByUsername (username: string) {
     const utente = await this.adminDAO.findByUsername(username);
     if (!utente)
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     return utente;
   };
 
-  public getUtenti = async () => {
+  public async getUtenti () {
     const utenti = await this.adminDAO.findAll();
     if (!utenti){
       throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
@@ -44,7 +44,7 @@ export class AdminService {
       return utenti;
   };
 
-  public getUtenteById = async (id: number) => {
+  public async getUtenteById (id: number) {
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     const utente = await this.adminDAO.findById(id);
@@ -54,7 +54,7 @@ export class AdminService {
     return utente;
   };
 
-  public updateUtente = async (id: number, data: Partial<UserCreationData>) => {
+  public async updateUtente (id: number, data: Partial<UserCreationData>){
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono
@@ -81,7 +81,7 @@ export class AdminService {
     }
   };
 
-  public deleteUtente = async (id: number) => {
+  public async deleteUtente (id: number){
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     const t = await DatabaseConnection.getInstance().transaction();
