@@ -33,7 +33,7 @@ export class AdminService {
   public updateUtente = async (id: number, data: Partial<UserCreationData>) => {
     // Controllo se l'id è corretto
     await this.checkId(id);
-    // COntrollo se l'username ed email inseriti già esistono
+    // Controllo se l'username ed email inseriti già esistono
     if(data.username && await this.adminDAO.findByUsername(data.username)){
       throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
     }
@@ -55,8 +55,6 @@ export class AdminService {
       await t.rollback();
       throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
-    
-    
   };
 
   public deleteUtente = async (id: number) => {

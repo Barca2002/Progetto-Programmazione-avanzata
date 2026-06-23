@@ -38,13 +38,20 @@ export class AdminDAO implements IAdminDAO {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    // Siccome a noi serve che non trova l'email, non possiamo mettere l'errore metterlo
+    try{
       return await User.findOne({ where: { email: email } });
+    } catch (err) {
+      throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
+    }
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    // Stessa cosa per l'username
+    try {
       return await User.findOne({ where: { username: username } });
+    } catch (error) {
+      throw ErrorFactory.getError(AppErrorEnum.USERNAME_NOT_FOUND);
+    }
+      
   }
 
   async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User> {

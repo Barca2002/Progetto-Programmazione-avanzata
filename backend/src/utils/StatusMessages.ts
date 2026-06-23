@@ -43,6 +43,8 @@ export const ERROR_LIST = {
     { statusCode: 401, message: "Token di autenticazione non valido o malformato." },
     USER_NOT_FOUND:
     { statusCode: 404, message: "Utente non trovato." },
+    USERNAME_NOT_FOUND:
+    { statusCode: 404, message: "Username non trovato." },
     GEOAREA_NOT_FOUND:
     { statusCode: 404, message: "Geoarea non trovata." },
     ASSOCIAZIONE_NOT_FOUND:
