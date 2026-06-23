@@ -60,7 +60,7 @@ export class AuthController {
                 "username": req.body.username.trim(),
                 "email": req.body.email,
                 "password": passwordHash,
-                "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegato
+                "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegnato
             }
             const t = await DatabaseConnection.getInstance().transaction();
             await this.AdminDAO.create(userInfo, t);

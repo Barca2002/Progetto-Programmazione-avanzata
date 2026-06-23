@@ -28,6 +28,13 @@ export class AdminService {
     return utente;
   };
 
+  public findByUsername = async (username: string) => {
+    const utente = await this.adminDAO.findByUsername(username);
+    if (!utente)
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    return utente;
+  };
+
   public getUtenti = async () => {
       return await this.adminDAO.findAll();
   };
