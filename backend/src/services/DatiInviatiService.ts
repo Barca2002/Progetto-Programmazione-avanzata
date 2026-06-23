@@ -5,6 +5,7 @@ import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { UserImbarcazioniDAO } from '../dao/UserImbarcazioniDAO.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
+import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
@@ -12,51 +13,57 @@ export class DatiInviatiService {
   private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
 
 
-  async sendData(user_id: number, mmsi: number, latitudine: number, longitudine: number, velocita_kmh: number, stato: string): Promise<void> {
+  async sendData(data: DatiinviatiCreationData): Promise<void> {
     
-    if (!mmsi || isNaN(mmsi) || mmsi.toString().length !== 9)
+    if (!data.mmsi || isNaN(data.mmsi) || data.mmsi.toString().length !== 9)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
 
-    if (!latitudine || isNaN(latitudine) || latitudine < -90 || latitudine > 90)
+    if (!data.latitudine || isNaN(data.latitudine) || data.latitudine < -90 || data.latitudine > 90)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE);
 
-    if (!longitudine || isNaN(longitudine) || longitudine < -180 || longitudine > 180)
+    if (!data.longitudine || isNaN(data.longitudine) || data.longitudine < -180 || data.longitudine > 180)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE);
 
-    if (!velocita_kmh || isNaN(velocita_kmh) || velocita_kmh < 0 || velocita_kmh > 200)
+    if (!data.velocita_kmh || isNaN(data.velocita_kmh) || data.velocita_kmh < 0 || data.velocita_kmh > 200)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_VELOCITA);
 
-    if (!stato || !['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'].includes(stato))
+    if (!data.stato || !['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'].includes(data.stato))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
     
-    const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user_id, mmsi);
+    const user = await this.userImbarcazioniDAO.findUserByMmsi(data.mmsi);
+    const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user!.user_id, data.mmsi);
 
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-    const t = await DatabaseConnection.getInstance().transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati
+    const connDB = DatabaseConnection.getInstance()
+    const t = await connDB.transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati
 
     try {
       //Inserisco i dati nel db, con una transaction metto in sospeso
-      await this.datiinviatiDAO.create({ mmsi, latitudine, longitudine, velocita_kmh, stato }, t);
+      await this.datiinviatiDAO.create({
+        mmsi: data.mmsi,
+        latitudine: data.latitudine,
+        longitudine: data.longitudine,
+        velocita_kmh: data.velocita_kmh,
+        stato: data.stato
+      }, t);
 
-      const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(DatabaseConnection.getInstance(), mmsi, latitudine, longitudine); //uso mmsi e non user_id perche una mmsi è associata ad un user quindi è uguale
+      const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(connDB, data.mmsi, data.latitudine, data.longitudine); //uso data.mmsi e non user_id perche una data.mmsi è associata ad un user quindi è uguale
 
       // Si resetta tutte le posizioni di quella barca
-      await this.geofenceImbarcazioniDAO.resetLocation(mmsi, t);
+      await this.geofenceImbarcazioniDAO.resetLocation(data.mmsi, t);
 
       if(!geoarea_found){
       // Si aggiorna la posizione della barca settando is_in a true in base a dove si trova attualmente
-      await this.geofenceImbarcazioniDAO.updateLocation(mmsi, geoarea_found!.geoarea_id, t);
+      await this.geofenceImbarcazioniDAO.updateLocation(data.mmsi, geoarea_found!.geoarea_id, t);
       }
-      
-
       await t.commit();
     } catch (err) {
       console.log(err);
       await t.rollback();
       if (err instanceof AppError) throw err;
-        throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     }
   }
 }

@@ -4,16 +4,17 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
-import { AdminDAO } from "../dao/AdminDAO.js";
 import { UserCreationData } from "../models/UserModel.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
+import { AdminService } from "../services/AdminService.js";
 
 export class AuthController {
     private authService: AuthService;
-    public readonly AdminDAO = new AdminDAO();
+    private adminService: AdminService;
 
     constructor() {
         this.authService = new AuthService();
+        this.adminService = new AdminService();
     }
 
     /**
@@ -25,7 +26,7 @@ export class AuthController {
         try {
             const { email, password } = req.body;
             // Controlliamo se l'email esiste
-            if(!(await this.AdminDAO.findByEmail(email))){
+            if(!(await this.adminService.findByEmail(email))){
                 throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
             }
             // Generazione del token
@@ -46,11 +47,11 @@ export class AuthController {
         try {
             const { username, email } = req.body;
             // Controlliamo se l'email già esiste
-            if(await this.AdminDAO.findByEmail(email)){
+            if(await this.adminService.findByEmail(email)){
                 throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
             }
             // Controlliamo se l'username già esiste
-            if(await this.AdminDAO.findByUsername(username)){
+            if(await this.adminService.findByUsername(username)){
                 throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
             }
             const passwordHash = await this.authService.hashPassword(req.body.password);

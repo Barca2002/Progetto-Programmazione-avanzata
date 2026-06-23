@@ -21,6 +21,13 @@ export class AdminService {
     return utente;
   }
 
+  public findByEmail = async (email: string) => {
+    const utente = await this.adminDAO.findByEmail(email);
+    if (!utente)
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    return utente;
+  };
+
   public getUtenti = async () => {
       return await this.adminDAO.findAll();
   };
@@ -60,9 +67,14 @@ export class AdminService {
   public deleteUtente = async (id: number) => {
     await this.checkId(id);
     const t = await DatabaseConnection.getInstance().transaction();
-    await this.adminDAO.delete(id, t);
-
-    return SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null);
+    try {
+      await this.adminDAO.delete(id, t);
+      await t.commit();
+      return SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null);
+    } catch (err) {
+      await t.rollback();
+      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
+    }
   };
 }
 
