@@ -7,7 +7,7 @@ import { Geofencearea } from '../models/GeofenceareaModel.js';
 
 interface IDatiinviatiDAO {
   create(data: DatiinviatiCreationData, t: Transaction): Promise<Datiinviati>;
-  findByMmsi(mmsi: number): Promise<Datiinviati[]>;
+  findAllByMmsi(mmsi: number): Promise<Datiinviati[]>;
   checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null>
 }
 
@@ -24,15 +24,15 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
           timestamp: Date.now()
         }, { transaction: t });
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
   }
 
-  async findByMmsi(mmsi: number): Promise<Datiinviati[]> {
+  async findAllByMmsi(mmsi: number): Promise<Datiinviati[]> {
     try {
       return await Datiinviati.findAll({ where: { mmsi: mmsi } });
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 

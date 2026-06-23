@@ -8,8 +8,8 @@ interface IGeofenceareaDAO {
   findById(geoarea_id: number, t: Transaction): Promise<Geofencearea | null>;
   findAll(): Promise<Geofencearea[]>;
   findByName(name: string): Promise<Geofencearea | null>;
-  update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<number>;
-  delete(geoarea_id: number): Promise<number>;
+  update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<Geofencearea>;
+  delete(geoarea_id: number, t:Transaction): Promise<number>;
 }
 
 export class GeofenceareaDAO implements IGeofenceareaDAO {
@@ -17,7 +17,7 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
   try {
     return await Geofencearea.create(data, {transaction: t});
   } catch (err) {
-    throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
   }
 }
 
@@ -28,7 +28,7 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
     }
     return await Geofencearea.findByPk(geoarea_id);
   } catch (err) {
-    throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+    throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
   }
 }
 
@@ -36,7 +36,7 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
     try{
       return await Geofencearea.findAll();
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 
@@ -45,20 +45,20 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
     return await Geofencearea.findOne({ where: { name } });
   }
 
-  async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<number> {
+  async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea> {
     try{
-      const [affectedCount] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t });
-      return affectedCount;
+      const [affectedCount, affectedRows] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t, returning: true });
+      return affectedRows[0]!;
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   }
 
-  async delete(geoarea_id: number): Promise<number> {
+  async delete(geoarea_id: number, t:Transaction): Promise<number> {
     try{
-      return await Geofencearea.destroy({ where: { geoarea_id } });
+      return await Geofencearea.destroy({ where: { geoarea_id }, transaction: t });
     } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
 
   }

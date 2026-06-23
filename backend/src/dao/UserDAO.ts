@@ -9,19 +9,18 @@ interface IUserDAO {
   findById(user_id: number): Promise<User | null>;
   findByUsername(username: string): Promise<User | null>;
   findAll(): Promise<User[]>;
-  update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<number>;
-  delete(user_id: number, t?: Transaction): Promise<number>;
+  update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User>;
+  delete(user_id: number, t: Transaction): Promise<number>;
 }
 
 export class UserDAO implements IUserDAO {
-
   async create(data: UserCreationData, t: Transaction): Promise<User> {
     try {
       return await User.create(
         data, { transaction: t }
       );
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
   }
 
@@ -29,7 +28,7 @@ export class UserDAO implements IUserDAO {
     try {
       return await User.findByPk(user_id);
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 
@@ -38,7 +37,7 @@ export class UserDAO implements IUserDAO {
       return await User.findOne({
         where: { username }});
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 
@@ -46,27 +45,26 @@ export class UserDAO implements IUserDAO {
     try {
       return await User.findAll();
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
 
-  async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<number> {
+  async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User> {
     try {
-      const [affectedCount] = await User.update(data, { where: { user_id }, transaction: t });
-      return affectedCount;
+      const [affectedCount, affectedRows] = await User.update(data, { where: { user_id }, transaction: t, returning: true });
+      return affectedRows[0]!;
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   }
 
-  async delete(user_id: number, t?: Transaction): Promise<number> {
+  async delete(user_id: number, t: Transaction): Promise<number> {
     try {
       return await User.destroy({
         where: { user_id },
-        ...(t && { transaction: t })
-      });
+        transaction: t });
     } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   }
 }

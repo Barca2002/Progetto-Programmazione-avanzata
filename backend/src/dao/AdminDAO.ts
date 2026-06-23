@@ -49,8 +49,6 @@ export class AdminDAO implements IAdminDAO {
 
   async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User> {
     try{
-      // Ritorna la riga interessata dall'update (qui è sempre una sola riga visto
-      // che si passa l'id di un utente).
       const [affecterdCount, affectedRows] = await User.update(data, { where: { user_id: user_id }, transaction: t, returning: true });
       return affectedRows[0]!;
     } catch (err){
