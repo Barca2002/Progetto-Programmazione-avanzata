@@ -85,7 +85,7 @@ export class AuthService{
         "username": username.trim(),
         "email": email,
         "password": passwordHash,
-        "is_admin": false // La registrazione di default non permette di creare acocunt admin per motivi di sicurezza.
+        "is_admin": false // La registrazione di default non permette di creare account admin per motivi di sicurezza.
     }
     return userInfo;
   }

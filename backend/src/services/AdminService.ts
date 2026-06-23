@@ -22,7 +22,7 @@ export class AdminService {
     }
   };
 
-  public async findByEmailasync (email: string) {
+  public async findByEmail (email: string) {
     const utente = await this.adminDAO.findByEmail(email);
     if (!utente)
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);

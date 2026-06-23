@@ -7,18 +7,22 @@ import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 export class GeofenceareaService {
   private readonly geofenceareaDAO = new GeofenceareaDAO();
 
-  public getAree = async () => {
+  public async getAree (){
     return await this.geofenceareaDAO.findAll();
   };
 
-  public async getAreaById (id: number){
+  public async getAreaById(id: number) {
+    if (isNaN(id) || id <= 0)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     const area = await this.geofenceareaDAO.findById(id);
     if (!area)
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
     return area;
   };
 
-  public async createArea (data: GeofenceareaCreationData) {
+  public async createArea(data: GeofenceareaCreationData) {
+    if (!data.name || !data.area)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.geofenceareaDAO.create(data, t);
@@ -30,8 +34,8 @@ export class GeofenceareaService {
     }
   };
 
-  public async updateArea (id: number, data: Partial<GeofenceareaCreationData>){
-    await this.getAreaById(id); // controlla esistenza
+  public async updateArea(id: number, data: Partial<GeofenceareaCreationData>) {
+    await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       await this.geofenceareaDAO.update(id, data, t);
@@ -43,8 +47,8 @@ export class GeofenceareaService {
     }
   };
 
-  public async deleteArea (id: number) {
-    await this.getAreaById(id); // controlla esistenza
+  public async deleteArea(id: number) {
+    await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.geofenceareaDAO.delete(id, t);

@@ -14,18 +14,25 @@ export class GeofenceAreaController {
       const aree = await this.geofenceareaService.getAree();
       res.json(aree);
     } catch (err) {
-      err instanceof AppError ? err.send(res) : res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
     }
   };
 
   public async getAreaById(req: Request, res: Response, next: NextFunction) {
     try {
       const id = Number(req.params.id);
-      if (isNaN(id) || id <= 0)
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      res.json(await this.geofenceareaService.getAreaById(id));
+      const area = await this.geofenceareaService.getAreaById(id);
+      res.json(area);
     } catch (err) {
-      err instanceof AppError ? err.send(res) : res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
     }
   };
 
@@ -59,31 +66,44 @@ export class GeofenceAreaController {
 
       const nuovaArea = await this.geofenceareaService.createArea(geoJsonArea);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
+      const nuovaArea = await this.geofenceareaService.createArea(req.body);
+      const success = SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea);
+      res.json(success);
     } catch (err) {
-      err instanceof AppError ? err.send(res) : res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
     }
   };
 
   public async updateArea(req: Request, res: Response, next: NextFunction) {
     try {
       const id = Number(req.params.id);
-      if (isNaN(id) || id <= 0)
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      res.json(await this.geofenceareaService.updateArea(id, req.body));
+      const areaAggiornata = await this.geofenceareaService.updateArea(id, req.body);
+      res.json(areaAggiornata);
     } catch (err) {
-      err instanceof AppError ? err.send(res) : res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
     }
   };
 
   public async deleteArea(req: Request, res: Response, next: NextFunction) {
     try {
       const id = Number(req.params.id);
-      if (isNaN(id) || id <= 0)
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       await this.geofenceareaService.deleteArea(id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, null));
+      const success = SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, null);
+      res.json(success);
     } catch (err) {
-      err instanceof AppError ? err.send(res) : res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
     }
   };
 }
