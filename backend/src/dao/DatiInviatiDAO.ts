@@ -4,11 +4,12 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
+import { DatabaseConnection } from '../singleton/DBConnection.js';
 
 interface IDatiinviatiDAO {
   create(data: DatiinviatiCreationData, t: Transaction): Promise<Datiinviati>;
   findAllByMmsi(mmsi: number): Promise<Datiinviati[]>;
-  checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null>
+  checkLocationInGeoarea(mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null>
 }
 
 export class DatiinviatiDAO implements IDatiinviatiDAO {
@@ -37,8 +38,9 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
   }
 
   // Estrae la geofence area di un'imbarcazione in base alla sua posizione
-  async checkLocationInGeoarea(db: Sequelize, mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null> {
+  async checkLocationInGeoarea(mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null> {
     try {
+        const db = DatabaseConnection.getInstance();
         const results = await db.query(`SELECT ga.* FROM geofence_areas ga INNER JOIN geofence_imbarcazioni gi ON ga.geoarea_id = gi.geoarea_id WHERE gi.mmsi = :mmsi AND ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
         {
           // Mappiamo il risultato al model Geofencearea, così otteniamo l'oggetto come risultato. Replacement sostituisce i parametri con i valori associati.
