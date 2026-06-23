@@ -62,8 +62,7 @@ export class AuthController {
                 "password": passwordHash,
                 "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegnato
             }
-            const t = await DatabaseConnection.getInstance().transaction();
-            await this.AdminDAO.create(userInfo, t);
+            await this.adminService.createUtente(userInfo);
 
             const responseData = {"username": username, "email": email};
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));
