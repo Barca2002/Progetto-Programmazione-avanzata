@@ -10,6 +10,18 @@ export class AdminService {
   private readonly adminDAO = new AdminDAO();
   private readonly authService = new AuthService();
 
+  public createUtente = async (data: UserCreationData) => {
+    const t = await DatabaseConnection.getInstance().transaction();
+    try {
+      const result = await this.adminDAO.create(data, t);
+      await t.commit();
+      return result;
+    } catch (err) {
+      await t.rollback();
+      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
+    }
+  };
+
   public findByEmail = async (email: string) => {
     const utente = await this.adminDAO.findByEmail(email);
     if (!utente)
