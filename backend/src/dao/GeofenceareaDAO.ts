@@ -47,7 +47,7 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
 
   async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea> {
     try{
-      const [affectedCount, affectedRows] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t, returning: true });
+      const [, affectedRows] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t, returning: true });
       return affectedRows[0]!;
     } catch (err){
       throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);

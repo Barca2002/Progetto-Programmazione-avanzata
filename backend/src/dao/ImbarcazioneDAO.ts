@@ -133,7 +133,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async update(mmsi: number, data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione> {
     try {
-      const [affectedCount, affectedRows] = await Imbarcazione.update(data, { where: { mmsi: mmsi }, transaction: t, returning: true });
+      const [, affectedRows] = await Imbarcazione.update(data, { where: { mmsi: mmsi }, transaction: t, returning: true });
       return affectedRows[0]!;
     } catch (err) {
       throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);

@@ -14,7 +14,6 @@ interface IGeofenceImbarcazioniDAO {
 }
 
 export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
-
   async create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
     try {
         return await GeofenceImbarcazioni.create({ geoarea_id, mmsi }, {transaction:t});
@@ -49,7 +48,7 @@ export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
    */
   async updateLocation(mmsi: number, geoarea_id: number, t: Transaction): Promise<GeofenceImbarcazioni> {
     try {
-      const [affectedCount, affectedRows] = await GeofenceImbarcazioni.update(
+      const [, affectedRows] = await GeofenceImbarcazioni.update(
         { is_in: true },
         { 
           where: { mmsi, geoarea_id }, 
@@ -67,7 +66,7 @@ export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
    */
   async resetLocation(mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
     try {
-      const [affectedCount, affectedRows] = await GeofenceImbarcazioni.update(
+      const [, affectedRows] = await GeofenceImbarcazioni.update(
         { is_in: false },
         { 
           where: { mmsi }, 
