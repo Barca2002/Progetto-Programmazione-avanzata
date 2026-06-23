@@ -15,11 +15,20 @@ export class ImbarcazioneService {
   private geofenceareaDAO = new GeofenceareaDAO();
 
   async createImbarcazione(data: ImbarcazioneCreationData) {
-    const t = await DatabaseConnection.getInstance().transaction()
-    return await this.imbarcazioneDAO.create(data, t);
+    const t = await DatabaseConnection.getInstance().transaction();
+    try {
+      const result = await this.imbarcazioneDAO.create(data, t);
+      await t.commit();
+      return result;
+    } catch (err) {
+      await t.rollback();
+      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
+    }
   }
 
   async getImbarcazioneById(mmsi: number) {
+    if (isNaN(mmsi) || mmsi <= 0)
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
     const imbarcazione = await this.imbarcazioneDAO.findById(mmsi);
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
@@ -27,14 +36,24 @@ export class ImbarcazioneService {
   }
 
   async getAllImbarcazioniWithGeofences() {
-    return await this.imbarcazioneDAO.findAllGeofences();
+    const imbarcazioni = await this.imbarcazioneDAO.findAllGeofences();
+    if (!imbarcazioni || imbarcazioni.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    return imbarcazioni;
   }
 
   async getMyImbarcazioniWithGeofences(user_id: number) {
-    return await this.imbarcazioneDAO.findAllWithUserWithGeofences(user_id);
+    if (isNaN(user_id) || user_id <= 0)
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
+    const imbarcazioni = await this.imbarcazioneDAO.findAllWithUserWithGeofences(user_id);
+    if (!imbarcazioni || imbarcazioni.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    return imbarcazioni;
   }
 
   async updateImbarcazione(mmsi: number, data: Partial<ImbarcazioneCreationData>) {
+    if (!data || Object.keys(data).length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     const imbarcazione = await this.imbarcazioneDAO.findById(mmsi);
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);

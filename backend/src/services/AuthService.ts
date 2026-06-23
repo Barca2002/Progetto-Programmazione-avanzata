@@ -26,30 +26,32 @@ export class AuthService{
         }
     }
     // Si prende l'utente, identificato univocamente dall'email, per comparare la password e poi prendere i suoi dati per generare il token JWT
-    public async checkCreds(email:string, password:string): Promise<string>{
-        
+    public async checkCreds(email: string, password: string): Promise<string> {
         const user = await this.adminDao.findByEmail(email);
-        const pwdMatch = await bcrypt.compare(password.trim(), user!.password);
-
-        if (!pwdMatch) {
+        if (!user)
+            throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
+        const pwdMatch = await bcrypt.compare(password.trim(), user.password);
+        if (!pwdMatch)
             throw ErrorFactory.getError(AppErrorEnum.INCORRECT_PASSWORD);
-        }
-        return await this.generateJWT(user!);
-    }
+        return await this.generateJWT(user);
+  }
 
     public async generateJWT(user: User){
-
+        if (!user)
+            throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
         const payload = {
-            "user_id": user?.get("user_id"), 
-            "email": user?.get("email"),
-            "is_admin": user?.get("is_admin")
+            "user_id": user.get("user_id"), 
+            "email": user.get("email"),
+            "is_admin": user.get("is_admin")
         }
         const jwtToken: string = jwt.sign(payload, this.privateKey, { algorithm: "RS256", expiresIn: "1h" });
 
         return jwtToken;
     }
 
-    public async hashPassword(pwd: string){
+    public async hashPassword(pwd: string) {
+        if (!pwd || pwd.trim().length === 0)
+            throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         return await bcrypt.hash(pwd.trim(), this.saltRounds);
     }
 
@@ -61,15 +63,15 @@ export class AuthService{
   }
 
   public async login (email: string, password: string){
-
-    if(!(await this.adminDao.findByEmail(email))){
-        throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
-    }
+    if (!email || !password)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     // Ritorna il token JWT se l'autenticazione va a buon fine.
     return await this.checkCreds(email, password);
   }
 
   public async register (email: string, username: string, password: string){
+    if (!email || !username || !password)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     // Controlliamo se l'email già esiste
     if(await this.adminDao.findByEmail(email)){
         throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);

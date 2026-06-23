@@ -36,12 +36,11 @@ export class AdminService {
     return utente;
   };
 
-  public async getUtenti () {
+  public async getUtenti() {
     const utenti = await this.adminDAO.findAll();
-    if (!utenti){
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
-      return utenti;
+    if (!utenti || utenti.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    return utenti;
   };
 
   public async getUtenteById (id: number) {
@@ -55,6 +54,8 @@ export class AdminService {
   };
 
   public async updateUtente (id: number, data: Partial<UserCreationData>){
+    if (!data || Object.keys(data).length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono

@@ -7,8 +7,11 @@ import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 export class GeofenceareaService {
   private readonly geofenceareaDAO = new GeofenceareaDAO();
 
-  public async getAree (){
-    return await this.geofenceareaDAO.findAll();
+  public async getAree() {
+    const aree = await this.geofenceareaDAO.findAll();
+    if (!aree || aree.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+    return aree;
   };
 
   public async getAreaById(id: number) {
@@ -35,6 +38,8 @@ export class GeofenceareaService {
   };
 
   public async updateArea(id: number, data: Partial<GeofenceareaCreationData>) {
+    if (!data || Object.keys(data).length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {

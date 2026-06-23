@@ -31,8 +31,10 @@ export class DatiInviatiService {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
     
     const user = await this.userImbarcazioniDAO.findUserByMmsi(data.mmsi);
-    const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user!.user_id, data.mmsi);
-
+    if (!user)
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    
+    const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user.user_id, data.mmsi);
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
@@ -49,12 +51,11 @@ export class DatiInviatiService {
       await this.geofenceImbarcazioniDAO.resetLocation(data.mmsi, t);
 
       if(!geoarea_found){
-      // Si aggiorna la posizione della barca settando is_in a true in base a dove si trova attualmente
-      await this.geofenceImbarcazioniDAO.updateLocation(data.mmsi, geoarea_found!.geoarea_id, t);
+        // Si aggiorna la posizione della barca settando is_in a true in base a dove si trova attualmente
+        await this.geofenceImbarcazioniDAO.updateLocation(data.mmsi, geoarea_found!.geoarea_id, t);
       }
       await t.commit();
     } catch (err) {
-      console.log(err);
       await t.rollback();
       if (err instanceof AppError) throw err;
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
