@@ -3,8 +3,7 @@ import { AdminDAO } from "../dao/AdminDAO.js";
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/UserModel.js';
-
+import { User, UserCreationData } from '../models/UserModel.js';
 
 
 export class AuthService{
@@ -30,12 +29,11 @@ export class AuthService{
     public async checkCreds(email:string, password:string): Promise<string>{
         
         const user = await this.adminDao.findByEmail(email);
-        const pwdMatch = await bcrypt.compare(password.trim(), user!.get("password") as string);
+        const pwdMatch = await bcrypt.compare(password.trim(), user!.password);
 
         if (!pwdMatch) {
             throw ErrorFactory.getError(AppErrorEnum.INCORRECT_PASSWORD);
         }
-
         return await this.generateJWT(user!);
     }
 
@@ -55,10 +53,41 @@ export class AuthService{
         return await bcrypt.hash(pwd.trim(), this.saltRounds);
     }
 
-    public checkUserId = async(id: number) => {
+    public async checkUserId (id: number){
+    // Controlla se l'user id è valido, cioè se è un numero e se non è minore o uguale a 0.
     if (isNaN(id) || id <= 0) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
     }
+  }
+
+  public async login (email: string, password: string){
+
+    if(!(await this.adminDao.findByEmail(email))){
+        throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
+    }
+    // Ritorna il token JWT se l'autenticazione va a buon fine.
+    return await this.checkCreds(email, password);
+  }
+
+  public async register (email: string, username: string, password: string){
+    // Controlliamo se l'email già esiste
+    if(await this.adminDao.findByEmail(email)){
+        throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
+    }
+    // Controlliamo se l'username già esiste
+    if(await this.adminDao.findByUsername(username)){
+        throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
+    }
+    // Se le credenziali inserite non esistono già, si calcola l'hash della password e si ritorna quella.
+    const passwordHash =  await this.hashPassword(password.trim());
+    // Creiamo il nuovo utente
+    const userInfo: UserCreationData = {
+        "username": username.trim(),
+        "email": email,
+        "password": passwordHash,
+        "is_admin": false // La registrazione di default non permette di creare acocunt admin per motivi di sicurezza.
+    }
+    return userInfo;
   }
     
 }

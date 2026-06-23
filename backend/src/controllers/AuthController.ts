@@ -26,11 +26,9 @@ export class AuthController {
         try {
             const { email, password } = req.body;
             // Controlliamo se l'email esiste
-            if(!(await this.adminService.findByEmail(email))){
-                throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
-            }
+            
             // Generazione del token
-            const jwtToken = await this.authService.checkCreds(email, password);
+            const jwtToken = await this.authService.login(email, password);
             const responseData = {token: jwtToken};
 
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_LOGGED_IN, responseData));
@@ -45,24 +43,10 @@ export class AuthController {
 
     public async register (req: Request, res: Response) {
         try {
-            const { username, email } = req.body;
-            // Controlliamo se l'email già esiste
-            if(await this.adminService.findByEmail(email)){
-                throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
-            }
-            // Controlliamo se l'username già esiste
-            if(await this.adminService.findByUsername(username)){
-                throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
-            }
-            const passwordHash = await this.authService.hashPassword(req.body.password);
-            // Creiamo il nuovo utente
-            const userInfo: UserCreationData = {
-                "username": req.body.username.trim(),
-                "email": req.body.email,
-                "password": passwordHash,
-                "is_admin": req.body.is_admin ?? false // Fallback false se non viene assegnato
-            }
-            await this.adminService.createUtente(userInfo);
+            const { username, email, password } = req.body;
+            
+            const newUser = await this.authService.register(email, username, password);
+            await this.adminService.createUtente(newUser);
 
             const responseData = {"username": username, "email": email};
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));
