@@ -4,6 +4,7 @@ import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
+import type { Position, Feature, Polygon } from 'geojson';
 
 export class GeofenceAreaController {
   public readonly geofenceareaService = new GeofenceareaService();
@@ -30,10 +31,33 @@ export class GeofenceAreaController {
 
   public async createArea(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, area } = req.body;
-      if (!name || !area)
+      const { name, coordinates } = req.body;
+      if (!name || !coordinates){
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      const nuovaArea = await this.geofenceareaService.createArea(req.body);
+      }
+
+      // area attesa: array di coordinate tipo [[[lng, lat], [lng, lat], ...]]
+    // esempio Polygon GeoJSON
+    const coordinatesGeoJson: Position[][] = coordinates;
+
+    if (!Array.isArray(coordinatesGeoJson) || !Array.isArray(coordinatesGeoJson[0]) ||
+      coordinatesGeoJson[0].length < 4
+    ) {
+      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    }
+
+      const geoJsonArea: Feature<Polygon> = {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates,
+      },
+      properties: {
+        name,
+      },
+    };
+
+      const nuovaArea = await this.geofenceareaService.createArea(geoJsonArea);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
     } catch (err) {
       err instanceof AppError ? err.send(res) : res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
