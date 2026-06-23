@@ -51,7 +51,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {
     err.send(res);
   } else {
-    console.log("Errore imprevisto: " + err);
+    console.log("Errore imprevisto: ");
+    console.log(err);
     return res.status(500).json({
       status: 'error_generic',
       message: 'Errore interno del server.'

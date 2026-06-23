@@ -45,9 +45,8 @@ export class GeofenceAreaController {
       }
 
       // Formato coordiante GeoJson
-      const coordinatesGeoJson: Position[][] = coordinates;
-      console.log(coordinatesGeoJson);
-
+      const coordinatesGeoJson: Position[] = coordinates;
+      console.log("Creazione nuova area");
       // Creazione della nuova area.
       const geoJsonArea: GeofenceareaCreationData = {
         name: name,
@@ -57,13 +56,14 @@ export class GeofenceAreaController {
         },
         max_speed: max_speed ? max_speed : null, 
       };
-
+      console.log(geoJsonArea);
       const nuovaArea = await this.geofenceareaService.createArea(geoJsonArea);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);
       } else {
+        console.log(err);
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }

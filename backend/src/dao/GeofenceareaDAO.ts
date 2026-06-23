@@ -8,7 +8,7 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 interface IGeofenceareaDAO {
   create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea>;
   findById(geoarea_id: number): Promise<Geofencearea | null>;
-  findByCoords(coords: Position[][]): Promise<Geofencearea | null>;
+  findByCoords(coords: Position[]): Promise<Geofencearea | null>;
   findAll(): Promise<Geofencearea[]>;
   findByName(name: string): Promise<Geofencearea | null>;
   update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<Geofencearea>;
@@ -32,8 +32,8 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
     }
   }
 
-  async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
-    
+  async findByCoords(coords: Position[]): Promise<Geofencearea | null> {
+
   const geoJson = {
     type: "Polygon",
     coordinates: coords

@@ -15,7 +15,7 @@ export class GeofenceareaService {
     return aree;
   };
 
-  public async getAreaByCoords(coords: Position[][]) {
+  public async getAreaByCoords(coords: Position[]) {
     const area = this.geofenceareaDAO.findByCoords(coords)
     if (!area){
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
@@ -33,6 +33,7 @@ export class GeofenceareaService {
   };
 
   public async createArea(data: GeofenceareaCreationData) {
+    console.log("Controllo se l'area esiste già");
     if(await this.geofenceareaDAO.findByCoords(data.area.coordinates)){
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_ALREADY_EXISTS)
     }

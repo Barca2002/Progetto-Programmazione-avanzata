@@ -4,7 +4,7 @@ import { Position } from 'geojson';
 
 interface GeoJsonPolygon {
   type: 'Polygon';
-  coordinates: Position[][]; // Le coordinate sono formate da un insieme di Position, cioè di coppie longitudine e latitudine
+  coordinates: Position[]; // Le coordinate sono formate da un insieme di Position, cioè di coppie longitudine e latitudine
 }
 
 export interface GeofenceareaAllData {
