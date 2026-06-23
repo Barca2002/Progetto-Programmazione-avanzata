@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Router } from "express";
 import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
 import { checkAdmin } from "../middlewares/JWTMiddleware.js";
-import { geoJsonValidation } from "../middlewares/GeofenceareaMiddleware.js";
+import { checkGeoJson } from "../middlewares/GeofenceareaMiddleware.js";
 
 
 export const geofenceareaRoutes = Router();
@@ -14,7 +14,7 @@ geofenceareaRoutes.get("/all", checkAdmin, geofencearea.getAree);
 geofenceareaRoutes.get("/:id", checkAdmin, geofencearea.getAreaById);
 
 // CREATE area (solo admin). Bisogna passare il contesto alla funzione altrimenti i this nella funzione creatArea sono undefined
-geofenceareaRoutes.post("/create", checkAdmin, geoJsonValidation, function(req: Request, res: Response, next: NextFunction) {
+geofenceareaRoutes.post("/create", checkAdmin, checkGeoJson, function(req: Request, res: Response, next: NextFunction) {
     geofencearea.createArea(req, res, next);
   }
 );

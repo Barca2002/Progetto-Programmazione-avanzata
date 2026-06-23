@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 import * as z from "zod";
 import * as turf from "@turf/turf";
 
-export const geoJsonValidation = [checkGeoJsonFormat, checkCoordinates];
+export const checkGeoJson = [checkGeoJsonFormat, checkCoordinates];
 export const MAX_POINTS = 15;
 
 // Definizione dello schema di validazione per il formato GeoJSON
