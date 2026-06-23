@@ -53,6 +53,8 @@ export class GeofenceAreaController {
       GeoJSON richiede Position[][] (array di anelli, dove ogni anello è un array di punti), quindi wrappiamo in un array esterno per ottenere il formato corretto (coordinatesGeoJson):
       "coordinates": [ [ [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] ] ]
       */
+
+      //Se dal body volessimo aggiungere un altro layer a mano nelle coordinate (altro strato di coppia di quadre), si potrebbe togliere questo wrap ma per semplicità si è deciso di fare il "cast" internamente
       const coordinatesGeoJson: Position[][] = [coordinates];
       
       console.log("Creazione nuova area");
