@@ -6,16 +6,15 @@ import { AppError } from "../models/AppErrorModel.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 
 export class UserController {
-  private datiinviatiService = new DatiInviatiService();
+  public readonly datiinviatiService = new DatiInviatiService();
 
   public async sendData(req: Request, res: Response, next: NextFunction){
     try {
-      const user_id = (req as any).userLoggato.user_id;
-      const { mmsi, latitudine, longitudine, velocita_kmh, stato } = req.body;
+      const data = req.body;
 
-      await this.datiinviatiService.sendData(user_id, mmsi, latitudine, longitudine, velocita_kmh, stato);
+      await this.datiinviatiService.sendData(data);
 
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, {mmsi, latitudine, longitudine, velocita_kmh, stato}));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);

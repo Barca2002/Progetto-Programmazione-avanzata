@@ -6,8 +6,7 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 
 export class ImbarcazioneController {
-
-  private imbarcazioneService = new ImbarcazioneService();
+  public readonly imbarcazioneService = new ImbarcazioneService();
 
   public async getImbarcazioneById(req: Request, res: Response, next: NextFunction){
     try {

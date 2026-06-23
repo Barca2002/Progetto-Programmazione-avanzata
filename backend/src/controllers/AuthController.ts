@@ -7,14 +7,8 @@ import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AdminService } from "../services/AdminService.js";
 
 export class AuthController {
-    private authService: AuthService;
-    private adminService: AdminService;
-
-    constructor() {
-        this.authService = new AuthService();
-        this.adminService = new AdminService();
-    }
-
+    public readonly authService = new AuthService();
+    public readonly adminService = new AdminService();
     /**
      * Metodo del controller per la gestione del login. Si occupa di recuperare i
      * dati nel body della richiesta per poi mandarli al service che si occupa di

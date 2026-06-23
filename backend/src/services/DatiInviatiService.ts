@@ -41,13 +41,7 @@ export class DatiInviatiService {
 
     try {
       //Inserisco i dati nel db, con una transaction metto in sospeso
-      await this.datiinviatiDAO.create({
-        mmsi: data.mmsi,
-        latitudine: data.latitudine,
-        longitudine: data.longitudine,
-        velocita_kmh: data.velocita_kmh,
-        stato: data.stato
-      }, t);
+      await this.datiinviatiDAO.create(data, t);
 
       const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(connDB, data.mmsi, data.latitudine, data.longitudine); //uso data.mmsi e non user_id perche una data.mmsi è associata ad un user quindi è uguale
 
