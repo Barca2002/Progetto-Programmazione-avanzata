@@ -3,6 +3,7 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { NextFunction, Request, Response } from "express";
 import * as z from "zod";
+import * as turf from "@turf/turf";
 
 export const geoJsonValidation = [checkGeoJsonFormat, checkCoordinates];
 export const MAX_POINTS = 15;
@@ -28,6 +29,8 @@ function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction){
 function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
     const coordinates: Position[][] = req.body?.coordinates;
+    console.log("------ COORDINATE --------");
+    console.log(coordinates);
     // Bisogna controllare 3 cose principali:
     // - Le coordinate devono contenere almeno 4 punti (per creare un triangolo
     //   servono 3 punti + l'ultimo che si sovrappone al primo).
@@ -47,12 +50,21 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
         throw ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS);
     }
     console.log("Controllo numero punti superato con successo.");
+    // Con turf controlliamo se ci sono punti di sovrapposizione nel poligono
+    // Definito dalle coordinare.
+    const polygon = turf.polygon(coordinates);
+    const kinks = turf.kinks(polygon);
+    // Se c'è almeno un punto in cui si sovrappone, lancia un'eccezione
+    if (kinks.features.length > 0) {
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
+    }
+    
     // Controllo che il primo e l'ultimo punto coincidono per chiudere l'area
     const punti = coordinates[0];
     const primoPunto = punti[0];
     const ultimoPunto = punti[punti.length - 1];
 
-    if (!primoPunto || !ultimoPunto || primoPunto !== ultimoPunto) {
+    if (!primoPunto || !ultimoPunto || primoPunto[0] !== ultimoPunto[0] || primoPunto[1] !== ultimoPunto[1]) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
     }
     console.log("Controllo primo ed ultimo punto superato con successo.");

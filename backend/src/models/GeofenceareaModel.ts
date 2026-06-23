@@ -1,12 +1,10 @@
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
+import { Position } from 'geojson';
 
 
 interface GeoJsonPolygon {
   type: 'Polygon';
-  coordinates: number[][][]; //Perché un poligono può avere buchi al suo interno, (è lo standard, ci devono essere per forza 3 strati, nel nostro caso lo strato 1 non c'è perché non ci sono buchi)
-  // Strato 1) lista di "anelli" che indica quanti perimetri interni ci sono
-  // Strati 2) insieme di punti, quindi il perimetro del poligono
-  // Strato 3) il singolo punto, longitudine e latitudine
+  coordinates: Position[][]; // Le coordinate sono formate da un insieme di Position, cioè di coppie longitudine e latitudine
 }
 
 export interface GeofenceareaAllData {

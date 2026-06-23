@@ -1,11 +1,14 @@
-import { Transaction } from 'sequelize';
+import { QueryTypes, Transaction } from 'sequelize';
 import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
+import { Position } from 'geojson';
+import { DatabaseConnection } from '../singleton/DBConnection.js';
 
 interface IGeofenceareaDAO {
   create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea>;
   findById(geoarea_id: number): Promise<Geofencearea | null>;
+  findByCoords(coords: Position[][]): Promise<Geofencearea | null>;
   findAll(): Promise<Geofencearea[]>;
   findByName(name: string): Promise<Geofencearea | null>;
   update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<Geofencearea>;
@@ -22,12 +25,38 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
 }
 
   async findById(geoarea_id: number): Promise<Geofencearea | null> {
-  try {
-    return await Geofencearea.findByPk(geoarea_id);
-  } catch (err) {
-    throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
+    try {
+      return await Geofencearea.findByPk(geoarea_id);
+    } catch (err) {
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
+    }
   }
-}
+
+  async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
+    
+  const geoJson = {
+    type: "Polygon",
+    coordinates: coords
+  };
+
+  const results = await DatabaseConnection.getInstance().query<Geofencearea>(
+    `
+    SELECT *
+    FROM geofence_areas
+    WHERE ST_Covers(
+      area,
+      ST_SetSRID(ST_GeomFromGeoJSON($1), 4326)
+    )
+    LIMIT 1;
+    `,
+    {
+      bind: [JSON.stringify(geoJson)],
+      type: QueryTypes.SELECT
+    }
+  );
+
+  return results[0] ?? null;
+  }
 
   async findAll(): Promise<Geofencearea[]> {
     try{
@@ -36,6 +65,7 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
       throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
   }
+  
 
   async findByName(name: string): Promise<Geofencearea | null> {
     // Stessa logica di findByEmail/findByUsername: serve poter restituire null senza lanciare errore

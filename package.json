@@ -23,6 +23,7 @@
     "generate-keys": "bun backend/src/utils/generateCryptoKeysV2.ts"
   },
   "dependencies": {
+    "@turf/turf": "^7.3.5",
     "@types/bcrypt": "^6.0.0",
     "@types/geojson": "^7946.0.16",
     "dotenv": "^17.4.2",

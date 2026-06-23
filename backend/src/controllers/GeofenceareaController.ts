@@ -4,7 +4,7 @@ import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
-import type { Position, Feature, Polygon } from 'geojson';
+import type { Position } from 'geojson';
 import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 
 export class GeofenceAreaController {
@@ -39,26 +39,24 @@ export class GeofenceAreaController {
 
   public async createArea(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, coordinates } = req.body;
+      const { name, coordinates, max_speed } = req.body;
       if (!name || !coordinates){
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
 
       // Formato coordiante GeoJson
       const coordinatesGeoJson: Position[][] = coordinates;
+      console.log(coordinatesGeoJson);
 
       // Creazione della nuova area.
-      
       const geoJsonArea: GeofenceareaCreationData = {
-        type: "Feature",
-        geometry: {
-        type: "Polygon",
-        coordinates,
-      },
-        properties: {
-          name,
-      },
-    };
+        name: name,
+        area: {
+          type: 'Polygon',
+          coordinates: coordinatesGeoJson,
+        },
+        max_speed: max_speed ? max_speed : null, 
+      };
 
       const nuovaArea = await this.geofenceareaService.createArea(geoJsonArea);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));

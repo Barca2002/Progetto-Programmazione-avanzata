@@ -3,6 +3,7 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
+import { Position } from "geojson";
 
 export class GeofenceareaService {
   private readonly geofenceareaDAO = new GeofenceareaDAO();
@@ -12,6 +13,14 @@ export class GeofenceareaService {
     if (!aree || aree.length === 0)
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
     return aree;
+  };
+
+  public async getAreaByCoords(coords: Position[][]) {
+    const area = this.geofenceareaDAO.findByCoords(coords)
+    if (!area){
+      throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+    }
+    return area;
   };
 
   public async getAreaById(id: number) {
@@ -24,8 +33,10 @@ export class GeofenceareaService {
   };
 
   public async createArea(data: GeofenceareaCreationData) {
-    if (!data.name || !data.area)
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    if(await this.geofenceareaDAO.findByCoords(data.area.coordinates)){
+      throw ErrorFactory.getError(AppErrorEnum.GEOAREA_ALREADY_EXISTS)
+    }
+    // La validazione dei dati già viene eseguito dal middleware.
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.geofenceareaDAO.create(data, t);
