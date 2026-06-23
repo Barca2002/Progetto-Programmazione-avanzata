@@ -8,7 +8,7 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 export class UserController {
   private datiinviatiService = new DatiInviatiService();
 
-  public sendData = async (req: Request, res: Response, next: NextFunction) => {
+  public async sendData(req: Request, res: Response, next: NextFunction){
     try {
       const user_id = (req as any).userLoggato.user_id;
       const { mmsi, latitudine, longitudine, velocita_kmh, stato } = req.body;

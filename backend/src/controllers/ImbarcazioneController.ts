@@ -9,7 +9,7 @@ export class ImbarcazioneController {
 
   private imbarcazioneService = new ImbarcazioneService();
 
-  public getImbarcazioneById = async (req: Request, res: Response, next: NextFunction) => {
+  public async getImbarcazioneById(req: Request, res: Response, next: NextFunction){
     try {
       const mmsi = Number(req.params.mmsi);
       if (isNaN(mmsi) || mmsi <= 0) {
@@ -27,7 +27,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public getAllImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public async getAllImbarcazioniWithGeofences(req: Request, res: Response, next: NextFunction): Promise<void>{
     try {
       const imbarcazioni = await this.imbarcazioneService.getAllImbarcazioniWithGeofences();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
@@ -40,7 +40,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public getMyImbarcazioniWithGeofences = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public async getMyImbarcazioniWithGeofences(req: Request, res: Response, next: NextFunction): Promise<void>{
     try {
       const user_id = (req as any).userLoggato.user_id; //l'id viene preso dalla request, che viene appeso durante il checkToken del middleware checkUser 
       const imbarcazioni = await this.imbarcazioneService.getMyImbarcazioniWithGeofences(user_id);
@@ -69,7 +69,7 @@ export class ImbarcazioneController {
       }
   ]
   */
-  public linkGeoareasEUserToImbarcazioni = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public async linkGeoareasEUserToImbarcazioni(req: Request, res: Response, next: NextFunction): Promise<void>{
     try {
       const links = req.body;
 
@@ -95,7 +95,7 @@ export class ImbarcazioneController {
     "geoarea_id": 1
   }
   */
-  public deleteGeoarea = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public async deleteGeoarea(req: Request, res: Response, next: NextFunction): Promise<void>{
     try {
       const { mmsi, geoarea_id } = req.body;
 
@@ -114,7 +114,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public createImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
+  public async createImbarcazione(req: Request, res: Response, next: NextFunction){
     try {
       const { mmsi, name, type } = req.body;
 
@@ -137,7 +137,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public updateImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
+  public async updateImbarcazione(req: Request, res: Response, next: NextFunction){
     try {
       const mmsi = Number(req.params.mmsi);
 
@@ -157,7 +157,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public deleteImbarcazione = async (req: Request, res: Response, next: NextFunction) => {
+  public async deleteImbarcazione(req: Request, res: Response, next: NextFunction){
     try {
       const mmsi = Number(req.params.mmsi);
 

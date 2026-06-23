@@ -4,8 +4,6 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
-import { UserCreationData } from "../models/UserModel.js";
-import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AdminService } from "../services/AdminService.js";
 
 export class AuthController {
