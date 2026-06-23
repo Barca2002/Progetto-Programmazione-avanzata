@@ -13,7 +13,7 @@ export class DatiInviatiService {
   private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
 
 
-  async sendData(data: DatiinviatiCreationData): Promise<void> {
+  public async sendData(data: DatiinviatiCreationData): Promise<void> {
     
     if (!data.mmsi || isNaN(data.mmsi) || data.mmsi.toString().length !== 9)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);

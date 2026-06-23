@@ -11,14 +11,14 @@ export class GeofenceareaService {
     return await this.geofenceareaDAO.findAll();
   };
 
-  public getAreaById = async (id: number) => {
+  public async getAreaById (id: number){
     const area = await this.geofenceareaDAO.findById(id);
     if (!area)
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
     return area;
   };
 
-  public createArea = async (data: GeofenceareaCreationData) => {
+  public async createArea (data: GeofenceareaCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.geofenceareaDAO.create(data, t);
@@ -30,7 +30,7 @@ export class GeofenceareaService {
     }
   };
 
-  public updateArea = async (id: number, data: Partial<GeofenceareaCreationData>) => {
+  public async updateArea (id: number, data: Partial<GeofenceareaCreationData>){
     await this.getAreaById(id); // controlla esistenza
     const t = await DatabaseConnection.getInstance().transaction();
     try {
@@ -43,7 +43,7 @@ export class GeofenceareaService {
     }
   };
 
-  public deleteArea = async (id: number) => {
+  public async deleteArea (id: number) {
     await this.getAreaById(id); // controlla esistenza
     const t = await DatabaseConnection.getInstance().transaction();
     try {
