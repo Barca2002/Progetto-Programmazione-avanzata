@@ -10,7 +10,7 @@ import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 export class GeofenceAreaController {
   public readonly geofenceareaService = new GeofenceareaService();
 
-  public getAree = async (req: Request, res: Response, next: NextFunction) => {
+  public async getAree(req: Request, res: Response, next: NextFunction){
     try {
       const aree = await this.geofenceareaService.getAree();
       res.json(aree);
@@ -23,7 +23,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public getAreaById = async (req: Request, res: Response, next: NextFunction) => {
+  public async getAreaById(req: Request, res: Response, next: NextFunction){
     try {
       const id = Number(req.params.id);
       const area = await this.geofenceareaService.getAreaById(id);
@@ -37,7 +37,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public createArea = async (req: Request, res: Response, next: NextFunction) => {
+  public async createArea(req: Request, res: Response, next: NextFunction){
     try {
       const { name, coordinates, max_speed } = req.body;
       if (!name || !coordinates){
@@ -56,9 +56,7 @@ export class GeofenceAreaController {
 
       //Se dal body volessimo aggiungere un altro layer a mano nelle coordinate (altro strato di coppia di quadre), si potrebbe togliere questo wrap ma per semplicità si è deciso di fare il "cast" internamente
       const coordinatesGeoJson: Position[][] = [coordinates];
-      
-      console.log("Creazione nuova area");
-      // Creazione della nuova area.
+            // Creazione della nuova area.
       const geoJsonArea: GeofenceareaCreationData = {
         name: name,
         area: {
@@ -67,7 +65,6 @@ export class GeofenceAreaController {
         },
         max_speed: max_speed ? max_speed : null, 
       };
-      console.log(geoJsonArea);
       const nuovaArea = await this.geofenceareaService.createArea(geoJsonArea);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
     } catch (err) {
@@ -80,7 +77,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public updateArea = async (req: Request, res: Response, next: NextFunction) => {
+  public async updateArea(req: Request, res: Response, next: NextFunction){
     try {
       const id = Number(req.params.id);
       const areaAggiornata = await this.geofenceareaService.updateArea(id, req.body);
@@ -94,7 +91,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public deleteArea = async (req: Request, res: Response, next: NextFunction) => {
+  public async deleteArea(req: Request, res: Response, next: NextFunction){
     try {
       const id = Number(req.params.id);
       await this.geofenceareaService.deleteArea(id);

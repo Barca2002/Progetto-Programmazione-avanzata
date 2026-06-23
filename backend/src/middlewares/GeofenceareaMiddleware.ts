@@ -48,10 +48,11 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     if (coordinates.length > MAX_POINTS){
         throw ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS);
     }
+    const wrap: Position[][] = [coordinates]; //perchè dall'input prendiamo uno strato in meno per semplicità, quindi qui lo si wrappa
 
     // Con turf controlliamo se ci sono punti di sovrapposizione nel poligono
     // Definito dalle coordinare.
-    const polygon = turf.polygon([coordinates]);
+    const polygon = turf.polygon(wrap);
     const kinks = turf.kinks(polygon);
     // Se c'è almeno un punto in cui si sovrappone, lancia un'eccezione
     if (kinks.features.length > 0) {
