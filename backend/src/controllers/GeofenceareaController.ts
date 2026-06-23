@@ -10,7 +10,7 @@ import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 export class GeofenceAreaController {
   public readonly geofenceareaService = new GeofenceareaService();
 
-  public async getAree(req: Request, res: Response, next: NextFunction) {
+  public getAree = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const aree = await this.geofenceareaService.getAree();
       res.json(aree);
@@ -23,7 +23,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async getAreaById(req: Request, res: Response, next: NextFunction) {
+  public getAreaById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
       const area = await this.geofenceareaService.getAreaById(id);
@@ -37,15 +37,24 @@ export class GeofenceAreaController {
     }
   };
 
-  public async createArea(req: Request, res: Response, next: NextFunction) {
+  public createArea = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, coordinates, max_speed } = req.body;
       if (!name || !coordinates){
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
-
-      // Formato coordiante GeoJson
-      const coordinatesGeoJson: Position[] = coordinates;
+      /*
+      Le coordinate nel body arrivano come array di punti (Position[]):
+      "coordinates": 
+      [ 
+        [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] 
+      ]
+      
+      GeoJSON richiede Position[][] (array di anelli, dove ogni anello è un array di punti), quindi wrappiamo in un array esterno per ottenere il formato corretto (coordinatesGeoJson):
+      "coordinates": [ [ [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] ] ]
+      */
+      const coordinatesGeoJson: Position[][] = [coordinates];
+      
       console.log("Creazione nuova area");
       // Creazione della nuova area.
       const geoJsonArea: GeofenceareaCreationData = {
@@ -69,7 +78,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async updateArea(req: Request, res: Response, next: NextFunction) {
+  public updateArea = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
       const areaAggiornata = await this.geofenceareaService.updateArea(id, req.body);
@@ -83,7 +92,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async deleteArea(req: Request, res: Response, next: NextFunction) {
+  public deleteArea = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
       await this.geofenceareaService.deleteArea(id);

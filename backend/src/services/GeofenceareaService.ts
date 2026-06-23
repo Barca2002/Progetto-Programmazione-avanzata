@@ -15,7 +15,7 @@ export class GeofenceareaService {
     return aree;
   };
 
-  public async getAreaByCoords(coords: Position[]) {
+  public async getAreaByCoords(coords: Position[][]) {
     const area = this.geofenceareaDAO.findByCoords(coords)
     if (!area){
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);

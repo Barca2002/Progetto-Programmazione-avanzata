@@ -8,7 +8,7 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 export class UserController {
   public readonly datiinviatiService = new DatiInviatiService();
 
-  public async sendData(req: Request, res: Response, next: NextFunction){
+  public sendData = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
 

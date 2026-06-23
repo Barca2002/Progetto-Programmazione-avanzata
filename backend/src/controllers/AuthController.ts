@@ -14,7 +14,7 @@ export class AuthController {
      * dati nel body della richiesta per poi mandarli al service che si occupa di
      * generare il token JWT
      */
-    public async login (req: Request, res: Response) {
+    public login = async (req: Request, res: Response) => {
         try {
             const { email, password } = req.body;
             // Controlliamo se l'email esiste
@@ -33,7 +33,7 @@ export class AuthController {
         }
     }
 
-    public async register (req: Request, res: Response) {
+    public register = async (req: Request, res: Response) => {
         try {
             const { username, email, password } = req.body;
             

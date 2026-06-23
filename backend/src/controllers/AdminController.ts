@@ -10,7 +10,7 @@ export class AdminController {
   // Quando chiamo una qualsiasi di queste funzioni sotto, passo per il Service che
   // contiene la logica di business, il quale a sua volta usa il DAO come intermediario
   // che sa come tradurre le operazioni in operazioni di Sequelize.
-  public async getUtenti (req: Request, res: Response, next: NextFunction) {
+  public getUtenti = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const utenti = await this.adminService.getUtenti();
       res.json(utenti);
@@ -23,7 +23,7 @@ export class AdminController {
     }
   };
 
-  public async getUtenteById(req: Request, res: Response, next: NextFunction){
+  public getUtenteById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
       const responseData = await this.adminService.getUtenteById(id);
@@ -39,7 +39,7 @@ export class AdminController {
     }
   };
 
-  public async updateUtente(req: Request, res: Response, next: NextFunction){
+  public updateUtente = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
       const utenteAggiornato = await this.adminService.updateUtente(id, req.body);
@@ -53,7 +53,7 @@ export class AdminController {
     }
   };
 
-  public async deleteUtente(req: Request, res: Response, next: NextFunction){
+  public deleteUtente = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
       const result = await this.adminService.deleteUtente(id);
