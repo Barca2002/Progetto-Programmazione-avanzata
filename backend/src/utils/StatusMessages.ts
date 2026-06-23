@@ -65,6 +65,8 @@ export const ERROR_LIST = {
     { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIO." },
     INVALID_VELOCITA:
     { statusCode: 400, message: "La velocità deve essere un numero positivo e non superiore a 200 km/h." },
+    MAX_SPEED_LIMIT:
+    { statusCode: 400, message: "La velocità deve essere inferiore a quella max oppure la geoarea non ha una velocità massima" },
     DELETE_ERROR:
     { statusCode: 400, message: "Errore nella cancellazione." },
     CREATE_ERROR:
