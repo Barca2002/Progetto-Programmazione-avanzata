@@ -4,7 +4,6 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { QueryTypes, Sequelize, Transaction } from 'sequelize';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
-import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 
 interface IDatiinviatiDAO {
   create(data: DatiinviatiCreationData, t: Transaction): Promise<Datiinviati>;
@@ -59,7 +58,7 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
   //Funzione che in base ai dati inseriti, controlla se la velocità inserita supera quella massima consentita, se presente
   async checkVelocity(geoarea: Geofencearea, velocity: number): Promise<boolean> {
     try {      
-      if (!geoarea || geoarea.max_speed === null)
+      if (geoarea.max_speed === null)
         return true; // non è in nessuna geoarea o non ha limite, velocità ok
 
       return velocity <= geoarea.max_speed;
