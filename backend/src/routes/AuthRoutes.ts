@@ -13,11 +13,11 @@ const authController = new AuthController();
  * 2. Esse vengono validate tramite la pipeline definita in validateLogin(checkEmail e checkPassword) da AuthMiddleware.
  * 3. Genera il token JWT di autenticazione
  */
-authRouter.post('/login', loginValidationPipeline, async (req: Request, res: Response) => {
+authRouter.post('/login', loginValidationPipeline, async function (req: Request, res: Response) {
     await authController.login(req, res);
 });
 
-authRouter.post('/register', registerValidationPipeline, async (req: Request, res: Response) => {
+authRouter.post('/register', registerValidationPipeline, async function(req: Request, res: Response) {
     await authController.register(req, res);
 });
 

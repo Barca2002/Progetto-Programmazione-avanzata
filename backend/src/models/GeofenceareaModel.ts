@@ -4,7 +4,7 @@ import { Position } from 'geojson';
 
 interface GeoJsonPolygon {
   type: 'Polygon';
-  coordinates: Position[][]; // Lo standard GeoJSON vuole per forza il Position[][]
+  coordinates: Position[][]; // Lo standard GeoJSON per i Polygon vuole per forza il Position[][]
 }
 
 export interface GeofenceareaAllData {

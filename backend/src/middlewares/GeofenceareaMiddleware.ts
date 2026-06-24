@@ -1,4 +1,4 @@
-import { Position } from "geojson";
+import { Feature, GeoJsonProperties, Polygon, Position } from "geojson";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { NextFunction, Request, Response } from "express";
@@ -7,18 +7,45 @@ import * as turf from "@turf/turf";
 
 export const checkGeoJson = [checkGeoJsonFormat, checkCoordinates];
 export const MAX_POINTS = 15;
+const MAX_DECIMALS = 7;
+
+// Funzione per controllare se i numeri dopo la virgola non superano MAX_DECIMALS
+const hasMaxDecimals = (value: number) => {
+    const parts = value.toString().split(".");
+    return parts.length === 1 || parts[1]!.length <= MAX_DECIMALS;
+};
 
 // Definizione dello schema di validazione per il formato GeoJSON
 const geofenceAreaSchema = z.object({
-    name: z.string().min(3, "Il nome dell'area è obbligatorio!"),
-    coordinates: z.array(z.array(
-            z.tuple([z.number(), z.number()]))).min(4)// Forza la struttura [longitudine, latitudine] di tipo number
+    type: z.literal("FeatureCollection"),
+    features: z.array(
+        z.object({
+            type: z.literal("Feature"),
+            // Properties, nel nostro caso, deve contenere il campo name ed opzionalmente il campo max_speed (max 200km/h).
+            properties: z.object({
+                name: z.string().min(3).max(255),
+                max_speed: z.number().min(1).max(200).optional()
+            }),
+            geometry: z.object({
+                type: z.literal("Polygon"),
+                // Le coordinate sono: [[[long, lat], [long, lat], ...]]
+                // Controlliamo anche che i numeri decimali non superino il massimo consentito
+                coordinates: z.array(
+                    z.array(z.tuple([z.number().min(-180).max(180).refine(hasMaxDecimals),  // longitude
+                            z.number().min(-90).max(90).refine
+                    (hasMaxDecimals)// latitude
+                    ]))
+                )
+            }),
+        })
+    ),
+    
 });
 
 // Controllo del formato della richiesta tramite zod
 function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction){
     const result = geofenceAreaSchema.safeParse(req.body);
-    if (!result){
+    if (!result.success){
         throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOJSON_FORMAT);
     }
     console.log("Controllo formato geojson superato con successo.");
@@ -28,8 +55,11 @@ function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction){
 
 function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
-    const coordinates: Position[] = req.body?.coordinates;
-
+    const coordinates: Position[][] = req.body?.features[0].geometry.coordinates;
+    const punti = coordinates[0]; // Prendiamo l'array di punti
+    if (!coordinates || !punti){
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
+    }
     // Bisogna controllare 3 cose principali:
     // - Le coordinate devono contenere almeno 4 punti (per creare un triangolo
     //   servono 3 punti + l'ultimo che si sovrappone al primo).
@@ -42,30 +72,27 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     }
 
     // Ci devono essere minimo 4 punti e massimo MAX_POINTS punti per definire una geofence area.    
-    if (coordinates.length < 4 ) {
+    if (punti.length < 4 ) {
         throw ErrorFactory.getError(AppErrorEnum.TOO_LITTLE_POINTS); 
     }
-    if (coordinates.length > MAX_POINTS){
+    if (punti.length > MAX_POINTS){
         throw ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS);
     }
-    const wrap: Position[][] = [coordinates]; //perchè dall'input prendiamo uno strato in meno per semplicità, quindi qui lo si wrappa
-
-    // Con turf controlliamo se ci sono punti di sovrapposizione nel poligono
-    // Definito dalle coordinare.
-    const polygon = turf.polygon(wrap);
-    const kinks = turf.kinks(polygon);
-    // Se c'è almeno un punto in cui si sovrappone, lancia un'eccezione
-    if (kinks.features.length > 0) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
-    }
-    
     // Controllo che il primo e l'ultimo punto coincidono per chiudere l'area
-    const primoPunto = coordinates[0];
-    const ultimoPunto = coordinates[coordinates.length - 1];
+    const primoPunto = punti[0];
+    const ultimoPunto = punti[punti.length - 1];
 
     if (!primoPunto || !ultimoPunto || primoPunto[0] !== ultimoPunto[0] || primoPunto[1] !== ultimoPunto[1]) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
     }
+    // Con turf controlliamo se ci sono punti di sovrapposizione nel poligono
+    // Definito dalle coordinare.
+    const polygon = turf.polygon(coordinates);
+    const kinks = turf.kinks(polygon);
+    // kinks contiene il numero di punti di autointersezione, quindi se ce ne sta uno o più, allora il poligono ha dei tratti che s'intersecano
+    if (kinks.features.length > 0){
+        throw ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON);
+    }    
 
     // Ritorna il controllo al controller
     next();

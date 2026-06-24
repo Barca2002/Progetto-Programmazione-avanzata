@@ -33,7 +33,7 @@ export class GeofenceareaService {
   };
 
   public async createArea(data: GeofenceareaCreationData) {
-    if(await this.geofenceareaDAO.findByCoords(data.area.coordinates)){
+    if(await this.geofenceareaDAO.findByCoords(data.area.coordinates) || await this.geofenceareaDAO.findByName(data.name)){
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_ALREADY_EXISTS)
     }
     // La validazione dei dati già viene eseguito dal middleware.

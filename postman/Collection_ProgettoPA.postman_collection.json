@@ -249,7 +249,46 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"name\": \"Dinagat Islands\",\r\n    \"coordinates\": [[125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1]]\r\n}",
+                  "raw": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"properties\": {\r\n        \"name\": \"test arezsdsszs2\",\r\n        \"max_speed\": 3\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [\r\n          [\r\n            [\r\n              4.6274281,\r\n              31.3803515\r\n            ],\r\n            [\r\n              4.59313,\r\n              31.2227126\r\n            ],\r\n            [\r\n              4.8869829,\r\n              31.1605834\r\n            ],\r\n            [\r\n              4.9487588,\r\n              31.3233181\r\n            ],\r\n            [\r\n              4.6274281,\r\n              31.3803515\r\n            ]\r\n          ]\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/geoarea/create",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "geoarea",
+                    "create"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "CreateArea(poligono sovrapposto)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"properties\": {\r\n        \"name\": \"test area\",\r\n        \"max_speed\": 50\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [\r\n          [\r\n            [\r\n              4.7019707,\r\n              31.4613478\r\n            ],\r\n            [\r\n              4.4686918,\r\n              31.1959124\r\n            ],\r\n            [\r\n              4.9592251,\r\n              31.1473308\r\n            ],\r\n            [\r\n              4.4473351,\r\n              31.4614216\r\n            ],\r\n            [\r\n              4.7019707,\r\n              31.4613478\r\n            ]\r\n          ]\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"

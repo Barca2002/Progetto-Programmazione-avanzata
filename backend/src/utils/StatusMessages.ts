@@ -81,11 +81,13 @@ export const ERROR_LIST = {
     TOO_LITTLE_POINTS:
     { statusCode: 401, message: "Inviati troppi pochi punti per la geofence area (min 4)."},
     INVALID_GEOJSON_FORMAT:
-    { statusCode: 401, message: "I dati forniti non rispettano il formato GeoJSON. Inoltre, è richiesto solo il nome e l'insieme dei punti per creare una nuova area."},
+    { statusCode: 401, message: "I dati forniti non rispettano il formato GeoJSON. Inoltre, nel campo 'properties' si deve definire il campo 'name' ed opzionalmente l'attributo 'max_speed', con un valore compreso tra 1 e 200."},
     INCORRECT_COORDS:
-    { statusCode: 401, message: "Le coordinate fornite non rispettano i vincoli richiesti."},
+    { statusCode: 401, message: "Le coordinate fornite non rispettano i vincoli richiesti (il primo punto)."},
+    OVERLAPPING_POLYGON:
+    { statusCode: 401, message: "Le coordinate fornite costruiscono un poligono che si sovrappone."},
     GEOAREA_ALREADY_EXISTS:
-    { statusCode: 401, message: "Le coordinate fornite già rappresentano una geoarea."},
+    { statusCode: 401, message: "Le coordinate fornite già rappresentano una geoarea o il nome è già stato usato."},
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.

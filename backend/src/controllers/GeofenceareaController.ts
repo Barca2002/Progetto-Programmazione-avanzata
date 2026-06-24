@@ -6,6 +6,7 @@ import { AppError } from "../models/AppErrorModel.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
 import type { Position } from 'geojson';
 import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
+import { maxHeaderSize } from "http";
 
 export class GeofenceAreaController {
   public readonly geofenceareaService = new GeofenceareaService();
@@ -39,31 +40,27 @@ export class GeofenceAreaController {
 
   public async createArea(req: Request, res: Response, next: NextFunction){
     try {
-      const { name, coordinates, max_speed } = req.body;
+      const name = req.body.features[0].properties.name;
+      const coordinates = req.body.features[0].geometry.coordinates;
+      const max_speed = req.body.features[0].properties.max_speed;
       if (!name || !coordinates){
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
       /*
-      Le coordinate nel body arrivano come array di punti (Position[]):
-      "coordinates": 
-      [ 
-        [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] 
-      ]
+      // Lo standard di geojson richiede prima la longituide e poi la latitudine, quindi coppie [long, lat], ...
       
-      GeoJSON richiede Position[][] (array di anelli, dove ogni anello è un array di punti), quindi wrappiamo in un array esterno per ottenere il formato corretto (coordinatesGeoJson):
+      GeoJSON richiede Position[][] (array di anelli, dove ogni anello è un array di punti):
       "coordinates": [ [ [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] ] ]
       */
-
-      //Se dal body volessimo aggiungere un altro layer a mano nelle coordinate (altro strato di coppia di quadre), si potrebbe togliere questo wrap ma per semplicità si è deciso di fare il "cast" internamente
-      const coordinatesGeoJson: Position[][] = [coordinates];
-            // Creazione della nuova area.
+      const coordinatesGeoJson: Position[][] = coordinates;
+      // Creazione della nuova area.
       const geoJsonArea: GeofenceareaCreationData = {
         name: name,
         area: {
           type: 'Polygon',
           coordinates: coordinatesGeoJson,
         },
-        max_speed: max_speed ? max_speed : null, 
+        max_speed: max_speed ?? null, 
       };
       const nuovaArea = await this.geofenceareaService.createArea(geoJsonArea);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));

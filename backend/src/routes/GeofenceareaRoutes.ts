@@ -14,8 +14,8 @@ geofenceareaRoutes.get("/all", checkAdmin, geofencearea.getAree);
 geofenceareaRoutes.get("/:id", checkAdmin, geofencearea.getAreaById);
 
 // CREATE area (solo admin). Bisogna passare il contesto alla funzione altrimenti i this nella funzione creatArea sono undefined
-geofenceareaRoutes.post("/create", checkAdmin, checkGeoJson, function(req: Request, res: Response, next: NextFunction) {
-    geofencearea.createArea(req, res, next);
+geofenceareaRoutes.post("/create", checkAdmin, checkGeoJson, async function(req: Request, res: Response, next: NextFunction) {
+    await geofencearea.createArea(req, res, next);
   }
 );
 
