@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
-
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdmin } from "../middlewares/JWTMiddleware.js";
+import { tokenValidation } from "../middlewares/TokenMiddleware.js";
 
 export const adminRoutes = Router();
 const adminController = new AdminController();
@@ -25,3 +25,13 @@ adminRoutes.delete("/delete/:id", checkAdmin, async function(req: Request, res: 
     await adminController.deleteUtente(req, res);
 });
 
+
+// Questa rotta permette di settare il saldo dei token di un utente.
+// Il format della richiesta deve essere:
+//  {
+//      newTokenAmount: <valore>,
+//      email: "<email>"
+//  }
+adminRoutes.patch("/updateTokenBalance", checkAdmin, tokenValidation, async function(req: Request, res: Response){
+    await adminController.updateTokenBalance(req, res);
+});

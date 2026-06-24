@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
+import { AuthService } from "../services/AuthService.js";
+import { userInfo } from "os";
 
 export class AdminController {
   public readonly adminService = new AdminService();
@@ -66,4 +68,18 @@ export class AdminController {
       }
     }
   };
+
+  public async updateTokenBalance(req: Request, res: Response){
+    try{
+    const tokenAmount = req.body?.newTokenAmount;
+    const email = req.body?.email;
+    res.json(await this.adminService.updateTokenAmount(email, tokenAmount));
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
 }

@@ -19,11 +19,13 @@ CREATE TABLE users (
     email      VARCHAR(255) NOT NULL,
     password   VARCHAR(255) NOT NULL,
     is_admin   BOOLEAN      NOT NULL DEFAULT FALSE,
+    tokens     NUMERIC(6,3) NOT NULL DEFAULT 0,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (user_id),
     CONSTRAINT users_username_key UNIQUE (username),
-    CONSTRAINT users_email_key    UNIQUE (email)
+    CONSTRAINT users_email_key    UNIQUE (email),
+    CONSTRAINT chk_token      CHECK (tokens >= 0)
 );
 
 -- ------------------------------------------------------------
@@ -139,17 +141,17 @@ CREATE TABLE dati_inviati (
 -- ------------------------------------------------------------
 --  users
 -- ------------------------------------------------------------
-INSERT INTO users (username, email, password, is_admin) VALUES
-('admin1', 'admin1@mail.com', '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', TRUE),   -- password: Admin123
-('admin2', 'admin2@mail.com', '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', TRUE),   -- password: Admin234
-('user1',  'user1@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE),  -- password: User1234
-('user2',  'user2@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE),  -- password: User2345
-('user3',  'user3@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE),  -- password: User3456
-('user4',  'user4@mail.com',  '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', FALSE),  -- password: Admin123
-('user5',  'user5@mail.com',  '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', FALSE),  -- password: Admin234
-('user6',  'user6@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE),  -- password: User1234
-('user7',  'user7@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE),  -- password: User2345
-('user8',  'user8@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE);  -- password: User3456
+INSERT INTO users (username, email, password, is_admin, tokens) VALUES
+('admin1', 'admin1@mail.com', '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', TRUE, 100),   -- password: Admin123
+('admin2', 'admin2@mail.com', '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', TRUE, 100),   -- password: Admin234
+('user1',  'user1@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE, 2),  -- password: User1234
+('user2',  'user2@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE, 0.5),  -- password: User2345
+('user3',  'user3@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 5),  -- password: User3456
+('user4',  'user4@mail.com',  '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', FALSE, 5),  -- password: Admin123
+('user5',  'user5@mail.com',  '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', FALSE, 5),  -- password: Admin234
+('user6',  'user6@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE, 10),  -- password: User1234
+('user7',  'user7@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE, 1),  -- password: User2345
+('user8',  'user8@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 1);  -- password: User3456
 
 -- ------------------------------------------------------------
 --  imbarcazioni

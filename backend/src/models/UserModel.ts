@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
+import { DataTypes, Sequelize, Model, Optional, DecimalDataType } from 'sequelize';
 
 // Definisce i campi che avrà ogni riga della tabella users
 export interface UserAllData {
@@ -7,11 +7,12 @@ export interface UserAllData {
   email: string;
   password: string;
   is_admin: boolean;
+  tokens: number;
   created_at: Date;
 }
 
 // user_id è autoincrement e is_admin ha un default, is_admin è opzionale e user_id e il timestamp non si possono inserire
-export interface UserCreationData extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id' | 'created_at'> {}
+export interface UserCreationData extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id' | 'created_at' | 'tokens'> {}
 
 // <Model<UserAllData, UserCreation>>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
 //Voglio ottenere un User definito come <Model<UserAllData, UserCreation>> perche mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db
@@ -22,6 +23,7 @@ export class User extends Model<UserAllData, UserCreationData> implements UserAl
   declare email: string;
   declare password: string;
   declare is_admin: boolean;
+  declare tokens: number;
   declare created_at: Date;
 
   static inizializzaModel(sequelize: Sequelize): typeof User{
@@ -50,6 +52,11 @@ export class User extends Model<UserAllData, UserCreationData> implements UserAl
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    tokens: {
+      type: DataTypes.DECIMAL(6,3),
+      allowNull: false,
+      defaultValue: 0
     },
     created_at: {
       type: DataTypes.DATE,

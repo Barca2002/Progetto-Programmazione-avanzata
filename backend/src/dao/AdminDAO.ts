@@ -11,8 +11,11 @@ import { Transaction } from 'sequelize';
 interface IAdminDAO {
   create(data: UserCreationData, t: Transaction): Promise<User>;
   findAll(): Promise<User[]>;
+  findByEmail(email: string): Promise<User | null>;
   findById(user_id: number): Promise<User | null>;
+  findByUsername(username: string): Promise<User | null>;
   update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User>;
+  updateTokenBalance(email: string, tokenAmount: number, t: Transaction): Promise<User>;
   delete(user_id: number, t: Transaction): Promise<number>; 
 }
 
@@ -41,6 +44,11 @@ export class AdminDAO implements IAdminDAO {
     // Il vettore, nella prima posizione, contiene il numero di righe interessate
     // dalla modifica, nella seconda posizione contiene le righe interessate.
     const [, affectedRows] = await User.update(data, { where: { user_id: user_id }, transaction: t, returning: true });
+    return affectedRows[0]!;
+  }
+
+  async updateTokenBalance(email: string, tokenAmount: number, t: Transaction): Promise<User> {
+    const [, affectedRows] = await User.update({ tokens: tokenAmount}, { where: { email }, transaction: t, returning: true });
     return affectedRows[0]!;
   }
 

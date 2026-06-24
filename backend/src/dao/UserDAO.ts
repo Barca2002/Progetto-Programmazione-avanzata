@@ -10,6 +10,7 @@ interface IUserDAO {
   findByUsername(username: string): Promise<User | null>;
   findAll(): Promise<User[]>;
   update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User>;
+
   delete(user_id: number, t: Transaction): Promise<number>;
 }
 

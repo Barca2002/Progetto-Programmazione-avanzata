@@ -88,6 +88,8 @@ export const ERROR_LIST = {
     { statusCode: 401, message: "Le coordinate fornite costruiscono un poligono che si sovrappone."},
     GEOAREA_ALREADY_EXISTS:
     { statusCode: 401, message: "Le coordinate fornite già rappresentano una geoarea o il nome è già stato usato."},
+    INVALID_TOKEN_AMOUNT:
+    { statusCode: 401, message: "La quantità di token specificata non è ammessa (min 0.025, max 100)."},
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
@@ -123,6 +125,8 @@ export const SUCCESS_LIST = {
     { statusCode: 200, message: "Geofence associate all'imbarcazione con successo." },
     SEND_DATA:
     { statusCode: 201, message: "Dati inviati con successo." },
+    TOKEN_BALANCE_UPDATED:
+    { statusCode: 201, message: "Saldo token aggiornato correttamente." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

@@ -5,6 +5,7 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { UserCreationData } from "../models/UserModel.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AuthService } from '../services/AuthService.js';
+import { string } from "zod";
 
 export class AdminService {
   private readonly adminDAO = new AdminDAO();
@@ -95,6 +96,23 @@ export class AdminService {
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   };
+
+  public async updateTokenAmount(email: string, tokenAmount: number){
+    const t = await DatabaseConnection.getInstance().transaction();
+    try {
+      // Controllo se l'id è un numero e se esiste un utente con quell'id
+      if(!email || !await this.adminDAO.findByEmail(email)){
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA)
+      }
+      const data = await this.adminDAO.updateTokenBalance(email, tokenAmount, t);
+      await t.commit();
+      // Restituisce anche il saldo aggiornato
+      return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, data.tokens);
+    } catch (err) {
+      await t.rollback();
+      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
+    }
+  }
 }
 
 export default AdminService;
