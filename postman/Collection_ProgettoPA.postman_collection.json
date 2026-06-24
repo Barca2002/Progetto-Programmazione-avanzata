@@ -164,7 +164,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"utentesszsdvbzsdshbsud@mail.com\",\r\n    \"password\": \"Admfgbdjfg@@@i3\"\r\n}",
+              "raw": "{\r\n    \"email\": \"user1@mail.com\",\r\n    \"password\": \"User1234\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -313,116 +313,160 @@
           ]
         },
         {
-          "name": "GetUtenteById",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{JWT_TOKEN_ADMIN}}",
-                  "type": "string"
+          "name": "Utenti",
+          "item": [
+            {
+              "name": "GetUtenteById",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"Test1\",\r\n    \"email\": \"email1@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/2",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "2"
+                  ]
                 }
-              ]
+              },
+              "response": []
             },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"Test1\",\r\n    \"email\": \"email1@mail.com\",\r\n    \"password\": \"pass123\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+            {
+              "name": "EditUtenteById",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"adminsdsdsdsdswewdftars\",\r\n    \"email\": \"admisdssdsdsdsn2@mail.com\",\r\n    \"password\": \"dsjgfjhsvd\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/update/3",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "update",
+                    "3"
+                  ]
                 }
-              }
+              },
+              "response": []
             },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/admin/2",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}}",
-              "path": [
-                "admin",
-                "2"
-              ]
+            {
+              "name": "UpdateTokens",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"newTokenAmount\": 10,\r\n    \"email\": \"user1@mail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/updateTokenBalance",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "updateTokenBalance"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GetAllUtenti",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_USER}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/all",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "all"
+                  ]
+                }
+              },
+              "response": []
             }
-          },
-          "response": []
-        },
-        {
-          "name": "EditUtenteById",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{JWT_TOKEN_ADMIN}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"username\": \"adminsdsdsdsdswewdftars\",\r\n    \"email\": \"admisdssdsdsdsn2@mail.com\",\r\n    \"password\": \"dsjgfjhsvd\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/admin/update/3",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}}",
-              "path": [
-                "admin",
-                "update",
-                "3"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "GetAllUtenti",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{JWT_TOKEN_USER}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}}/admin/all",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}}",
-              "path": [
-                "admin",
-                "all"
-              ]
-            }
-          },
-          "response": []
+          ]
         }
       ]
     },
@@ -449,7 +493,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 13.52000,\r\n    \"velocita_kmh\": 65.34243234234223434232,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}",
+              "raw": "{\r\n    \"mmsi\": 247901234,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 40,\r\n    \"velocita_kmh\": 65.34243,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
