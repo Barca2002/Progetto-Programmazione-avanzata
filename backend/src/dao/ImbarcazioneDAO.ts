@@ -25,126 +25,79 @@ interface IImbarcazioneDAO {
 
 export class ImbarcazioneDAO implements IImbarcazioneDAO {
   async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione> {
-    try {
-      return await Imbarcazione.create(data, {transaction: t});
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
+    return await Imbarcazione.create(data, {transaction: t});
   }
 
   async findById(mmsi: number): Promise<Imbarcazione | null> {
-    try {
-      return await Imbarcazione.findByPk(mmsi);
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await Imbarcazione.findByPk(mmsi);
   }
 
   async findAll(): Promise<Imbarcazione[]> {
-    try {
-      return await Imbarcazione.findAll();
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await Imbarcazione.findAll();
   }
 
   async findAllGeofences(): Promise<Imbarcazione[]> {
-    try {
-      return await Imbarcazione.findAll({
-        include: [{
-          model: Geofencearea,
-          as: 'Geofenceareas', //Altrimenti dava problemi e non trovava il model (è un alias dichiarato nel model)
-          attributes: ['geoarea_id', 'name'], //Specifica quali attributi mostrare
-          through: { attributes: [] } //Così escludo gli attributi della tabella di collegamento
-        }]
-      });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await Imbarcazione.findAll({
+      include: [{
+        model: Geofencearea,
+        as: 'Geofenceareas', //Altrimenti dava problemi e non trovava il model (è un alias dichiarato nel model)
+        attributes: ['geoarea_id', 'name'], //Specifica quali attributi mostrare
+        through: { attributes: [] } //Così escludo gli attributi della tabella di collegamento
+      }]
+    });
   }
 
   async findAllWithUserWithGeofences(user_id: number): Promise<Imbarcazione[]> {
-    try {
-      return await Imbarcazione.findAll({
-        include: [
-          {
-            model: User,
-            as: 'Proprietario',
-            where: { user_id: user_id },
-            attributes: [],
-            through: { attributes: [] }
-          },
-          {
-            model: Geofencearea,
-            as: 'Geofenceareas',
-            attributes: ['geoarea_id', 'name'],
-            through: { attributes: [] }
-          }
-        ]
-      });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await Imbarcazione.findAll({
+      include: [
+        {
+          model: User,
+          as: 'Proprietario',
+          where: { user_id: user_id },
+          attributes: [],
+          through: { attributes: [] }
+        },
+        {
+          model: Geofencearea,
+          as: 'Geofenceareas',
+          attributes: ['geoarea_id', 'name'],
+          through: { attributes: [] }
+        }
+      ]
+    });
   }
 
   async linkGeoareas(mmsi: number, geoarea_ids: number[], t: Transaction): Promise<GeofenceImbarcazioni[]> {
-    try {
-      //bulkCreate è utile quando devo fare più insert contemporaneamente, come in questo caso. Uso map cosi ad ogni id associo l'oggetto { mmsi: mmsi, geoarea_id: geoarea_id } che bulkCreate inserirà nella tabella molti a molti di collegamento
-      return await GeofenceImbarcazioni.bulkCreate(
-        geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })),
-        { ignoreDuplicates: true, transaction: t }
-      );
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
+    //bulkCreate è utile quando devo fare più insert contemporaneamente, come in questo caso. Uso map cosi ad ogni id associo l'oggetto { mmsi: mmsi, geoarea_id: geoarea_id } che bulkCreate inserirà nella tabella molti a molti di collegamento
+    return await GeofenceImbarcazioni.bulkCreate(
+      geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })),
+      { ignoreDuplicates: true, transaction: t }
+    );
   }
 
   async linkUser(mmsi: number, user_id: number, t: Transaction): Promise<UserImbarcazioni> {
-    try {
-      return await UserImbarcazioni.create({ user_id: user_id, mmsi: mmsi }, { transaction: t });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
+    return await UserImbarcazioni.create({ user_id: user_id, mmsi: mmsi }, { transaction: t });
   }
 
   async findUserAssociation(mmsi: number): Promise<UserImbarcazioni | null> {
-    try {
-      return await UserImbarcazioni.findOne({ where: { mmsi: mmsi }});
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await UserImbarcazioni.findOne({ where: { mmsi: mmsi }});
   }
 
   async findGeoareaAssociation(mmsi: number, geoarea_id: number): Promise<GeofenceImbarcazioni | null> {
-    try {
-      return await GeofenceImbarcazioni.findOne({ where: { mmsi: mmsi, geoarea_id: geoarea_id }});
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await GeofenceImbarcazioni.findOne({ where: { mmsi: mmsi, geoarea_id: geoarea_id }});
+  
   }
 
   async deleteGeoareaAssociation(mmsi: number, geoarea_id: number, t: Transaction): Promise<number> {
-    try {
-      return await GeofenceImbarcazioni.destroy({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
-    }
+    return await GeofenceImbarcazioni.destroy({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t });
   }
 
   async update(mmsi: number, data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione> {
-    try {
-      const [, affectedRows] = await Imbarcazione.update(data, { where: { mmsi: mmsi }, transaction: t, returning: true });
-      return affectedRows[0]!;
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
-    }
+    const [, affectedRows] = await Imbarcazione.update(data, { where: { mmsi: mmsi }, transaction: t, returning: true });
+    return affectedRows[0]!;
   }
 
   async delete(mmsi: number, t: Transaction): Promise<number> {
-    try {
-      return await Imbarcazione.destroy({ where: { mmsi: mmsi }, transaction: t });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
-    }
+    return await Imbarcazione.destroy({ where: { mmsi: mmsi }, transaction: t });
   }
 }

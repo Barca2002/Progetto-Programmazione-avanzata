@@ -15,32 +15,20 @@ interface IGeofenceImbarcazioniDAO {
 
 export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
   async create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
-    try {
-        return await GeofenceImbarcazioni.create({ geoarea_id, mmsi }, {transaction:t});
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
+      return await GeofenceImbarcazioni.create({ geoarea_id, mmsi }, {transaction:t});
   }
 
   // Funzione per trovare l'associazione tra la geoarea e l'imbarcazione
   async findAssociation(geoarea_id: number, mmsi: number): Promise<GeofenceImbarcazioni | null> {
-    try {
       return await GeofenceImbarcazioni.findOne({
         where: { geoarea_id, mmsi }
       });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
   }
 
   async findAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]> {
-    try {
-      return await GeofenceImbarcazioni.findAll({
-        where: { mmsi }
-      });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await GeofenceImbarcazioni.findAll({
+      where: { mmsi }
+    });
   }
 
   /**
@@ -65,29 +53,21 @@ export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
    * Resetta lo stato 'is_in' a false per tutte le geofence associate a una determinata imbarcazione
    */
   async resetLocation(mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
-    try {
-      const [, affectedRows] = await GeofenceImbarcazioni.update(
-        { is_in: false },
-        { 
-          where: { mmsi }, 
-          transaction: t,
-          returning: true 
-        }
-      );
-      return affectedRows[0]!;
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
-    }
+    const [, affectedRows] = await GeofenceImbarcazioni.update(
+      { is_in: false },
+      { 
+        where: { mmsi }, 
+        transaction: t,
+        returning: true 
+      }
+    );
+    return affectedRows[0]!;
   }
 
   async delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<number> {
-    try {
-      return await GeofenceImbarcazioni.destroy({
-        where: { geoarea_id, mmsi },
-        transaction: t
-      });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
-    }
+    return await GeofenceImbarcazioni.destroy({
+      where: { geoarea_id, mmsi },
+      transaction: t
+    });
   }
 }

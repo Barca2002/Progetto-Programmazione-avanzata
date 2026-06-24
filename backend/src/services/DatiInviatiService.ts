@@ -57,7 +57,7 @@ export class DatiInviatiService {
       else 
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
 
-      if(!await this.datiinviatiDAO.checkVelocity(geoarea_found, data.velocita_kmh))
+      if(!await this.datiinviatiDAO.checkSpeed(geoarea_found, data.velocita_kmh))
           throw ErrorFactory.getError(AppErrorEnum.MAX_SPEED_LIMIT);
 
       await t.commit();

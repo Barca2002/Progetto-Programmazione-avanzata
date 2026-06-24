@@ -17,19 +17,11 @@ interface IGeofenceareaDAO {
 
 export class GeofenceareaDAO implements IGeofenceareaDAO {
   async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
-  try {
     return await Geofencearea.create(data, {transaction: t});
-  } catch (err) {
-    throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-  }
 }
 
   async findById(geoarea_id: number): Promise<Geofencearea | null> {
-    try {
-      return await Geofencearea.findByPk(geoarea_id);
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await Geofencearea.findByPk(geoarea_id);
   }
 
   async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
@@ -53,11 +45,7 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
   }
 
   async findAll(): Promise<Geofencearea[]> {
-    try{
-      return await Geofencearea.findAll();
-    } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await Geofencearea.findAll();
   }
   
 
@@ -67,20 +55,11 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
   }
 
   async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea> {
-    try{
       const [, affectedRows] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t, returning: true });
       return affectedRows[0]!;
-    } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
-    }
   }
 
   async delete(geoarea_id: number, t:Transaction): Promise<number> {
-    try{
-      return await Geofencearea.destroy({ where: { geoarea_id }, transaction: t });
-    } catch (err){
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
-    }
-
+    return await Geofencearea.destroy({ where: { geoarea_id }, transaction: t });
   }
 }

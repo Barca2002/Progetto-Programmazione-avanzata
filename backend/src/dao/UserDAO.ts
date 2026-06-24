@@ -15,56 +15,32 @@ interface IUserDAO {
 
 export class UserDAO implements IUserDAO {
   async create(data: UserCreationData, t: Transaction): Promise<User> {
-    try {
-      return await User.create(
-        data, { transaction: t }
-      );
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
+    return await User.create(
+      data, { transaction: t }
+    );
   }
 
   async findById(user_id: number): Promise<User | null> {
-    try {
-      return await User.findByPk(user_id);
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await User.findByPk(user_id);
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    try {
-      return await User.findOne({
-        where: { username }});
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await User.findOne({
+      where: { username }});
   }
 
   async findAll(): Promise<User[]> {
-    try {
-      return await User.findAll();
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
+    return await User.findAll();
   }
 
   async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User> {
-    try {
-      const [, affectedRows] = await User.update(data, { where: { user_id }, transaction: t, returning: true });
-      return affectedRows[0]!;
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
-    }
+    const [, affectedRows] = await User.update(data, { where: { user_id }, transaction: t, returning: true });
+    return affectedRows[0]!;
   }
 
   async delete(user_id: number, t: Transaction): Promise<number> {
-    try {
-      return await User.destroy({
-        where: { user_id },
-        transaction: t });
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
-    }
+    return await User.destroy({
+      where: { user_id },
+      transaction: t });
   }
 }
