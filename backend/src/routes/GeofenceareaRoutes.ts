@@ -19,15 +19,15 @@ geofenceareaRoutes.get("/:id", checkAdmin, async function(req: Request, res: Res
 
 // CREATE area (solo admin). Bisogna passare il contesto alla funzione altrimenti i this nella funzione createArea sono undefined
 geofenceareaRoutes.post("/create", checkAdmin, checkGeoJson, async function(req: Request, res: Response) {
-    await geofencearea.createArea(req, res);
+  await geofencearea.createArea(req, res);
 });
 
 // UPDATE area (solo admin)
 geofenceareaRoutes.patch("/update/:id", checkAdmin, async function(req: Request, res: Response){
-  geofencearea.updateArea(req, res);
+  await geofencearea.updateArea(req, res);
 });
 
 // DELETE area (solo admin)
 geofenceareaRoutes.delete("/delete/:id", checkAdmin, async function(req: Request, res: Response){
-  geofencearea.deleteArea(req, res);
+  await geofencearea.deleteArea(req, res);
 });
