@@ -4,6 +4,7 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
+import { checkToken } from "../middlewares/JWTMiddleware.js";
 
 export class ImbarcazioneController {
   public readonly imbarcazioneService = new ImbarcazioneService();
@@ -41,7 +42,7 @@ export class ImbarcazioneController {
 
   public async getMyImbarcazioniWithGeofences(req: Request, res: Response ): Promise<void>{
     try {
-      const user_id = (req as any).userLoggato.user_id; //l'id viene preso dalla request, che viene appeso durante il checkToken del middleware checkUser 
+      const user_id = checkToken(req).user_id;
       const imbarcazioni = await this.imbarcazioneService.getMyImbarcazioniWithGeofences(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
     } catch (err) {
@@ -68,7 +69,7 @@ export class ImbarcazioneController {
       }
   ]
   */
-  public async linkGeoareasEUserToImbarcazioni(req: Request, res: Response ): Promise<void>{
+  public async linkGeoareasToImbarcazioni(req: Request, res: Response ): Promise<void>{
     try {
       const links = req.body;
 
@@ -76,7 +77,7 @@ export class ImbarcazioneController {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
 
-      await this.imbarcazioneService.linkGeoareasEUserToImbarcazioni(links);
+      await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_E_USER_ADDED, links as any));
     } catch (err) {
       if (err instanceof AppError) {

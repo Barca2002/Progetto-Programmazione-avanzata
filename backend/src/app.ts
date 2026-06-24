@@ -13,8 +13,8 @@ import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
 import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioniModel.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
 import { userRoutes } from './routes/UserRoutes.js';
-import { UserImbarcazioni } from './models/UserImbarcazioniModel.js';
 import { LogSpostamenti } from './models/LogSpostamentiModel.js';
+import { logSpostamentiRoutes } from './routes/LogSpostamentiRoutes.js';
 
 dotenv.config();
 
@@ -26,7 +26,6 @@ Geofencearea.inizializzaModel(DatabaseConnection.getInstance());
 Imbarcazione.inizializzaModel(DatabaseConnection.getInstance());
 GeofenceImbarcazioni.inizializzaModel(DatabaseConnection.getInstance());
 Datiinviati.inizializzaModel(DatabaseConnection.getInstance());
-UserImbarcazioni.inizializzaModel(DatabaseConnection.getInstance());
 LogSpostamenti.inizializzaModel(DatabaseConnection.getInstance());
 
 inizializzaAssociazioni(); //serve per inizializzare le molti a molti
@@ -46,6 +45,7 @@ app.use("/admin", adminRoutes);
 app.use("/geoarea", geofenceareaRoutes);
 app.use("/imbarcazione", imbarcazioneRoutes);
 app.use("/user", userRoutes);
+app.use('/log-spostamenti', logSpostamentiRoutes);
 
 
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR

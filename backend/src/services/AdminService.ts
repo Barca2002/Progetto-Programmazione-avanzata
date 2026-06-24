@@ -5,7 +5,6 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { UserCreationData } from "../models/UserModel.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AuthService } from '../services/AuthService.js';
-import { string } from "zod";
 
 export class AdminService {
   private readonly adminDAO = new AdminDAO();

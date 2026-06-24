@@ -4,7 +4,7 @@ export class LogSpostamenti extends Model {
   declare id: number;
   declare mmsi: number;
   declare geoarea_id: string;
-  declare spostamento: string;
+  declare spostamento: 'IN CORSO' | 'RIENTRATA';
   declare created_at: Date;
 
 

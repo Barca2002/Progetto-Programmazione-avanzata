@@ -17,6 +17,12 @@ export const ERROR_LIST = {
     { statusCode: 400, message: "La password fornita non è in un formato valido (Deve essere lunga tra 8 e 32 caratteri, comprendere almeno un numero e sono ammessi caratteri alfanumerici)." },
     INVALID_USERNAME:
     { statusCode: 400, message: "Lo username fornito non è in un formato valido." },
+    INVALID_NAME:
+    { statusCode: 400, message: "Il nome non è in un formato valido." },
+    INVALID_TYPE:
+    { statusCode: 400, message: "Il tipo non è in un formato valido." },
+    INVALID_ASSOCIATION:
+    { statusCode: 400, message: "Un associazione è già presente" },
     INVALID_USERID:
     { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
     INCORRECT_DATA:
@@ -94,6 +100,10 @@ export const ERROR_LIST = {
     { statusCode: 401, message: "L'Authentication Header è invalido. Deve iniziare con 'Bearer '."},
     INSUFFICIENT_TOKEN_BALANCE:
     { statusCode: 401, message: "Saldo token non sufficiente per effettuare la richiesta."},
+    LOG_NOT_FOUND:
+    { statusCode: 404, message: "Log non found"},
+    INVALID_GEOAREA_ID:
+    { statusCode: 400, message: "Invalid geoarea id"}
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
@@ -131,6 +141,8 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "Dati inviati con successo." },
     TOKEN_BALANCE_UPDATED:
     { statusCode: 201, message: "Saldo token aggiornato correttamente." },
+    LOG_SPOSTAMENTI_FOUND:
+    { statusCode: 201, message: "Log spostamenti trovati correttamente" },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

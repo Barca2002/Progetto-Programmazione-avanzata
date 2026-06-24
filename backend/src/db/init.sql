@@ -1,11 +1,11 @@
 -- Abilita l'estensione PostGIS
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+DROP TABLE IF EXISTS log_spostamenti;
 DROP TABLE IF EXISTS violazioni;
 DROP TABLE IF EXISTS dati_inviati;      
 DROP TABLE IF EXISTS segnalazioni;
 DROP TABLE IF EXISTS geofence_imbarcazioni;
-DROP TABLE IF EXISTS user_imbarcazioni;
 DROP TABLE IF EXISTS geofence_areas;
 DROP TABLE IF EXISTS imbarcazioni;      
 DROP TABLE IF EXISTS users;
@@ -35,11 +35,16 @@ CREATE TABLE imbarcazioni (
     mmsi          INT          PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
     type          VARCHAR(50)  NOT NULL,
-    descr          VARCHAR(255) NOT NULL,
+    descr         VARCHAR(255) NOT NULL,
     max_capacity  INT          NOT NULL,
+    user_id       INT          NOT NULL,
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT imbarcazioni_name_key UNIQUE (name)
+    CONSTRAINT imbarcazioni_name_key UNIQUE (name),
+    CONSTRAINT fk_imbarcazioni_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL 
 );
 
 -- ------------------------------------------------------------
@@ -57,19 +62,6 @@ CREATE TABLE geofence_areas (
 );
 
 -- ------------------------------------------------------------
---  TABELLA: user_imbarcazioni
--- ------------------------------------------------------------
-CREATE TABLE user_imbarcazioni (
-    user_id INT NOT NULL,
-    mmsi    INT NOT NULL,
-
-    PRIMARY KEY (user_id, mmsi),
-    CONSTRAINT fk_ui_user FOREIGN KEY (user_id) REFERENCES users(user_id)      ON DELETE CASCADE,
-    CONSTRAINT fk_ui_mmsi FOREIGN KEY (mmsi)    REFERENCES imbarcazioni(mmsi)  ON DELETE CASCADE,
-    CONSTRAINT unique_mmsi UNIQUE (mmsi)
-);
-
--- ------------------------------------------------------------
 --  TABELLA: geofence_imbarcazioni
 -- ------------------------------------------------------------
 CREATE TABLE geofence_imbarcazioni (
@@ -83,7 +75,6 @@ CREATE TABLE geofence_imbarcazioni (
 
 -- ------------------------------------------------------------
 --  TABELLA: segnalazioni
--- Una segnazione avviene quando entro due giorni da una violazione, se ne verificano in totale 5. Però, se una violazione successiva avviene entro un'ora dalla precedente, essa non viene conteggiata.
 -- ------------------------------------------------------------
 CREATE TABLE segnalazioni (
     id    INT GENERATED ALWAYS AS IDENTITY,
@@ -100,8 +91,6 @@ CREATE TABLE segnalazioni (
 
 -- ------------------------------------------------------------
 --  TABELLA: violazioni
--- Se un'imbarcazione commette 5 violazioni in un arco di 2 giorni in una certa geoarea, verrà emessa una segnalazione.
--- Però se dalla prima violazione viene commessa un'altra entro 1h, essa non viene conteggiata. 
 -- ------------------------------------------------------------
 CREATE TABLE violazioni (
     id    INT GENERATED ALWAYS AS IDENTITY,
@@ -119,7 +108,6 @@ CREATE TABLE violazioni (
 -- ------------------------------------------------------------
 --  TABELLA: dati_inviati
 -- ------------------------------------------------------------
-
 CREATE TABLE dati_inviati (
     id        INT GENERATED ALWAYS AS IDENTITY,
     mmsi           INT             NOT NULL,
@@ -137,7 +125,6 @@ CREATE TABLE dati_inviati (
 -- ------------------------------------------------------------
 --  TABELLA: log_spostamenti
 -- ------------------------------------------------------------
-
 CREATE TABLE log_spostamenti (
     id        INT GENERATED ALWAYS AS IDENTITY,
     mmsi           INT             NOT NULL,
@@ -151,6 +138,7 @@ CREATE TABLE log_spostamenti (
     CONSTRAINT chk_spostamento CHECK (spostamento IN ('USCITA', 'ENTRATA'))
 );
 
+
 -- ============================================================
 --  SEEDING
 -- ============================================================
@@ -159,170 +147,56 @@ CREATE TABLE log_spostamenti (
 --  users
 -- ------------------------------------------------------------
 INSERT INTO users (username, email, password, is_admin, tokens) VALUES
-('admin1', 'admin1@mail.com', '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', TRUE, 100),   -- password: Admin123
-('admin2', 'admin2@mail.com', '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', TRUE, 100),   -- password: Admin234
-('user1',  'user1@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE, 2),  -- password: User1234
-('user2',  'user2@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE, 0.5),  -- password: User2345
-('user3',  'user3@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 5),  -- password: User3456
-('user4',  'user4@mail.com',  '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', FALSE, 5),  -- password: Admin123
-('user5',  'user5@mail.com',  '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', FALSE, 5),  -- password: Admin234
-('user6',  'user6@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE, 10),  -- password: User1234
-('user7',  'user7@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE, 1),  -- password: User2345
-('user8',  'user8@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 1);  -- password: User3456
+('admin1', 'admin1@mail.com', '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', TRUE, 100),   
+('admin2', 'admin2@mail.com', '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', TRUE, 100),   
+('user1',  'user1@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE, 2),  
+('user2',  'user2@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE, 0.5),  
+('user3',  'user3@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 5),  
+('user4',  'user4@mail.com',  '$2a$12$2bDNGhP/5n6QaX0.Wqck8uq6bl6t4YLoRDxL5gp4fcNF6Kb/iMVoW', FALSE, 5),  
+('user5',  'user5@mail.com',  '$2a$12$NpQxcovOve2mXsqywHW2MeW.hK0MgOqbCUSzM4jb4Gdo4LtUfz.Ji', FALSE, 5),  
+('user6',  'user6@mail.com',  '$2a$12$p9iYrTGX7ZXNDrliMdpsZuK7sHXmQSeAXFZw6Y7OVLZj4fLSRwdkC', FALSE, 10),  
+('user7',  'user7@mail.com',  '$2a$12$JZqS1wa2UpFVRxXemEKWC.l6q6oULEg7DAVmD7kiPqRrGfgjj37uG', FALSE, 1),  
+('user8',  'user8@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 1);  
 
 -- ------------------------------------------------------------
---  imbarcazioni
+--  imbarcazioni (Modificato: ora alcune barche hanno user_id = NULL)
 -- ------------------------------------------------------------
-INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity) VALUES
-(247123456, 'Adriatica Uno','peschereccio_strascico','Peschereccio a strascico oceanico per pesce bianco', 10),
-
-(247234567, 'Conero Explorer','peschereccio_circuizione', 'Peschereccio a circuizione per pesce azzurro',10),
-
-(247345678, 'San Ciriaco','nave_fattoria','Nave fattoria per congelamento e lavorazione pesce',40),
-
-(215456789, 'Marche Star','trasporto_pescato','Nave da trasporto e logistica del pescato',6),
-
-(247567890, 'Riviera Blu','pesca_artigianale','Barca per pesca artigianale costiera',12),
-
-(247789012, 'Don Bosco II','palamitaro','Palamitaro per la pesca d’altura di tonno e spada',10),
-
-(247890123, 'Bora Bora','reti_da_posta','Imbarcazione da pesca con reti da posta',10),
-
-(247901234, 'Eurocargo Ancona','trasporto_pescato','Nave trasporto per rifornimento mercati ittici',25),
-
-(247012345, 'Falco Marino','vigilanza_pesca','Unità di vigilanza e controllo attività ittiche',25),
-
-(247112233, 'Medusa','ricerca_ittica','Nave per la ricerca e monitoraggio degli stock ittici',40),
-
-(247113344, 'Stella del Mare','peschereccio_strascico','Peschereccio a strascico costiero per fondali bassi',15),
-
-(247114455, 'Vento di Levante','lampara','Lampara per la pesca notturna del pesce azzurro',9),
-
-(247115566, 'Porto Recanati','vongolara_turbosoffiante', 'Turbosoffiante per la pesca di molluschi e vongole',10),
-
-(247116677, 'Sirena Adriatica','pesca_artigianale','Imbarcazione locale per la piccola pesca costiera',14),
-
-(247117788, 'Orizzonte Blu','peschereccio_strascico','Peschereccio per la pesca a strascico adriatica',22),
-
-(247118899, 'Punta Trave','pesca_nasse','Barca specializzata nella pesca con trappole e nasse',8),
-
-(247119900, 'Mare Nostrum','nave_fattoria','Nave da grande pesca con impianti di surgelazione',21),
-
-(247120011, 'Costa Conero','palamitaro','Palamitaro d’altura per grandi pelagici',1800),
-
-(247121122, 'Albatros Due','assistenza_pesca','Unità di assistenza e soccorso alla flotta peschereccia',18),
-
-(247122233, 'Tritone','ricerca_ittica','Nave per lo studio biologico delle risorse marine',   20);
+INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity, user_id) VALUES
+(247123456, 'Adriatica Uno','peschereccio_strascico','Peschereccio a strascico oceanico per pesce bianco', 10, 3),
+(247234567, 'Conero Explorer','peschereccio_circuizione', 'Peschereccio a circuizione per pesce azzurro',10, 3),
+(247345678, 'San Ciriaco','nave_fattoria','Nave fattoria per congelamento e lavorazione pesce',40, 4),
+(215456789, 'Marche Star','trasporto_pescato','Nave da trasporto e logistica del pescato',6, 4),
+(247567890, 'Riviera Blu','pesca_artigianale','Barca per pesca artigianale costiera',12, 3),
+(247789012, 'Don Bosco II','palamitaro','Palamitaro per la pesca d’altura di tonno e spada',10, 5),
+(247890123, 'Bora Bora','reti_da_posta','Imbarcazione da pesca con reti da posta',10, 5),
+(247901234, 'Eurocargo Ancona','trasporto_pescato','Nave trasporto per rifornimento mercati ittici',25, 1),
+(247012345, 'Falco Marino','vigilanza_pesca','Unità di vigilanza e controllo attività ittiche',25, 2),
+(247112233, 'Medusa','ricerca_ittica','Nave per la ricerca e monitoraggio degli stock ittici',40, 5),
+(247113344, 'Stella del Mare','peschereccio_strascico','Peschereccio a strascico costiero per fondali bassi',15, 6),
+(247114455, 'Vento di Levante','lampara','Lampara per la pesca notturna del pesce azzurro',9, 6),
+(247115566, 'Porto Recanati','vongolara_turbosoffiante', 'Turbosoffiante per la pesca di molluschi e vongole',10, 7),
+(247116677, 'Sirena Adriatica','pesca_artigianale','Imbarcazione locale per la piccola pesca costiera',14, 4),
+(247117788, 'Orizzonte Blu','peschereccio_strascico','Peschereccio per la pesca a strascico adriatica',22, 8),
+(247118899, 'Punta Trave','pesca_nasse','Barca specializzata nella pesca con trappole e nasse',8, 8),
+(247119900, 'Mare Nostrum','nave_fattoria','Nave da grande pesca con impianti di surgelazione',21, 9),
+(247120011, 'Costa Conero','palamitaro','Palamitaro d’altura per grandi pelagici',1800, 9),
+(247121122, 'Albatros Due','assistenza_pesca','Unità di assistenza e soccorso alla flotta peschereccia',18, 5),
+(247122233, 'Tritone','ricerca_ittica','Nave per lo studio biologico delle risorse marine',   20, 10);
 
 -- ------------------------------------------------------------
 --  geofence_areas
 -- ------------------------------------------------------------
 INSERT INTO geofence_areas (name, area, max_speed) VALUES
-
-('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((
-  13.4700 43.7000,
-  13.5500 43.7000,
-  13.5600 43.6700,
-  13.4900 43.6600,
-  13.4700 43.7000
-))', 4326), 20),
-
-('Zona Marittima Est Porto', ST_GeomFromText('POLYGON((
-  13.5600 43.6600,
-  13.6400 43.6600,
-  13.6500 43.6300,
-  13.5800 43.6200,
-  13.5600 43.6600
-))', 4326), 20),
-
-('Area Offshore Conero Nord', ST_GeomFromText('POLYGON((
-  13.6200 43.6000,
-  13.7000 43.6000,
-  13.7100 43.5600,
-  13.6400 43.5500,
-  13.6200 43.6000
-))', 4326), 50),
-
-('Area Offshore Portonovo', ST_GeomFromText('POLYGON((
-  13.6500 43.5600,
-  13.7300 43.5600,
-  13.7400 43.5200,
-  13.6700 43.5100,
-  13.6500 43.5600
-))', 4326), 50),
-
-('Area Offshore Sirolo', ST_GeomFromText('POLYGON((
-  13.6800 43.5200,
-  13.7600 43.5200,
-  13.7700 43.4800,
-  13.7000 43.4700,
-  13.6800 43.5200
-))', 4326), 50),
-
-('Area Offshore Numana', ST_GeomFromText('POLYGON((
-  13.7000 43.4700,
-  13.7900 43.4700,
-  13.8000 43.4300,
-  13.7200 43.4200,
-  13.7000 43.4700
-))', 4326), 50),
-
-('Adriatico Centrale 1', ST_GeomFromText('POLYGON((
-  13.8000 43.6500,
-  13.9500 43.6500,
-  13.9500 43.5000,
-  13.8000 43.5000,
-  13.8000 43.6500
-))', 4326), NULL),
-
-('Adriatico Centrale 2', ST_GeomFromText('POLYGON((
-  13.8500 43.4800,
-  14.0000 43.4800,
-  14.0000 43.3500,
-  13.8500 43.3500,
-  13.8500 43.4800
-))', 4326), NULL),
-
-('Canale di Fano', ST_GeomFromText('POLYGON((
-  13.8000 43.8500,
-  13.9500 43.8500,
-  13.9500 43.7500,
-  13.8000 43.7500,
-  13.8000 43.8500
-))', 4326), NULL),
-
-('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((
-  12.8000 43.9500,
-  13.0000 43.9500,
-  13.0000 43.8500,
-  12.8000 43.8500,
-  12.8000 43.9500
-))', 4326), NULL);
-
--- ------------------------------------------------------------
---  user_imbarcazioni
--- ------------------------------------------------------------
-INSERT INTO user_imbarcazioni (user_id, mmsi) VALUES
-(1,  247901234),  -- admin1  -> Eurocargo Ancona
-(2,  247012345),  -- admin2  -> Falco Marino
-(3,  247123456),  -- user1   -> Adriatica Uno
-(3,  247234567),  -- user1   -> Conero Explorer
-(3,  247567890),  -- user1   -> Riviera Blu
-(4,  247345678),  -- user2   -> San Ciriaco
-(4,  215456789),  -- user2   -> Marche Star
-(5,  247789012),  -- user3   -> Don Bosco II
-(5,  247890123),  -- user3   -> Bora Bora
-(5,  247112233),  -- user3   -> Medusa
-(6,  247113344),  -- user4   -> Stella del Mare
-(6,  247114455),  -- user4   -> Vento di Levante
-(7,  247115566),  -- user5   -> Porto Recanati
-(7,  247116677),  -- user5   -> Sirena Adriatica
-(8,  247117788),  -- user6   -> Orizzonte Blu
-(8,  247118899),  -- user6   -> Punta Trave
-(9,  247119900),  -- user7   -> Mare Nostrum
-(9,  247120011),  -- user7   -> Costa Conero
-(10, 247121122),  -- user8   -> Albatros Due
-(10, 247122233);  -- user8   -> Tritone
+('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((13.4700 43.7000, 13.5500 43.7000, 13.5600 43.6700, 13.4900 43.6600, 13.4700 43.7000))', 4326), 20),
+('Zona Marittima Est Porto', ST_GeomFromText('POLYGON((13.5600 43.6600, 13.6400 43.6600, 13.6500 43.6300, 13.5800 43.6200, 13.5600 43.6600))', 4326), 20),
+('Area Offshore Conero Nord', ST_GeomFromText('POLYGON((13.6200 43.6000, 13.7000 43.6000, 13.7100 43.5600, 13.6400 43.5500, 13.6200 43.6000))', 4326), 50),
+('Area Offshore Portonovo', ST_GeomFromText('POLYGON((13.6500 43.5600, 13.7300 43.5600, 13.7400 43.5200, 13.6700 43.5100, 13.6500 43.5600))', 4326), 50),
+('Area Offshore Sirolo', ST_GeomFromText('POLYGON((13.6800 43.5200, 13.7600 43.5200, 13.7700 43.4800, 13.7000 43.4700, 13.6800 43.5200))', 4326), 50),
+('Area Offshore Numana', ST_GeomFromText('POLYGON((13.7000 43.4700, 13.7900 43.4700, 13.8000 43.4300, 13.7200 43.4200, 13.7000 43.4700))', 4326), 50),
+('Adriatico Centrale 1', ST_GeomFromText('POLYGON((13.8000 43.6500, 13.9500 43.6500, 13.9500 43.5000, 13.8000 43.5000, 13.8000 43.6500))', 4326), NULL),
+('Adriatico Centrale 2', ST_GeomFromText('POLYGON((13.8500 43.4800, 14.0000 43.4800, 14.0000 43.3500, 13.8500 43.3500, 13.8500 43.4800))', 4326), NULL),
+('Canale di Fano', ST_GeomFromText('POLYGON((13.8000 43.8500, 13.9500 43.8500, 13.9500 43.7500, 13.8000 43.7500, 13.8000 43.8500))', 4326), NULL),
+('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((12.8000 43.9500, 13.0000 43.9500, 13.0000 43.8500, 12.8000 43.8500, 12.8000 43.9500))', 4326), NULL);
 
 -- ------------------------------------------------------------
 --  geofence_imbarcazioni

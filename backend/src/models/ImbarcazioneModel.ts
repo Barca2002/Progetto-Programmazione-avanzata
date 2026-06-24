@@ -6,10 +6,11 @@ export interface ImbarcazioneAllData {
   type: string;
   descr: string;
   max_capacity: number;
+  user_id: number;
   created_at: Date;
 }
 
-export interface ImbarcazioneCreationData extends Omit<Optional<ImbarcazioneAllData, 'mmsi'>,'created_at'> {}
+export interface ImbarcazioneCreationData extends Omit<Optional<ImbarcazioneAllData, 'mmsi'>, 'created_at'> {}
 
 
 export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreationData> implements ImbarcazioneAllData {
@@ -18,6 +19,7 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
   declare type: string;
   declare descr: string;
   declare max_capacity: number;
+  declare user_id: number;
   declare created_at: Date;
 
 
@@ -45,10 +47,14 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
         type: DataTypes.INTEGER,
         allowNull: false
       },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
       created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
       }
     }, {
       sequelize,

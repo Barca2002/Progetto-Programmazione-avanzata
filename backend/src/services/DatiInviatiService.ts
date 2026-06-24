@@ -3,25 +3,24 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import { UserImbarcazioniDAO } from '../dao/UserImbarcazioniDAO.js';
+import { ImbarcazioneDAO } from '../dao/ImbarcazioneDAO.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
-  private userImbarcazioniDAO = new UserImbarcazioniDAO();
+  private imbarcazioneDAO = new ImbarcazioneDAO();
   private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
 
 
   public async sendData(data: DatiinviatiCreationData): Promise<void> {
     
-    const user = await this.userImbarcazioniDAO.findUserByMmsi(data.mmsi);
-    if (!user)
-      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
-    
-    const imbarcazione = await this.userImbarcazioniDAO.findAssociation(user.user_id, data.mmsi);
+    const imbarcazione = await this.imbarcazioneDAO.findById(data.mmsi);
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    
+    if (!imbarcazione.user_id)
+      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
 
     const connDB = DatabaseConnection.getInstance();
     const t = await connDB.transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati

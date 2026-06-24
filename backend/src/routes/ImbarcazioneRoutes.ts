@@ -7,12 +7,12 @@ export const imbarcazioneRoutes = Router();
 const imbarcazione = new ImbarcazioneController();
 
 // GET tutte le imbarcazioni con le geofence associate (solo admin)
-imbarcazioneRoutes.get("/geofences", checkAdmin, async function(req: Request, res: Response) {
+imbarcazioneRoutes.get("/geofences/all", checkAdmin, async function(req: Request, res: Response) {
     await imbarcazione.getAllImbarcazioniWithGeofences(req, res);
 });
 
 // GET imbarcazioni dell'utente loggato con geofence associate
-imbarcazioneRoutes.get("/my/geoareas", checkUser,  async function(req: Request, res: Response) {
+imbarcazioneRoutes.get("/my", checkUser,  async function(req: Request, res: Response) {
     await imbarcazione.getMyImbarcazioniWithGeofences(req, res);
 });
 
@@ -21,9 +21,9 @@ imbarcazioneRoutes.get("/:mmsi", checkAdmin,  async function(req: Request, res: 
     await imbarcazione.getImbarcazioneById(req, res);
 });
 
-// ASSOCIA PIU GEOAREAS E USER A PIU IMBARCAZIONI (solo admin)
-imbarcazioneRoutes.post("/geoareas-user/add", checkAdmin,  async function(req: Request, res: Response) {
-    await imbarcazione.linkGeoareasEUserToImbarcazioni(req, res);
+// ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI (solo admin)
+imbarcazioneRoutes.post("/geoareas/add", checkAdmin,  async function(req: Request, res: Response) {
+    await imbarcazione.linkGeoareasToImbarcazioni(req, res);
 });
 
 // DISSOCIA UNA GEOAREA DA UNA IMBARCAZIONE (solo admin)

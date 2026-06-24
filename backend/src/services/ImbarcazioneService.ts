@@ -6,6 +6,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
+import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
@@ -13,15 +14,29 @@ export class ImbarcazioneService {
   private imbarcazioneDAO = new ImbarcazioneDAO();
   private adminDAO = new AdminDAO();
   private geofenceareaDAO = new GeofenceareaDAO();
+  private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
 
   async createImbarcazione(data: ImbarcazioneCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
+
+      //AGGIUNGERE CONTROLLI SUI PARAMETRI DI DATA
+
+      const utenteEsistente = await this.adminDAO.findById(data.user_id);
+      if (!utenteEsistente) {
+        throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+      }
+
       const result = await this.imbarcazioneDAO.create(data, t);
+      
       await t.commit();
       return result;
+
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError) { 
+        throw err;
+      }
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
   }
@@ -83,40 +98,38 @@ export class ImbarcazioneService {
     }
   }
 
-  async linkGeoareasEUserToImbarcazioni(links: { mmsi: number, geoarea_ids: number[], user_id: number }[]): Promise<void> {
+  async linkGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[]}[]): Promise<void> {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      for (const { mmsi, geoarea_ids, user_id } of links) {
+      for (const { mmsi, geoarea_ids } of links) {
+        
         //Controllo che l'imbarcazione esista
         const imbarcazione = await this.imbarcazioneDAO.findById(mmsi);
         if (!imbarcazione)
           throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-        //Controllo che lo user esista
-        const user = await this.adminDAO.findById(user_id);
-        if (!user)
-          throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
-
-        //Controllo che tutte le geoareas esistano
+        //Controllo che tutte le geoareas esistano e che non siano già presenti
         for (const geoarea_id of geoarea_ids) {
           const geoarea = await this.geofenceareaDAO.findById(geoarea_id);
           if (!geoarea)
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+
+          const associazioneEsistente = await this.geofenceImbarcazioniDAO.findAssociation(geoarea_id, mmsi);
+
+          if (associazioneEsistente) {
+            throw ErrorFactory.getError(AppErrorEnum.INVALID_ASSOCIATION);
+          }
         }
 
-        //Controllo che l'imbarcazione non sia già associata ad un utente
-        const associazioneEsistente = await this.imbarcazioneDAO.findUserAssociation(mmsi);
-        if (associazioneEsistente){
-          throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_ALREADY_ASSOCIATED);
-        }
+        //Associo le geoaree
         await this.imbarcazioneDAO.linkGeoareas(mmsi, geoarea_ids, t);
-        await this.imbarcazioneDAO.linkUser(mmsi, user_id, t);
       }
 
       await t.commit(); //se tutto è andato a buon fine viene scritto sul db
     } catch (err) {
       await t.rollback(); //se c'è un errore viene fatto il rollback della transazione e bisogna rimandare la richiesta
-      if (err instanceof AppError) throw err;
+      if (err instanceof AppError) 
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
   }
