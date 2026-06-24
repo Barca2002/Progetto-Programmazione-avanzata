@@ -134,6 +134,23 @@ CREATE TABLE dati_inviati (
     CONSTRAINT chk_stato_dati CHECK (stato IN ('IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'))
 );
 
+-- ------------------------------------------------------------
+--  TABELLA: log_spostamenti
+-- ------------------------------------------------------------
+
+CREATE TABLE log_spostamenti (
+    id        INT GENERATED ALWAYS AS IDENTITY,
+    mmsi           INT             NOT NULL,
+    geoarea_id     INT             NOT NULL,
+    spostamento    VARCHAR(10)     NOT NULL,
+    created_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (id),
+    CONSTRAINT fk_mmsi FOREIGN KEY (mmsi) REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE,
+    CONSTRAINT fk_geoid FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
+    CONSTRAINT chk_spostamento CHECK (spostamento IN ('USCITA', 'ENTRATA'))
+);
+
 -- ============================================================
 --  SEEDING
 -- ============================================================
@@ -157,26 +174,45 @@ INSERT INTO users (username, email, password, is_admin, tokens) VALUES
 --  imbarcazioni
 -- ------------------------------------------------------------
 INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity) VALUES
-(247123456, 'Adriatica Uno',      'cargo',         'Cargo multipurpose per merci varie',             1800),
-(247234567, 'Conero Explorer',    'ferry',         'Traghetto passeggeri costiero',                  850),
-(247345678, 'San Ciriaco',        'tanker',        'Petroliera per trasporto carburanti',           12000),
-(215456789, 'Marche Star',        'container',     'Portacontainer regionale',                       3500),
-(247567890, 'Riviera Blu',        'yacht',         'Yacht privato di lusso',                           12),
-(247789012, 'Don Bosco II',       'fishing',       'Peschereccio per pesca d’altura',                 35),
-(247890123, 'Bora Bora',          'sailing_yacht', 'Yacht a vela per crociere',                        10),
-(247901234, 'Eurocargo Ancona',   'ro_ro',         'Nave Ro-Ro per veicoli e rimorchi',             2500),
-(247012345, 'Falco Marino',       'coast_guard',   'Motovedetta per pattugliamento',                  25),
-(247112233, 'Medusa',             'research',      'Nave per ricerca oceanografica',                  40),
-(247113344, 'Stella del Mare',    'cargo',         'Cargo costiero per merci secche',              1500),
-(247114455, 'Vento di Levante',   'ferry',         'Traghetto per collegamenti regionali',           650),
-(247115566, 'Porto Recanati',     'tanker',        'Cisterna per prodotti chimici',                 8500),
-(247116677, 'Sirena Adriatica',   'yacht',         'Yacht da diporto moderno',                         14),
-(247117788, 'Orizzonte Blu',      'fishing',       'Peschereccio per pesca costiera',                 22),
-(247118899, 'Punta Trave',        'sailing_yacht', 'Imbarcazione a vela da regata',                    8),
-(247119900, 'Mare Nostrum',       'container',     'Portacontainer per rotte adriatiche',          4200),
-(247120011, 'Costa Conero',       'ro_ro',         'Trasporto veicoli e mezzi pesanti',            1800),
-(247121122, 'Albatros Due',       'coast_guard',   'Unità di soccorso marittimo',                     18),
-(247122233, 'Tritone',            'research',      'Nave per monitoraggio ambientale',                30);
+(247123456, 'Adriatica Uno','peschereccio_strascico','Peschereccio a strascico oceanico per pesce bianco', 10),
+
+(247234567, 'Conero Explorer','peschereccio_circuizione', 'Peschereccio a circuizione per pesce azzurro',10),
+
+(247345678, 'San Ciriaco','nave_fattoria','Nave fattoria per congelamento e lavorazione pesce',40),
+
+(215456789, 'Marche Star','trasporto_pescato','Nave da trasporto e logistica del pescato',6),
+
+(247567890, 'Riviera Blu','pesca_artigianale','Barca per pesca artigianale costiera',12),
+
+(247789012, 'Don Bosco II','palamitaro','Palamitaro per la pesca d’altura di tonno e spada',10),
+
+(247890123, 'Bora Bora','reti_da_posta','Imbarcazione da pesca con reti da posta',10),
+
+(247901234, 'Eurocargo Ancona','trasporto_pescato','Nave trasporto per rifornimento mercati ittici',25),
+
+(247012345, 'Falco Marino','vigilanza_pesca','Unità di vigilanza e controllo attività ittiche',25),
+
+(247112233, 'Medusa','ricerca_ittica','Nave per la ricerca e monitoraggio degli stock ittici',40),
+
+(247113344, 'Stella del Mare','peschereccio_strascico','Peschereccio a strascico costiero per fondali bassi',15),
+
+(247114455, 'Vento di Levante','lampara','Lampara per la pesca notturna del pesce azzurro',9),
+
+(247115566, 'Porto Recanati','vongolara_turbosoffiante', 'Turbosoffiante per la pesca di molluschi e vongole',10),
+
+(247116677, 'Sirena Adriatica','pesca_artigianale','Imbarcazione locale per la piccola pesca costiera',14),
+
+(247117788, 'Orizzonte Blu','peschereccio_strascico','Peschereccio per la pesca a strascico adriatica',22),
+
+(247118899, 'Punta Trave','pesca_nasse','Barca specializzata nella pesca con trappole e nasse',8),
+
+(247119900, 'Mare Nostrum','nave_fattoria','Nave da grande pesca con impianti di surgelazione',21),
+
+(247120011, 'Costa Conero','palamitaro','Palamitaro d’altura per grandi pelagici',1800),
+
+(247121122, 'Albatros Due','assistenza_pesca','Unità di assistenza e soccorso alla flotta peschereccia',18),
+
+(247122233, 'Tritone','ricerca_ittica','Nave per lo studio biologico delle risorse marine',   20);
 
 -- ------------------------------------------------------------
 --  geofence_areas
@@ -529,3 +565,16 @@ INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
 ('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-04 19:25:00'),
 ('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 05:00:00'),
 ('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 11:00:00');
+
+INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
+(247123456, 1, 'ENTRATA', '2026-06-20 06:00:00'),
+(247123456, 1, 'USCITA',  '2026-06-20 18:30:00'),
+(247123456, 1, 'ENTRATA', '2026-06-21 05:45:00'),
+(247123456, 1, 'USCITA',  '2026-06-21 19:15:00'),
+(247123456, 1, 'ENTRATA', '2026-06-22 06:10:00'),
+
+(247234567, 2, 'ENTRATA', '2026-06-20 08:00:00'),
+(247234567, 2, 'USCITA',  '2026-06-20 12:00:00'),
+(247234567, 2, 'ENTRATA', '2026-06-21 08:15:00'),
+(247234567, 2, 'USCITA',  '2026-06-21 13:00:00'),
+(247234567, 2, 'ENTRATA', '2026-06-22 07:45:00');
