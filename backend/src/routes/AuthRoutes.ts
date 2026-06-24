@@ -1,4 +1,4 @@
-import { Router, Response, Request, NextFunction } from "express";
+import { Router, Response, Request } from "express";
 import { AuthController } from "../controllers/AuthController.js";
 import { loginValidationPipeline, registerValidationPipeline } from "../middlewares/AuthMiddleware.js";
 

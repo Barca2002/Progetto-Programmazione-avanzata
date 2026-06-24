@@ -6,12 +6,11 @@ import { AppError } from "../models/AppErrorModel.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
 import type { Position } from 'geojson';
 import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
-import { maxHeaderSize } from "http";
 
 export class GeofenceAreaController {
   public readonly geofenceareaService = new GeofenceareaService();
 
-  public async getAree(req: Request, res: Response, next: NextFunction){
+  public async getAree(req: Request, res: Response ){
     try {
       const aree = await this.geofenceareaService.getAree();
       res.json(aree);
@@ -24,7 +23,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async getAreaById(req: Request, res: Response, next: NextFunction){
+  public async getAreaById(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
       const area = await this.geofenceareaService.getAreaById(id);
@@ -38,7 +37,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async createArea(req: Request, res: Response, next: NextFunction){
+  public async createArea(req: Request, res: Response ){
     try {
       const name = req.body.features[0].properties.name;
       const coordinates = req.body.features[0].geometry.coordinates;
@@ -74,7 +73,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async updateArea(req: Request, res: Response, next: NextFunction){
+  public async updateArea(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
       const areaAggiornata = await this.geofenceareaService.updateArea(id, req.body);
@@ -88,7 +87,7 @@ export class GeofenceAreaController {
     }
   };
 
-  public async deleteArea(req: Request, res: Response, next: NextFunction){
+  public async deleteArea(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
       await this.geofenceareaService.deleteArea(id);
