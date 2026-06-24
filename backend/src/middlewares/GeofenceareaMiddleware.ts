@@ -1,19 +1,13 @@
-import { Feature, GeoJsonProperties, Polygon, Position } from "geojson";
+import { Position } from "geojson";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { NextFunction, Request, Response } from "express";
 import * as z from "zod";
 import * as turf from "@turf/turf";
+import { hasMaxDecimals } from "../utils/DecimalChecker.js";
 
 export const checkGeoJson = [checkGeoJsonFormat, checkCoordinates];
 export const MAX_POINTS = 15;
-const MAX_DECIMALS = 7;
-
-// Funzione per controllare se i numeri dopo la virgola non superano MAX_DECIMALS
-const hasMaxDecimals = (value: number) => {
-    const parts = value.toString().split(".");
-    return parts.length === 1 || parts[1]!.length <= MAX_DECIMALS;
-};
 
 // Definizione dello schema di validazione per il formato GeoJSON
 const geofenceAreaSchema = z.object({

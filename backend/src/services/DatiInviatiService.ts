@@ -15,21 +15,6 @@ export class DatiInviatiService {
 
   public async sendData(data: DatiinviatiCreationData): Promise<void> {
     
-    if (!data.mmsi || isNaN(data.mmsi) || data.mmsi.toString().length !== 9)
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-
-    if (!data.latitudine || isNaN(data.latitudine) || data.latitudine < -90 || data.latitudine > 90)
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE);
-
-    if (!data.longitudine || isNaN(data.longitudine) || data.longitudine < -180 || data.longitudine > 180)
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE);
-
-    if (!data.velocita_kmh || isNaN(data.velocita_kmh) || data.velocita_kmh < 0 || data.velocita_kmh > 200)
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_VELOCITA);
-
-    if (!data.stato || !['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'].includes(data.stato))
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
-    
     const user = await this.userImbarcazioniDAO.findUserByMmsi(data.mmsi);
     if (!user)
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
@@ -40,7 +25,6 @@ export class DatiInviatiService {
 
     const connDB = DatabaseConnection.getInstance();
     const t = await connDB.transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati
-
     try {
       //Inserisco i dati nel db, con una transaction metto in sospeso
       await this.datiinviatiDAO.create(data, t);

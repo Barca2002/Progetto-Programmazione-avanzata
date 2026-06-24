@@ -28,8 +28,7 @@ export class UserImbarcazioniDAO implements IUserImbarcazioniDAO {
 
   async findUserByMmsi(mmsi: number): Promise<User | null> {
     const association = await UserImbarcazioni.findOne({ where: { mmsi } });
-    if (!association) return null;
-    return await User.findByPk(association.user_id);
+    return await User.findByPk(association!.user_id);
   }
 
   async findOneByMmsi(mmsi: number): Promise<UserImbarcazioni | null> {

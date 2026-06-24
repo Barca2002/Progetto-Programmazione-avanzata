@@ -33,15 +33,13 @@ export const ERROR_LIST = {
     JWT_TOKEN_ADMIN_MISSING:
     { statusCode: 500, message: "Controlla JWT_TOKEN_ADMIN nelle variabili d'ambiente" },
     JWT_TOKEN_EMPTY: 
-    { statusCode: 401, message: "Token di autenticazione vuoto." },
-    INVALID_JWT:
-    { statusCode: 401, message: "Il JWT fornito non è valido." },
+    { statusCode: 401, message: "Token JWT vuoto." },
     JWT_NOT_PROVIDED:
     { statusCode: 401, message: "Token JWT non fornito." },
     JWT_TOKEN_EXPIRED:
-    { statusCode: 401, message: "Token di autenticazione scaduto." },
+    { statusCode: 401, message: "Token JWT scaduto." },
     JWT_TOKEN_INVALID:
-    { statusCode: 401, message: "Token di autenticazione non valido o malformato." },
+    { statusCode: 401, message: "Token JWT non valido o malformato." },
     USER_NOT_FOUND:
     { statusCode: 404, message: "Utente non trovato." },
     USERNAME_NOT_FOUND:
@@ -90,6 +88,12 @@ export const ERROR_LIST = {
     { statusCode: 401, message: "Le coordinate fornite già rappresentano una geoarea o il nome è già stato usato."},
     INVALID_TOKEN_AMOUNT:
     { statusCode: 401, message: "La quantità di token specificata non è ammessa (min 0.025, max 100)."},
+    MISSING_AUTH_HEADER:
+    { statusCode: 401, message: "L'Authentication Header non è presente."},
+    INVALID_AUTH_HEADER:
+    { statusCode: 401, message: "L'Authentication Header è invalido. Deve iniziare con 'Bearer '."},
+    INSUFFICIENT_TOKEN_BALANCE:
+    { statusCode: 401, message: "Saldo token non sufficiente per effettuare la richiesta."},
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.

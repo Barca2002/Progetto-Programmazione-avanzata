@@ -1,8 +1,8 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
 
 export class UserImbarcazioni extends Model {
-  public user_id!: number;
-  public mmsi!: number;
+  declare user_id: number;
+  declare mmsi: number;
 
   public static inizializzaModel(sequelize: Sequelize) {
     UserImbarcazioni.init(
