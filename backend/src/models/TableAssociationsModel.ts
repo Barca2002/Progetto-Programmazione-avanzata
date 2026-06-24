@@ -1,12 +1,12 @@
 import { Imbarcazione } from './ImbarcazioneModel.js';
 import { Geofencearea } from './GeofenceareaModel.js';
 import { User } from './UserModel.js';
-import { GeofenceImbarcazioni } from './GeofenceImbarcazioniModel.js'; // modello della tabella di giunzione
+import { GeofenceImbarcazioni } from './GeofenceImbarcazioniModel.js';
+import { LogSpostamenti } from './LogSpostamentiModel.js';
 
-// Si inizializzano le associazioni molti a molti (tabelle di collegamento)
-// HasMany = 1:N, BelongsToMany = N:N
 export function inizializzaAssociazioni(): void {
-    // Tra imbarcazione e Geofenceareas c'è una molti a molti
+
+    // N:N — Imbarcazione <-> Geofencearea
     Imbarcazione.belongsToMany(Geofencearea, {
         through: GeofenceImbarcazioni,
         timestamps: false,
@@ -19,20 +19,40 @@ export function inizializzaAssociazioni(): void {
         through: GeofenceImbarcazioni,
         timestamps: false,
         foreignKey: 'geoarea_id',
-        otherKey: 'mmsi'
+        otherKey: 'mmsi',
+        as: 'Imbarcazioni'
     });
 
-    // Relazione 1:N. Un utente ha più imbarcazioni, ma un'imbarcazione è posseduta da un solo utente.
+    // 1:N — Un User ha molte Imbarcazioni e una Imbarcazione appartiene a un solo User
     User.hasMany(Imbarcazione, {
         foreignKey: 'user_id',
         as: 'Imbarcazioni'
     });
 
-    Imbarcazione.belongsToMany(User, {
-        through: 'user_imbarcazioni',
-        timestamps: false,
-        foreignKey: 'mmsi',
-        otherKey: 'user_id',
+    Imbarcazione.belongsTo(User, {      
+        foreignKey: 'user_id',
         as: 'Proprietario'
+    });
+
+    // 1:N — Una Imbarcazione ha molti LogMovimenti
+    Imbarcazione.hasMany(LogSpostamenti, {
+        foreignKey: 'mmsi',
+        as: 'LogMovimenti'
+    });
+
+    LogSpostamenti.belongsTo(Imbarcazione, {
+        foreignKey: 'mmsi',
+        as: 'Imbarcazione'
+    });
+
+    // 1:N — Una Geofencearea ha molti LogMovimenti
+    Geofencearea.hasMany(LogSpostamenti, {
+        foreignKey: 'geoarea_id',
+        as: 'LogMovimenti'
+    });
+
+    LogSpostamenti.belongsTo(Geofencearea, {
+        foreignKey: 'geoarea_id',
+        as: 'Geofencearea'
     });
 }
