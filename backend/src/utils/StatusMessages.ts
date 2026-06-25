@@ -109,7 +109,13 @@ export const ERROR_LIST = {
     VIOLAZIONE_NOT_FOUND:
     { statusCode: 404, message: "Nessuna violazione trovata." },
     INVALID_STATO_VIOLAZIONE:
-    {statusCode: 400, message: "Stato della violazione non ammesso." }
+    {statusCode: 400, message: "Stato della violazione non ammesso." },
+    INVALID_DATE_RANGE:
+    {statusCode: 400, message: "Le date inserite non sono nel formato adeguato" },
+    INVALID_START_DATE:
+    {statusCode: 400, message: "Le data di inizio non è nel formato adeguato" },
+    INVALID_END_DATE:
+    {statusCode: 400, message: "Le data di fine non è nel formato adeguato" }
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
@@ -153,6 +159,8 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "Saldo token aggiornato correttamente." },
     LOG_SPOSTAMENTI_FOUND:
     { statusCode: 201, message: "Log spostamenti trovati correttamente" },
+    POSIZIONI_FOUND:
+    { statusCode: 201, message: "Posizioni trovate correttamente" },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

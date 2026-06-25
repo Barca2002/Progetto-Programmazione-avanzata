@@ -1,4 +1,4 @@
-import { col, fn, Op, QueryTypes, Transaction } from 'sequelize';
+import { Op, QueryTypes, Transaction } from 'sequelize';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
@@ -6,7 +6,8 @@ import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 import { Segnalazione } from '../models/SegnalazioneModel.js';
 import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import sequelize from 'sequelize/lib/sequelize';
+import { Datiinviati } from '../models/DatiInviatiModel.js';
+import { FeatureCollection } from 'geojson';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
@@ -105,6 +106,45 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         }]
     });
   }
+
+  async getGeofenceAreasGeoJson(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
+  const db = DatabaseConnection.getInstance();
+  const startEpoch = start_date.getTime();
+  const endEpoch = end_date.getTime();
+
+  const [row] = await db.query<{ geojson: FeatureCollection }>(
+      `SELECT json_build_object(
+          'type', 'FeatureCollection',
+          'features', COALESCE(
+            json_agg(
+              json_build_object(
+                'type', 'Feature',
+                'geometry', json_build_object(
+                  'type', 'Point',
+                  'coordinates', ARRAY[d.longitudine, d.latitudine]
+                )
+              )
+            ),
+            '[]'::json
+          )
+        ) AS geojson
+        FROM dati_inviati d
+        WHERE d.mmsi = :mmsi
+          AND d."timestamp" BETWEEN :startEpoch AND :endEpoch;
+      `,
+      {
+        replacements: {
+          mmsi,
+          startEpoch,
+          endEpoch
+        },
+        type: QueryTypes.SELECT
+      }
+    );
+    return row!.geojson;
+  }
+
+
 
   async findAllWithUserWithGeofences(user_id: number): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll({

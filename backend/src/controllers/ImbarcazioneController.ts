@@ -134,6 +134,41 @@ export class ImbarcazioneController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
+  }
+
+  public async getPosizioniImbarcazione(req: Request, res: Response): Promise<void> {
+    try {
+        const { mmsi, start_date } = req.body;
+
+        if (!mmsi || !start_date) {
+            throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        }
+
+        const end_date = req.body.end_date ? new Date(req.body.end_date) : new Date();
+
+        const startDate = new Date(start_date);
+        const endDate = new Date(end_date);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        }
+
+        const posizioni = await this.imbarcazioneService.getPosizioniImbarcazione(mmsi,startDate, endDate);
+
+        res.json(
+            SuccessFactory.getSuccess(
+                AppSuccessEnum.POSIZIONI_FOUND,
+                posizioni
+            )
+        );
+
+    } catch (err) {
+        if (err instanceof AppError) {
+            err.send(res);
+        } else {
+            res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        }
+    }
 }
 
   public async getSegnalazioniByMmsi(req: Request, res: Response){
