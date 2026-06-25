@@ -7,7 +7,7 @@ export const imbarcazioneRoutes = Router();
 const imbarcazione = new ImbarcazioneController();
 
 // GET tutte le imbarcazioni con le geofence associate (solo admin)
-imbarcazioneRoutes.get("/geofences/all", checkAdmin, async function(req: Request, res: Response) {
+imbarcazioneRoutes.get("/all", checkAdmin, async function(req: Request, res: Response) {
     await imbarcazione.getAllImbarcazioniWithGeofences(req, res);
 });
 

@@ -1,4 +1,4 @@
-import { Op, QueryTypes, Transaction } from 'sequelize';
+import { QueryTypes, Transaction } from 'sequelize';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
@@ -98,7 +98,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
   ]
   */
 
-  async findLastSpostamento(): Promise<Imbarcazione[]> {
+  async findAllLastSpostamento(): Promise<Imbarcazione[]> {
     const db = DatabaseConnection.getInstance();
     return await Imbarcazione.findAll({
         include: [{
@@ -111,6 +111,13 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
                 AND ls.geoarea_id = "Spostamenti"."geoarea_id"
             )`),
         }]
+    });
+  }
+
+  async findLastDatoInviato(mmsi: number): Promise<Datiinviati | null> {
+    return await Datiinviati.findOne({
+        where: { mmsi: mmsi },
+        order: [['timestamp', 'DESC']], // Ordina dal più recente al più vecchio
     });
   }
 

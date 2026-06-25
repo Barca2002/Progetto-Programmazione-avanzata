@@ -1,15 +1,14 @@
 import { LogSpostamentiDAO } from '../dao/LogSpostamentiDAO.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
+import { ImbarcazioneDAO } from '../dao/ImbarcazioneDAO.js';
 
 export class LogSpostamentiService {
   private logSpostamentiDAO = new LogSpostamentiDAO();
+  private imbarcazioneDAO = new ImbarcazioneDAO();
 
-  async getAllImbarcazioniConSegnalazioni() {
-    const result = await this.logSpostamentiDAO.findAllConImbarcazioni();
-    console.log(result);
-    if (!result || result.length === 0)
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-    return result;
+  async logSpostamento(spostamento: string, geoarea_id: number){
+    
   }
+
 }

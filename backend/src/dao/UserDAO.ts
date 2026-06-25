@@ -1,7 +1,5 @@
 import { Transaction } from 'sequelize';
 import { User, UserCreationData } from '../models/UserModel.js';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 // Interfaccia del layer DAO per la gestione dell'User
 interface IUserDAO {
@@ -37,6 +35,12 @@ export class UserDAO implements IUserDAO {
   async update(user_id: number, data: Partial<UserCreationData>, t: Transaction): Promise<User> {
     const [, affectedRows] = await User.update(data, { where: { user_id }, transaction: t, returning: true });
     return affectedRows[0]!;
+  }
+
+  async decrToken(user_id: number, t: Transaction){
+    
+    const [affectedRows,] = await User.decrement( { tokens: 0.025 }, { where: { user_id }, transaction: t});
+    return affectedRows;
   }
 
   async delete(user_id: number, t: Transaction): Promise<number> {

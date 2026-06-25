@@ -1,7 +1,5 @@
 import { Transaction } from 'sequelize';
 import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
 
 // Interfaccia del DAO per l'associazione Geofence-Imbarcazione
 interface IGeofenceImbarcazioniDAO {
@@ -9,8 +7,8 @@ interface IGeofenceImbarcazioniDAO {
   findAssociation(geoarea_id: number, mmsi: number): Promise<GeofenceImbarcazioni | null>;
   findIsInMmsi(mmsi: number): Promise<GeofenceImbarcazioni | null>;
   findAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]>;
-  updateLocation(mmsi: number, geoarea_id: number, t: Transaction): Promise<GeofenceImbarcazioni>;
-  resetLocation(mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni>;
+  //updateLocation(mmsi: number, geoarea_id: number, t: Transaction): Promise<GeofenceImbarcazioni>;
+  //resetLocation(mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni>;
   delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<number>;
 }
 
@@ -42,35 +40,35 @@ export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
   /**
    * Aggiorna la posizione di un'imbarcazione impostando lo stato 'is_in' per una specifica barca dentro una specifica geofence.
    */
-  async updateLocation(mmsi: number, geoarea_id: number, t: Transaction): Promise<GeofenceImbarcazioni> {
-    try {
-      const [, affectedRows] = await GeofenceImbarcazioni.update(
-        { is_in: true },
-        { 
-          where: { mmsi, geoarea_id }, 
-          transaction: t, returning: true 
-        }
-      );
-      return affectedRows[0]!;
-    } catch (err) {
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
-    }
-  }
+  // async updateLocation(mmsi: number, geoarea_id: number, t: Transaction): Promise<GeofenceImbarcazioni> {
+  //   try {
+  //     const [, affectedRows] = await GeofenceImbarcazioni.update(
+  //       { is_in: true },
+  //       { 
+  //         where: { mmsi, geoarea_id }, 
+  //         transaction: t, returning: true 
+  //       }
+  //     );
+  //     return affectedRows[0]!;
+  //   } catch (err) {
+  //     throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
+  //   }
+  // }
 
-  /**
-   * Resetta lo stato 'is_in' a false per tutte le geofence associate a una determinata imbarcazione
-   */
-  async resetLocation(mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
-    const [, affectedRows] = await GeofenceImbarcazioni.update(
-      { is_in: false },
-      { 
-        where: { mmsi }, 
-        transaction: t,
-        returning: true 
-      }
-    );
-    return affectedRows[0]!;
-  }
+  // /**
+  //  * Resetta lo stato 'is_in' a false per tutte le geofence associate a una determinata imbarcazione
+  //  */
+  // async resetLocation(mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
+  //   const [, affectedRows] = await GeofenceImbarcazioni.update(
+  //     { is_in: false },
+  //     { 
+  //       where: { mmsi }, 
+  //       transaction: t,
+  //       returning: true 
+  //     }
+  //   );
+  //   return affectedRows[0]!;
+  // }
 
   async delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<number> {
     return await GeofenceImbarcazioni.destroy({

@@ -117,7 +117,9 @@ export const ERROR_LIST = {
     INVALID_END_DATE:
     {statusCode: 400, message: "Le data di fine non è nel formato adeguato" },
     IMBARCAZIONE_OWNERSHIP_ERROR:
-    { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." }
+    { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." },
+    TOKEN_SPEND_ERROR:
+    { statusCode: 400, message: "Errore diminuzione token." },
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
@@ -153,8 +155,8 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "La segnalazione è stata creata con successo." },
     IMBARCAZIONE_CREATED:
     { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
-    GEOAREAS_E_USER_ADDED:
-    { statusCode: 200, message: "Geofence associate all'imbarcazione con successo." },
+    GEOAREAS_LINKED:
+    { statusCode: 200, message: "Geoaree associate alle imbarcazioni con successo." },
     SEND_DATA:
     { statusCode: 201, message: "Dati inviati con successo." },
     TOKEN_BALANCE_UPDATED:

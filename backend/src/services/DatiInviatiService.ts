@@ -6,14 +6,15 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { ImbarcazioneDAO } from '../dao/ImbarcazioneDAO.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
-import { decodeJwt } from '../middlewares/JWTMiddleware.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js'; 
+import { LogSpostamentiService } from './LogSpostamentiService.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
   private imbarcazioneDAO = new ImbarcazioneDAO();
   private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
   private imbarcazioniService = new ImbarcazioneService();
+  private logspostamentoService = new LogSpostamentiService();
 
   // Si controlla se l'imbarcazione esiste (con l'mmsi), se l'utente che ha inviato la richiesta è il proprietario di essa e se le coordinate ricadono dentro una geoarea.
   public async sendData(data: DatiinviatiCreationData, user_id: number): Promise<void> {
@@ -24,17 +25,25 @@ export class DatiInviatiService {
     }
     // Passiamo l'user_id estratto dal token JWT per controllare se è il proprietario della barca.
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
+    const allowedGeoareas = this.geofenceImbarcazioniDAO.findAllByMmsi(data.mmsi);
 
-    const connDB = DatabaseConnection.getInstance();
-    const t = await connDB.transaction(); //Mi serve perche sia la create che gli updates devono andare a buon fine, altrimenti avrei dei risultati errati
+    const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, data.longitudine, data.latitudine);
+      const current_geoarea = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, data.longitudine, data.latitudine);
       //Controllo se ha trovato una geoarea in cui risiede il punto
-      if(geoarea_found){
-        // Si resetta tutte le posizioni di quella barca
-        await this.geofenceImbarcazioniDAO.resetLocation(data.mmsi, t);
-        // Si aggiorna la posizione della barca settando is_in a true in base a dove si trova attualmente
-        await this.geofenceImbarcazioniDAO.updateLocation(data.mmsi, geoarea_found.geoarea_id, t);
+      if(current_geoarea){
+        const lastSpostamento = await this.imbarcazioneDAO.findLastDatoInviato(data.mmsi);
+        if(!lastSpostamento){
+          throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR); // Da cambiare
+        }
+        const lastGeoarea = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
+
+        if((await allowedGeoareas).some(g => g.geoarea_id === lastGeoarea?.geoarea_id) ){
+          if(lastGeoarea?.geoarea_id == current_geoarea.geoarea_id){
+            await this.logspostamentoService.logSpostamento("ENTRATA", current_geoarea.geoarea_id);
+            await this.logspostamentoService.logSpostamento("USCITA", lastGeoarea.geoarea_id);
+          }
+        }
       } else {
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
       }

@@ -8,12 +8,14 @@ import { decodeJwt } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
+import { TokenService } from "../services/TokenService.js";
 
 export class UserController {
   public readonly datiinviatiService = new DatiInviatiService();
   public readonly imbarcazioneService = new ImbarcazioneService();
   public readonly violazioneService = new ViolazioneService();
   public readonly segnalazioneService = new SegnalazioneService();
+  public readonly tokenService = new TokenService();
 
   public async sendData(req: Request, res: Response ){
     try {
@@ -24,6 +26,9 @@ export class UserController {
       const user_id = decodeJwt(token!).user_id;
       // invio dei dati
       await this.datiinviatiService.sendData(data, user_id!);
+      // Togliamo i token per la richiesta.
+      await this.spendToken(user_id);
+      // Controllo se generare una violazione ed eventualmente una segnalazione.
       await this.violazioneService.checkIfViolazione(data);
       await this.segnalazioneService.checkIfSegnalazione();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
@@ -35,4 +40,9 @@ export class UserController {
       }
     }
   };
+
+  public async spendToken(user_id: number){
+    await this.tokenService.spendToken(user_id);
+    return true;
+  }
 }

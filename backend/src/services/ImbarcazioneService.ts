@@ -68,7 +68,7 @@ export class ImbarcazioneService {
   }
 
   async getLocationPerGeoarea(): Promise<object[]> {
-    const imbarcazioni = await this.imbarcazioneDAO.findLastSpostamento();
+    const imbarcazioni = await this.imbarcazioneDAO.findAllLastSpostamento();
 
     return imbarcazioni.map(imb => {
         const spostamenti = (imb.get('Spostamenti') as LogSpostamenti[]); 
