@@ -5,7 +5,7 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import { ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
+import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 
 
@@ -132,6 +132,10 @@ export class ImbarcazioneService {
         throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
+  }
+
+  async getAllWithSegnalazioni(): Promise<Imbarcazione[]>{
+    return await this.imbarcazioneDAO.findAllWithSegnalazioni();
   }
 
   async deleteGeoarea(mmsi: number, geoarea_id: number): Promise<void> {

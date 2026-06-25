@@ -16,6 +16,10 @@ imbarcazioneRoutes.get("/my", checkUser,  async function(req: Request, res: Resp
     await imbarcazione.getMyImbarcazioniWithGeofences(req, res);
 });
 
+imbarcazioneRoutes.get("/segnalazioni/all", checkUser,  async function(req: Request, res: Response) {
+    await imbarcazione.getAllWithSegnalazioni(req, res);
+});
+
 // GET imbarcazione per mmsi
 imbarcazioneRoutes.get("/:mmsi", checkAdmin,  async function(req: Request, res: Response) {
     await imbarcazione.getImbarcazioneById(req, res);
