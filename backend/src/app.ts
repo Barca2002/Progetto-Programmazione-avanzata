@@ -14,7 +14,7 @@ import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioniModel.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
 import { userRoutes } from './routes/UserRoutes.js';
 import { LogSpostamenti } from './models/LogSpostamentiModel.js';
-import { logSpostamentiRoutes } from './routes/LogSpostamentiRoutes.js';
+
 
 dotenv.config();
 
@@ -45,7 +45,6 @@ app.use("/admin", adminRoutes);
 app.use("/geoarea", geofenceareaRoutes);
 app.use("/imbarcazione", imbarcazioneRoutes);
 app.use("/user", userRoutes);
-app.use('/log-spostamenti', logSpostamentiRoutes);
 
 
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR

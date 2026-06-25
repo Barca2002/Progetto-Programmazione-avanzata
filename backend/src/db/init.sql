@@ -41,10 +41,7 @@ CREATE TABLE imbarcazioni (
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT imbarcazioni_name_key UNIQUE (name),
-    CONSTRAINT fk_imbarcazioni_user
-        FOREIGN KEY (user_id)
-        REFERENCES users(user_id)
-        ON DELETE SET NULL 
+    CONSTRAINT fk_imbarcazioni_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL 
 );
 
 -- ------------------------------------------------------------
@@ -159,7 +156,7 @@ INSERT INTO users (username, email, password, is_admin, tokens) VALUES
 ('user8',  'user8@mail.com',  '$2a$12$2LeoNCaTB6wUlgsf.uegCeYcWWSjJxNKLD1JfdvrdZ5Um7tYVBKkO', FALSE, 1);  
 
 -- ------------------------------------------------------------
---  imbarcazioni (Modificato: ora alcune barche hanno user_id = NULL)
+--  imbarcazioni
 -- ------------------------------------------------------------
 INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity, user_id) VALUES
 (247123456, 'Adriatica Uno','peschereccio_strascico','Peschereccio a strascico oceanico per pesce bianco', 10, 3),
@@ -446,7 +443,6 @@ INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
 (247123456, 1, 'ENTRATA', '2026-06-21 05:45:00'),
 (247123456, 1, 'USCITA',  '2026-06-21 19:15:00'),
 (247123456, 1, 'ENTRATA', '2026-06-22 06:10:00'),
-
 (247234567, 2, 'ENTRATA', '2026-06-20 08:00:00'),
 (247234567, 2, 'USCITA',  '2026-06-20 12:00:00'),
 (247234567, 2, 'ENTRATA', '2026-06-21 08:15:00'),
