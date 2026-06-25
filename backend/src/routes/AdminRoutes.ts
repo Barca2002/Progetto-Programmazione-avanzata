@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdmin } from "../middlewares/JWTMiddleware.js";
 import { tokenValidation } from "../middlewares/TokenMiddleware.js";
+import { checkMmsi } from "../middlewares/ImbarcazioniMiddleware.js";
 
 export const adminRoutes = Router();
 const adminController = new AdminController();
@@ -34,4 +35,8 @@ adminRoutes.delete("/delete/:id", checkAdmin, async function(req: Request, res: 
 //  }
 adminRoutes.patch("/updateTokenBalance", checkAdmin, tokenValidation, async function(req: Request, res: Response){
     await adminController.updateTokenBalance(req, res);
+});
+
+adminRoutes.get("/checkSegnalazioni/:mmsi", checkMmsi, async function(req: Request, res: Response){
+    await adminController.checkViolazioniByMmsi(req, res);
 });

@@ -49,5 +49,5 @@ export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreatio
         freezeTableName: true,
         timestamps: false
         });
-  }
+    }
 }

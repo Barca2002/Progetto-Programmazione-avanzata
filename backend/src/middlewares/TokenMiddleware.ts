@@ -8,7 +8,7 @@ export const tokenValidation = [checkTokenAmount];
 export const tokenBalanceCheck = [checkTokenBalance];
 const adminService = new AdminService();
 
-// Controllo valore token nella ricarica del saldo (admin).
+// Controllo valore token nella ricarica del saldo (admin). Usata solo internamente.
 function checkTokenAmount(req: Request, res: Response, next: NextFunction){
     const tokenAmount = req.body.newTokenAmount;
     if(!tokenAmount || isNaN(tokenAmount)){

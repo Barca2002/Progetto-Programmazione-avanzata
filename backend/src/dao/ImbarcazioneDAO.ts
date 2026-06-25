@@ -1,7 +1,5 @@
 import { Transaction } from 'sequelize';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
 import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';

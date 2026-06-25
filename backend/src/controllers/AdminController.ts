@@ -3,8 +3,6 @@ import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
-import { AuthService } from "../services/AuthService.js";
-import { userInfo } from "os";
 
 export class AdminController {
   public readonly adminService = new AdminService();
@@ -81,5 +79,9 @@ export class AdminController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
+  }
+
+  public async checkViolazioniByMmsi(req: Request, res: Response){
+    
   }
 }

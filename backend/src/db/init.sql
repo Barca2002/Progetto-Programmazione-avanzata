@@ -437,6 +437,9 @@ INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
 ('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 05:00:00'),
 ('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 11:00:00');
 
+-- ------------------------------------------------------------
+--  log_spostamenti
+-- ------------------------------------------------------------
 INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
 (247123456, 1, 'ENTRATA', '2026-06-20 06:00:00'),
 (247123456, 1, 'USCITA',  '2026-06-20 18:30:00'),
