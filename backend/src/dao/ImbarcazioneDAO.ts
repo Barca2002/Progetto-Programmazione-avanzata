@@ -1,9 +1,12 @@
-import { Transaction } from 'sequelize';
+import { col, fn, Op, QueryTypes, Transaction } from 'sequelize';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
 import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 import { Segnalazione } from '../models/SegnalazioneModel.js';
+import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
+import { DatabaseConnection } from '../singleton/DBConnection.js';
+import sequelize from 'sequelize/lib/sequelize';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
@@ -57,6 +60,49 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         as: 'Segnalazioni',
         attributes: ['geoarea_id', 'stato'], 
       }]
+    });
+  }
+
+  //Prendo per ogni coppia (mmsi, geoarea) l'ultimo spostamento fatto
+
+  /*
+  [
+    {
+        "mmsi": 247123456,
+        "name": "Adriatica Uno",
+        "Spostamenti": [
+            { "geoarea_id": 1, "spostamento": "ENTRATA", "created_at": "2026-06-22 06:10:00" },
+            { "geoarea_id": 7, "spostamento": "USCITA",  "created_at": "2026-06-20 18:30:00" }
+        ]
+    },
+    {
+        "mmsi": 247234567,
+        "name": "Conero Explorer",
+        "Spostamenti": [
+            { "geoarea_id": 2, "spostamento": "ENTRATA", "created_at": "2026-06-22 07:45:00" }
+        ]
+    },
+    {
+        "mmsi": 247345678,
+        "name": "San Ciriaco",
+        "Spostamenti": []
+    }
+  ]
+  */
+
+  async findLastSpostamento(): Promise<Imbarcazione[]> {
+    const db = DatabaseConnection.getInstance();
+    return await Imbarcazione.findAll({
+        include: [{
+            model: LogSpostamenti,
+            as: 'Spostamenti',
+            attributes: ['geoarea_id', 'spostamento', 'created_at'],
+            where: db.literal(`"Spostamenti"."created_at" = (
+                SELECT MAX(ls.created_at) FROM log_spostamenti ls
+                WHERE ls.mmsi = "Spostamenti"."mmsi"
+                AND ls.geoarea_id = "Spostamenti"."geoarea_id"
+            )`),
+        }]
     });
   }
 

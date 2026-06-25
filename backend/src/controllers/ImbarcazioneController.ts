@@ -123,6 +123,19 @@ export class ImbarcazioneController {
     }
   }
 
+  async getLocationPerGeoarea(req: Request, res: Response){
+    try {
+        const result = await this.imbarcazioneService.getLocationPerGeoarea();
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.LOG_SPOSTAMENTI_FOUND, result));
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+}
+
   public async getSegnalazioniByMmsi(req: Request, res: Response){
     try {
       const imbarcazione = await this.imbarcazioneService.getImbarcazioneByMmsi(req.body.mmsi);

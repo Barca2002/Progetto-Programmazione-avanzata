@@ -3,8 +3,8 @@ import { DataTypes, Sequelize, Model } from 'sequelize';
 export class LogSpostamenti extends Model {
   declare id: number;
   declare mmsi: number;
-  declare geoarea_id: string;
-  declare spostamento: 'IN CORSO' | 'RIENTRATA';
+  declare geoarea_id: number;
+  declare spostamento: 'ENTRATA' | 'USCITA';
   declare created_at: Date;
 
 

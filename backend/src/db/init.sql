@@ -75,13 +75,11 @@ CREATE TABLE geofence_imbarcazioni (
 -- ------------------------------------------------------------
 CREATE TABLE segnalazioni (
     id    INT GENERATED ALWAYS AS IDENTITY,
-    mmsi               INT          NOT NULL,
     geoarea_id         INT          NOT NULL,
     stato              VARCHAR(10)  NOT NULL DEFAULT 'IN CORSO',
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    CONSTRAINT fk_seg_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
     CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT chk_stato      CHECK (stato IN ('IN CORSO', 'RIENTRATA'))
 );
@@ -263,32 +261,32 @@ INSERT INTO geofence_imbarcazioni (geoarea_id, mmsi) VALUES
 --  segnalazioni
 -- DA RIVEDERE
 -- ------------------------------------------------------------
-INSERT INTO segnalazioni (mmsi, geoarea_id, stato, created_at) VALUES
-(247123456, 1, 'RIENTRATA',  '2025-01-10 08:15:00'),  -- Adriatica Uno      in Zona Nord Ancona
-(247234567, 1, 'IN CORSO',   '2025-01-15 10:30:00'),  -- Conero Explorer    in Zona Nord Ancona
-(247345678, 2, 'RIENTRATA',  '2025-01-20 14:00:00'),  -- San Ciriaco        in Zona Est Porto
-(215456789, 2, 'IN CORSO',   '2025-02-01 09:00:00'),  -- Marche Star        in Zona Est Porto
-(247567890, 3, 'RIENTRATA',  '2025-02-05 16:45:00'),  -- Riviera Blu        in Offshore Conero Nord
-(247890123, 3, 'IN CORSO',   '2025-02-10 11:20:00'),  -- Bora Bora          in Offshore Conero Nord
-(247789012, 4, 'RIENTRATA',  '2025-02-14 07:30:00'),  -- Don Bosco II       in Offshore Portonovo
-(247112233, 4, 'IN CORSO',   '2025-02-20 13:00:00'),  -- Medusa             in Offshore Portonovo
-(247567890, 5, 'RIENTRATA',  '2025-03-01 09:15:00'),  -- Riviera Blu        in Offshore Sirolo
-(247112233, 5, 'IN CORSO',   '2025-03-05 15:00:00'),  -- Medusa             in Offshore Sirolo
-(247789012, 6, 'RIENTRATA',  '2025-03-10 08:00:00'),  -- Don Bosco II       in Offshore Numana
-(247112233, 6, 'IN CORSO',   '2025-03-15 12:30:00'),  -- Medusa             in Offshore Numana
-(247123456, 7, 'RIENTRATA',  '2025-03-20 10:00:00'),  -- Adriatica Uno      in Adriatico Centrale 1
-(247345678, 7, 'IN CORSO',   '2025-03-25 14:45:00'),  -- San Ciriaco        in Adriatico Centrale 1
-(215456789, 7, 'RIENTRATA',  '2025-04-01 09:30:00'),  -- Marche Star        in Adriatico Centrale 1
-(247901234, 7, 'IN CORSO',   '2025-04-05 11:00:00'),  -- Eurocargo Ancona   in Adriatico Centrale 1
-(247123456, 8, 'RIENTRATA',  '2025-04-10 08:45:00'),  -- Adriatica Uno      in Adriatico Centrale 2
-(215456789, 8, 'IN CORSO',   '2025-04-15 13:15:00'),  -- Marche Star        in Adriatico Centrale 2
-(247114455, 9, 'RIENTRATA',  '2025-04-20 10:30:00'),  -- Vento di Levante   in Canale di Fano
-(247117788, 9, 'IN CORSO',   '2025-04-25 15:00:00'),  -- Orizzonte Blu      in Canale di Fano
-(247115566, 10, 'RIENTRATA', '2025-05-01 09:00:00'),  -- Porto Recanati     in Acque Pesaro
-(247118899, 10, 'IN CORSO',  '2025-05-05 11:30:00'),  -- Punta Trave        in Acque Pesaro
-(247113344, 1,  'RIENTRATA', '2025-05-10 08:00:00'),  -- Stella del Mare    in Zona Nord Ancona
-(247119900, 8,  'IN CORSO',  '2025-05-15 14:00:00'),  -- Mare Nostrum       in Adriatico Centrale 2
-(247120011, 2,  'RIENTRATA', '2025-05-20 10:15:00');  -- Costa Conero       in Zona Est Porto
+INSERT INTO segnalazioni (geoarea_id, stato, created_at) VALUES
+(1, 'RIENTRATA',  '2025-01-10 08:15:00'),  -- Adriatica Uno      in Zona Nord Ancona
+(1, 'IN CORSO',   '2025-01-15 10:30:00'),  -- Conero Explorer    in Zona Nord Ancona
+(2, 'RIENTRATA',  '2025-01-20 14:00:00'),  -- San Ciriaco        in Zona Est Porto
+(2, 'IN CORSO',   '2025-02-01 09:00:00'),  -- Marche Star        in Zona Est Porto
+(3, 'RIENTRATA',  '2025-02-05 16:45:00'),  -- Riviera Blu        in Offshore Conero Nord
+(3, 'IN CORSO',   '2025-02-10 11:20:00'),  -- Bora Bora          in Offshore Conero Nord
+(4, 'RIENTRATA',  '2025-02-14 07:30:00'),  -- Don Bosco II       in Offshore Portonovo
+(4, 'IN CORSO',   '2025-02-20 13:00:00'),  -- Medusa             in Offshore Portonovo
+(5, 'RIENTRATA',  '2025-03-01 09:15:00'),  -- Riviera Blu        in Offshore Sirolo
+(5, 'IN CORSO',   '2025-03-05 15:00:00'),  -- Medusa             in Offshore Sirolo
+(6, 'RIENTRATA',  '2025-03-10 08:00:00'),  -- Don Bosco II       in Offshore Numana
+(6, 'IN CORSO',   '2025-03-15 12:30:00'),  -- Medusa             in Offshore Numana
+(7, 'RIENTRATA',  '2025-03-20 10:00:00'),  -- Adriatica Uno      in Adriatico Centrale 1
+(7, 'IN CORSO',   '2025-03-25 14:45:00'),  -- San Ciriaco        in Adriatico Centrale 1
+(7, 'RIENTRATA',  '2025-04-01 09:30:00'),  -- Marche Star        in Adriatico Centrale 1
+(7, 'IN CORSO',   '2025-04-05 11:00:00'),  -- Eurocargo Ancona   in Adriatico Centrale 1
+(8, 'RIENTRATA',  '2025-04-10 08:45:00'),  -- Adriatica Uno      in Adriatico Centrale 2
+(8, 'IN CORSO',   '2025-04-15 13:15:00'),  -- Marche Star        in Adriatico Centrale 2
+(9, 'RIENTRATA',  '2025-04-20 10:30:00'),  -- Vento di Levante   in Canale di Fano
+(9, 'IN CORSO',   '2025-04-25 15:00:00'),  -- Orizzonte Blu      in Canale di Fano
+(10, 'RIENTRATA', '2025-05-01 09:00:00'),  -- Porto Recanati     in Acque Pesaro
+(10, 'IN CORSO',  '2025-05-05 11:30:00'),  -- Punta Trave        in Acque Pesaro
+(1,  'RIENTRATA', '2025-05-10 08:00:00'),  -- Stella del Mare    in Zona Nord Ancona
+(8,  'IN CORSO',  '2025-05-15 14:00:00'),  -- Mare Nostrum       in Adriatico Centrale 2
+(2,  'RIENTRATA', '2025-05-20 10:15:00');  -- Costa Conero       in Zona Est Porto
 
 -- ------------------------------------------------------------
 --  violazioni
@@ -445,9 +443,9 @@ INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
 (247123456, 1, 'USCITA',  '2026-06-20 18:30:00'),
 (247123456, 1, 'ENTRATA', '2026-06-21 05:45:00'),
 (247123456, 1, 'USCITA',  '2026-06-21 19:15:00'),
-(247123456, 1, 'ENTRATA', '2026-06-22 06:10:00'),
+(247123456, 1, 'ENTRATA', '2026-06-22 06:10:00'), --ultimo per geoid 1
 (247234567, 2, 'ENTRATA', '2026-06-20 08:00:00'),
 (247234567, 2, 'USCITA',  '2026-06-20 12:00:00'),
 (247234567, 2, 'ENTRATA', '2026-06-21 08:15:00'),
 (247234567, 2, 'USCITA',  '2026-06-21 13:00:00'),
-(247234567, 2, 'ENTRATA', '2026-06-22 07:45:00');
+(247234567, 2, 'USCITA', '2026-06-22 07:45:00');
