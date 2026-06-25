@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { hasMaxDecimals } from '../utils/DecimalChecker.js';
@@ -9,7 +8,7 @@ export async function checkDatiInviati(req: Request, res: Response, next: NextFu
     const result = datiInviatiSchema.safeParse(req.body);
 
     if (!result.success) {
-        // Prendiamo il primo campo che ha fallito la validazione
+        // Prendiamo il primo campo che ha fallito la validazione (path contiene il nome del campo/proprietà).
         const firstError = result.error.issues[0]!.path[0];
 
         // Mappiamo l'errore 
@@ -25,7 +24,7 @@ export async function checkDatiInviati(req: Request, res: Response, next: NextFu
             case 'stato':
                 throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
             default:
-                throw new Error("Errore di validazione generico");
+                throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         }
     }
     next();
@@ -52,4 +51,4 @@ export const datiInviatiSchema = z.object({
         .max(200)
         .refine(hasMaxDecimals),
     stato: z.enum(['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'])
-});
+}).strict(); // Modalità strict, altrimenti si possono aggiungere campi a piacere

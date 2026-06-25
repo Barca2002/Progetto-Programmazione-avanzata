@@ -34,7 +34,7 @@ const geofenceAreaSchema = z.object({
         })
     ),
     
-});
+}).strict();
 
 // Controllo del formato della richiesta tramite zod
 function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction){

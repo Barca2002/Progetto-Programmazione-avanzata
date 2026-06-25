@@ -134,7 +134,6 @@ export class AdminController {
   public async createViolazione(req: Request, res: Response){
     try{
       const data = req.body;
-      console.log(data);
       const result = await this.violazioneService.createViolazione(data);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.VIOLAZIONE_CREATED, result));
     } catch (err) {

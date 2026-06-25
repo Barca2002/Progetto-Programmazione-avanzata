@@ -13,6 +13,7 @@ import { FeatureCollection } from 'geojson';
 interface IImbarcazioneDAO {
   create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione>;
   findById(mmsi: number): Promise<Imbarcazione | null>;
+  findByUserId(user_id: number): Promise<Imbarcazione | null>;
   findAll(): Promise<Imbarcazione[]>;
   findAllByUserId(user_id: number): Promise<Imbarcazione[]>;
   update(mmsi: number, data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione>;
@@ -35,6 +36,12 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
 
   async findAll(): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll();
+  }
+
+  async findByUserId(user_id: number): Promise<Imbarcazione | null> {
+    return await Imbarcazione.findOne({
+      where: { user_id: user_id }
+    });
   }
 
   async findAllByUserId(user_id: number): Promise<Imbarcazione[]> {

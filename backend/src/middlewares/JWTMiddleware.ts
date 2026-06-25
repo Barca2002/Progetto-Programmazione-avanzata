@@ -44,28 +44,24 @@ export function checkToken (req: Request) {
 
 // Controlliamo il token, ma non ci interessa il campo is admin
 export function checkUser (req: Request, res: Response, next: NextFunction): void {
-  const jwtdecoded = checkToken(req);
-  if (jwtdecoded) next();
+  // Basta controllare il token
+  checkToken(req);
+  next();
 };
 
 // Si controlla il campo is_admin nel token
 export function checkAdmin (req: Request, res: Response, next: NextFunction): void {
   const jwtdecoded = checkToken(req);
-
-  if (!jwtdecoded){
-    throw ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_INVALID);
-  }
   if (!jwtdecoded.is_admin) {
     throw ErrorFactory.getError(AppErrorEnum.NOT_ADMIN);
   }
-
   next();
 };
 
 export function decodeJwt(token: string){
   const decodedToken = jwt.verify(token, publicKeyBase64, { algorithms: ['RS256'] }) as JwtPayload;
   if(!decodedToken){
-    throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_DECODING_ERROR);
+    throw ErrorFactory.getError(AppErrorEnum.JWT_VERIFY_ERROR);
   }
   return decodedToken;
 }
