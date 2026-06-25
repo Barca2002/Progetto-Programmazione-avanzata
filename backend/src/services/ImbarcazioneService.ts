@@ -7,6 +7,7 @@ import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
+import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
@@ -64,6 +65,35 @@ export class ImbarcazioneService {
     if (!imbarcazioni || imbarcazioni.length === 0)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     return imbarcazioni;
+  }
+
+  async getLocationPerGeoarea(): Promise<object[]> {
+    const imbarcazioni = await this.imbarcazioneDAO.findLastSpostamento();
+
+    return imbarcazioni.map(imb => {
+        const spostamenti = (imb.get('Spostamenti') as LogSpostamenti[]); 
+        /*
+        Per ogni geoarea dell'imbarcazione la query del DAO già torna un solo elemento con il timestamp più grande --> quindi otterrò un array di LogSpostamenti con tanti elementi quanti il numero di geoaree con log associati all'imbarcazione:
+        Spostamenti: [
+            { geoarea_id: 1, spostamento: 'ENTRATA', created_at: '2026-06-22 06:10:00' },
+            { geoarea_id: 7, spostamento: 'USCITA',  created_at: '2026-06-21 19:15:00' },
+            { geoarea_id: 8, spostamento: 'ENTRATA', created_at: '2026-06-20 18:30:00' },
+            ...
+        ]
+        */
+
+        return {
+            mmsi: imb.mmsi,
+            name: imb.name,
+            spostamenti: spostamenti.map(s => ({
+                geoarea_id: s.geoarea_id,
+                stato: s.spostamento === 'ENTRATA' ? 'DENTRO' : 'FUORI',
+                permanenza: s.spostamento === 'ENTRATA'
+                    ? Math.floor((Date.now() - new Date(s.created_at).getTime()) / 60000)
+                    : 0
+            }))
+        };
+    });
   }
 
   async updateImbarcazione(mmsi: number, data: Partial<ImbarcazioneCreationData>) {

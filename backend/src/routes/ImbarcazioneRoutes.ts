@@ -20,6 +20,10 @@ imbarcazioneRoutes.get("/segnalazioni/all", checkUser,  async function(req: Requ
     await imbarcazione.getAllWithSegnalazioni(req, res);
 });
 
+imbarcazioneRoutes.get("/location", checkAdmin,  async function(req: Request, res: Response) {
+    await imbarcazione.getLocationPerGeoarea(req, res);
+});
+
 // GET imbarcazione per mmsi
 imbarcazioneRoutes.get("/:mmsi", checkAdmin,  async function(req: Request, res: Response) {
     await imbarcazione.getImbarcazioneById(req, res);
