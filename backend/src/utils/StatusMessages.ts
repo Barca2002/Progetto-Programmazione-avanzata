@@ -32,8 +32,8 @@ export const ERROR_LIST = {
     USERNAME_ALREADY_EXISTS: { statusCode: 409, message: "Lo username fornito è già esistente e associato ad un altro utente." },
     JWT_SECRET_MISSING:
     { statusCode: 500, message: "Chiave privata per JWT non configurata nel file env." },
-    JWT_SECRET_DECODING_ERROR:
-    { statusCode: 500, message: "Errore nella decodifica della chiave privata per JWT." },
+    JWT_VERIFY_ERROR:
+    { statusCode: 500, message: "Errore nella verifica del token JWT." },
     JWT_PUBLIC_MISSING:
     { statusCode: 500, message: "Chiave pubblica per JWT non configurata nel file env." },
     JWT_TOKEN_ADMIN_MISSING:
@@ -109,7 +109,9 @@ export const ERROR_LIST = {
     VIOLAZIONE_NOT_FOUND:
     { statusCode: 404, message: "Nessuna violazione trovata." },
     INVALID_STATO_VIOLAZIONE:
-    {statusCode: 400, message: "Stato della violazione non ammesso." }
+    {statusCode: 400, message: "Stato della violazione non ammesso." },
+    IMBARCAZIONE_OWNERSHIP_ERROR:
+    { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." }
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.

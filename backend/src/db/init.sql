@@ -191,7 +191,8 @@ INSERT INTO geofence_areas (name, area, max_speed) VALUES
 ('Adriatico Centrale 1', ST_GeomFromText('POLYGON((13.8000 43.6500, 13.9500 43.6500, 13.9500 43.5000, 13.8000 43.5000, 13.8000 43.6500))', 4326), NULL),
 ('Adriatico Centrale 2', ST_GeomFromText('POLYGON((13.8500 43.4800, 14.0000 43.4800, 14.0000 43.3500, 13.8500 43.3500, 13.8500 43.4800))', 4326), NULL),
 ('Canale di Fano', ST_GeomFromText('POLYGON((13.8000 43.8500, 13.9500 43.8500, 13.9500 43.7500, 13.8000 43.7500, 13.8000 43.8500))', 4326), NULL),
-('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((12.8000 43.9500, 13.0000 43.9500, 13.0000 43.8500, 12.8000 43.8500, 12.8000 43.9500))', 4326), NULL);
+('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((12.8000 43.9500, 13.0000 43.9500, 13.0000 43.8500, 12.8000 43.8500, 12.8000 43.9500))', 4326), NULL),
+('ZONA TEST', ST_GeomFromText('POLYGON((100.0 100.0, 13.0000 43.9500, 13.0000 43.8500, 12.8000 43.8500, 12.8000 43.9500))', 4326), NULL);
 
 -- ------------------------------------------------------------
 --  geofence_imbarcazioni

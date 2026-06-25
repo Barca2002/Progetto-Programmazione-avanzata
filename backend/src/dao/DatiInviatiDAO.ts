@@ -28,9 +28,9 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
   }
 
   // Estrae la geofence area di un'imbarcazione in base alla sua posizione
-  async checkLocationInGeoarea(mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null> {
+  async checkLocationInGeoarea(mmsi: number, longitudine: number, latitudine: number): Promise<Geofencearea | null> {
       const db = DatabaseConnection.getInstance();
-      const results = await db.query(`SELECT ga.* FROM geofence_areas ga INNER JOIN geofence_imbarcazioni gi ON ga.geoarea_id = gi.geoarea_id WHERE gi.mmsi = :mmsi AND ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
+      const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
       {
         // Mappiamo il risultato al model Geofencearea, così otteniamo l'oggetto come risultato. Replacement sostituisce i parametri con i valori associati.
           replacements: { mmsi: mmsi, latitudine: latitudine, longitudine: longitudine },

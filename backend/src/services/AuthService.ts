@@ -60,6 +60,7 @@ export class AuthService{
     if (isNaN(id) || id <= 0) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
     }
+    return true;
   }
 
   public async login (email: string, password: string){
