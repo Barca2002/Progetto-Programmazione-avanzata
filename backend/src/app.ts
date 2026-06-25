@@ -13,7 +13,9 @@ import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
 import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioniModel.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
 import { userRoutes } from './routes/UserRoutes.js';
+import { Segnalazione } from './models/SegnalazioneModel.js';
 import { LogSpostamenti } from './models/LogSpostamentiModel.js';
+import { Violazione } from './models/ViolazioneModel.js';
 
 
 dotenv.config();
@@ -26,7 +28,9 @@ Geofencearea.inizializzaModel(DatabaseConnection.getInstance());
 Imbarcazione.inizializzaModel(DatabaseConnection.getInstance());
 GeofenceImbarcazioni.inizializzaModel(DatabaseConnection.getInstance());
 Datiinviati.inizializzaModel(DatabaseConnection.getInstance());
+Segnalazione.inizializzaModel(DatabaseConnection.getInstance());
 LogSpostamenti.inizializzaModel(DatabaseConnection.getInstance());
+Violazione.inizializzaModel(DatabaseConnection.getInstance());
 
 inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 

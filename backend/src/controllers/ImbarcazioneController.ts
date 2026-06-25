@@ -114,6 +114,19 @@ export class ImbarcazioneController {
     }
   };
 
+  public async getAllWithSegnalazioni(req: Request, res: Response){
+    try {
+      const imbarcazioni = await this.imbarcazioneService.getAllWithSegnalazioni();
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
   public async createImbarcazione(req: Request, res: Response ){
     try {
       const { mmsi, name, type } = req.body;

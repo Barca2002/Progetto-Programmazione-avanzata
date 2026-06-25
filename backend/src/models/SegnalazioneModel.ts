@@ -4,7 +4,7 @@ export interface SegnalazioneAllData {
     id: number;
     mmsi: number;
     geoarea_id: number;
-    stato: 'IN CORSO'| 'RIENTRATA';
+    stato: 'IN CORSO' | 'RIENTRATA';
     created_at: Date;
 }
 
@@ -39,9 +39,9 @@ export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreatio
             allowNull: false
         },
         created_at: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
         }
         }, {
         sequelize,

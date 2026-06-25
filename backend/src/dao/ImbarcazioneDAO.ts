@@ -5,6 +5,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
 import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
+import { Segnalazione } from '../models/SegnalazioneModel.js';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
@@ -47,6 +48,16 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         as: 'Geofenceareas', //Altrimenti dava problemi e non trovava il model (è un alias dichiarato nel model)
         attributes: ['geoarea_id', 'name'], //Specifica quali attributi mostrare
         through: { attributes: [] } //Così escludo gli attributi della tabella di collegamento
+      }]
+    });
+  }
+
+  async findAllWithSegnalazioni(): Promise<Imbarcazione[]> {
+    return await Imbarcazione.findAll({
+      include: [{
+        model: Segnalazione,
+        as: 'Segnalazioni',
+        attributes: ['geoarea_id', 'stato'], 
       }]
     });
   }
