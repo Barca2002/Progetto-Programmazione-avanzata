@@ -9,14 +9,10 @@ import { checkToken } from "../middlewares/JWTMiddleware.js";
 export class ImbarcazioneController {
   public readonly imbarcazioneService = new ImbarcazioneService();
 
-  public async getImbarcazioneById(req: Request, res: Response ){
+  public async getImbarcazioneByMmsi(req: Request, res: Response ){
     try {
       const mmsi = Number(req.params.mmsi);
-      if (isNaN(mmsi) || mmsi <= 0) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
-      const imbarcazione = await this.imbarcazioneService.getImbarcazioneById(mmsi);
+      const imbarcazione = await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
       res.json(imbarcazione);
     } catch (err) {
       if (err instanceof AppError) {
@@ -127,6 +123,19 @@ export class ImbarcazioneController {
     }
   }
 
+  public async getSegnalazioniByMmsi(req: Request, res: Response){
+    try {
+      const imbarcazione = await this.imbarcazioneService.getImbarcazioneByMmsi(req.body.mmsi);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazione));
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
   public async createImbarcazione(req: Request, res: Response ){
     try {
       const { mmsi, name, type } = req.body;
@@ -159,7 +168,7 @@ export class ImbarcazioneController {
       }
 
       await this.imbarcazioneService.updateImbarcazione(mmsi, req.body);
-      const imbarcazioneAggiornata = await this.imbarcazioneService.getImbarcazioneById(mmsi);
+      const imbarcazioneAggiornata = await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
       res.json(imbarcazioneAggiornata);
     } catch (err) {
       if (err instanceof AppError) {

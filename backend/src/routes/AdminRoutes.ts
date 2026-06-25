@@ -37,6 +37,18 @@ adminRoutes.patch("/updateTokenBalance", checkAdmin, tokenValidation, async func
     await adminController.updateTokenBalance(req, res);
 });
 
-adminRoutes.get("/checkSegnalazioni/:mmsi", checkMmsi, async function(req: Request, res: Response){
-    await adminController.checkViolazioniByMmsi(req, res);
+adminRoutes.get("/checkViolazioni/mmsi/:mmsi", checkAdmin, checkMmsi, async function(req: Request, res: Response){
+    await adminController.getViolazioniByMmsi(req, res);
+});
+
+adminRoutes.get("/checkViolazioni/geoarea/:geoarea_id", checkAdmin, async function(req: Request, res: Response){
+    await adminController.getViolazioniByGeoarea(req, res);
+});
+
+adminRoutes.get("/checkSegnalazioni/:geoarea_id", checkAdmin, async function(req: Request, res: Response){
+    await adminController.getSegnalazioniByGeoarea(req, res);
+});
+
+adminRoutes.post("/creaViolazione", checkAdmin, async function(req: Request, res: Response){
+    await adminController.createViolazione(req, res);
 });

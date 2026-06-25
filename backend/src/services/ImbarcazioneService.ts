@@ -19,9 +19,6 @@ export class ImbarcazioneService {
   async createImbarcazione(data: ImbarcazioneCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-
-      //AGGIUNGERE CONTROLLI SUI PARAMETRI DI DATA
-
       const utenteEsistente = await this.adminDAO.findById(data.user_id);
       if (!utenteEsistente) {
         throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
@@ -41,12 +38,13 @@ export class ImbarcazioneService {
     }
   }
 
-  async getImbarcazioneById(mmsi: number) {
+  async getImbarcazioneByMmsi(mmsi: number) {
     if (isNaN(mmsi) || mmsi <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
     const imbarcazione = await this.imbarcazioneDAO.findById(mmsi);
-    if (!imbarcazione)
+    if (!imbarcazione){
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    }
     return imbarcazione;
   }
 

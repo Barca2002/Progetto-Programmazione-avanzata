@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
+import { DataTypes, Sequelize, Model } from 'sequelize';
 
 export interface ViolazioneAllData {
     id: number;
@@ -8,7 +8,7 @@ export interface ViolazioneAllData {
     created_at: Date;
 }
 
-export interface ViolazioneCreationData extends Omit<Optional<ViolazioneAllData, 'mmsi'>,'created_at'> {}
+export interface ViolazioneCreationData extends Omit<ViolazioneAllData, 'id' |'created_at'> {}
 
 
 export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData> implements ViolazioneAllData {
@@ -24,7 +24,8 @@ export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData>
         id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            primaryKey: true
+            primaryKey: true,
+            autoIncrement: true
         },
         mmsi: {
             type: DataTypes.BIGINT,

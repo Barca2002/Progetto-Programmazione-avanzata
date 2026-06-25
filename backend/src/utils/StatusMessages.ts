@@ -101,9 +101,15 @@ export const ERROR_LIST = {
     INSUFFICIENT_TOKEN_BALANCE:
     { statusCode: 401, message: "Saldo token non sufficiente per effettuare la richiesta."},
     LOG_NOT_FOUND:
-    { statusCode: 404, message: "Log non found"},
+    { statusCode: 404, message: "Log dello spostamento non trovato."},
     INVALID_GEOAREA_ID:
-    { statusCode: 400, message: "Invalid geoarea id"}
+    { statusCode: 400, message: "L'id della geoarea specificato non è valido."},
+    SEGNALAZIONE_NOT_FOUND:
+    { statusCode: 404, message: "Nessuna segnalazione trovata." },
+    VIOLAZIONE_NOT_FOUND:
+    { statusCode: 404, message: "Nessuna violazione trovata." },
+    INVALID_STATO_VIOLAZIONE:
+    {statusCode: 400, message: "Stato della violazione non ammesso." }
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
@@ -133,6 +139,10 @@ export const SUCCESS_LIST = {
     { statusCode: 200, message: "Imbarcazioni con geofence associate recuperate con successo." },
     GEOAREA_CREATED:
     { statusCode: 201, message: "L'area è stata creata con successo." },
+    VIOLAZIONE_CREATED:
+    { statusCode: 201, message: "La violazione è stata creata con successo." },
+    SEGNALAZIONE_CREATED:
+    { statusCode: 201, message: "La segnalazione è stata creata con successo." },
     IMBARCAZIONE_CREATED:
     { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
     GEOAREAS_E_USER_ADDED:

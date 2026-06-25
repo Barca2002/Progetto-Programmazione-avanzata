@@ -1,7 +1,5 @@
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { QueryTypes, Transaction } from 'sequelize';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';

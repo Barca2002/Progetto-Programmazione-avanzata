@@ -1,15 +1,20 @@
 import { AdminService } from "../services/AdminService.js";
 import { Request, Response, NextFunction } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
-import { AppErrorEnum } from "../utils/StatusMessages.js";
+import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
+import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
+import { SegnalazioneService } from "../services/SegnalazioneService.js";
+import { ViolazioneService } from "../services/ViolazioneService.js";
+import { SuccessFactory } from "../factory/SuccessFactory.js";
 
 export class AdminController {
   public readonly adminService = new AdminService();
+  public readonly imbarcazioneService = new ImbarcazioneService();
+  public readonly segnalazioneService = new SegnalazioneService();
+  public readonly violazioneService = new ViolazioneService();
+  
 
-  // Quando chiamo una qualsiasi di queste funzioni sotto, passo per il Service che
-  // contiene la logica di business, il quale a sua volta usa il DAO come intermediario
-  // che sa come tradurre le operazioni in operazioni di Sequelize.
   public async getUtenti(req: Request, res: Response ){
     try {
       const utenti = await this.adminService.getUtenti();
@@ -81,7 +86,64 @@ export class AdminController {
     }
   }
 
-  public async checkViolazioniByMmsi(req: Request, res: Response){
-    
+  public async getSegnalazioniByGeoarea(req: Request, res: Response){
+    // L'mmsi va castato in number per lavorarci con le altre funzioni
+    try {
+      const geoarea_id = Number(req.params.geoarea_id);
+      const segnalazioni = await this.segnalazioneService.getSegnalazioniByGeoarea(geoarea_id);
+      res.json(segnalazioni);
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async getViolazioniByMmsi(req: Request, res: Response){
+    // L'mmsi va castato in number per lavorarci con le altre funzioni
+    try {
+      const mmsi = Number(req.params.mmsi);
+      const violazioni = await this.violazioneService.getViolazioniByMmsi(mmsi);
+      res.json(violazioni);
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async getViolazioniByGeoarea(req: Request, res: Response){
+    // L'mmsi va castato in number per lavorarci con le altre funzioni
+    try {
+      const geoarea_id = Number(req.params.geoarea_id);
+      const violazioni = await this.violazioneService.getViolazioniByGeoarea(geoarea_id);
+      res.json(violazioni);
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async createViolazione(req: Request, res: Response){
+    try{
+      const data = req.body;
+      console.log(data);
+      const result = await this.violazioneService.createViolazione(data);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.VIOLAZIONE_CREATED, result));
+    } catch (err) {
+      if (err instanceof AppError) {
+        (err as AppError).send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+
   }
 }

@@ -8,7 +8,7 @@ export interface SegnalazioneAllData {
     created_at: Date;
 }
 
-export interface SegnalazioneCreationData extends Omit<Optional<SegnalazioneAllData, 'mmsi'>,'created_at'> {}
+export interface SegnalazioneCreationData extends Omit<Optional<SegnalazioneAllData, 'mmsi'>, 'id' | 'created_at'> {}
 
 
 export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreationData> implements SegnalazioneAllData {
