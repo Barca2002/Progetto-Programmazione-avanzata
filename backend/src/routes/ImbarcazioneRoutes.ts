@@ -24,9 +24,13 @@ imbarcazioneRoutes.get("/location", checkAdmin,  async function(req: Request, re
     await imbarcazione.getLocationPerGeoarea(req, res);
 });
 
+imbarcazioneRoutes.get("/positions", checkAdmin,  async function(req: Request, res: Response) {
+    await imbarcazione.getPosizioniImbarcazione(req, res);
+});
+
 // GET imbarcazione per mmsi
 imbarcazioneRoutes.get("/:mmsi", checkAdmin,  async function(req: Request, res: Response) {
-    await imbarcazione.getImbarcazioneById(req, res);
+    await imbarcazione.getImbarcazioneByMmsi(req, res);
 });
 
 // ASSOCIA PIU GEOAREAS A PIU IMBARCAZIONI (solo admin)

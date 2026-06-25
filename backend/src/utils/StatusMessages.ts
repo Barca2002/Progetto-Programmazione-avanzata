@@ -110,6 +110,12 @@ export const ERROR_LIST = {
     { statusCode: 404, message: "Nessuna violazione trovata." },
     INVALID_STATO_VIOLAZIONE:
     {statusCode: 400, message: "Stato della violazione non ammesso." },
+    INVALID_DATE_RANGE:
+    {statusCode: 400, message: "Le date inserite non sono nel formato adeguato" },
+    INVALID_START_DATE:
+    {statusCode: 400, message: "Le data di inizio non è nel formato adeguato" },
+    INVALID_END_DATE:
+    {statusCode: 400, message: "Le data di fine non è nel formato adeguato" },
     IMBARCAZIONE_OWNERSHIP_ERROR:
     { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." }
 } as const;
@@ -155,6 +161,8 @@ export const SUCCESS_LIST = {
     { statusCode: 201, message: "Saldo token aggiornato correttamente." },
     LOG_SPOSTAMENTI_FOUND:
     { statusCode: 201, message: "Log spostamenti trovati correttamente" },
+    POSIZIONI_FOUND:
+    { statusCode: 201, message: "Posizioni trovate correttamente" },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

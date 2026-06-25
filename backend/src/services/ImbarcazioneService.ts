@@ -8,6 +8,8 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
+import { Datiinviati } from '../models/DatiInviatiModel.js';
+import { FeatureCollection } from 'geojson';
 
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
@@ -93,6 +95,30 @@ export class ImbarcazioneService {
         };
     });
   }
+
+  async getPosizioniImbarcazione(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
+    if (!Number.isFinite(mmsi) || mmsi <= 0) {
+        throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
+    }
+
+    const imbarcazione = await this.imbarcazioneDAO.findById(mmsi);
+    if (!imbarcazione) {
+        throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    }
+
+    if (!(start_date instanceof Date) || isNaN(start_date.getTime())) {
+        throw ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE);
+    }
+
+    if (!(end_date instanceof Date) || isNaN(end_date.getTime())) {
+        throw ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE);
+    }
+
+    if (start_date >= end_date) {
+        throw ErrorFactory.getError(AppErrorEnum.INVALID_DATE_RANGE);
+    }
+    return await this.imbarcazioneDAO.getGeofenceAreasGeoJson(mmsi, start_date, end_date);
+}
 
   async updateImbarcazione(mmsi: number, data: Partial<ImbarcazioneCreationData>) {
     if (!data || Object.keys(data).length === 0)
