@@ -25,7 +25,7 @@ export class GeofenceareaService {
 
   public async getAreaById(id: number) {
     if (isNaN(id) || id <= 0)
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
     const area = await this.geofenceareaDAO.findById(id);
     if (!area){
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);

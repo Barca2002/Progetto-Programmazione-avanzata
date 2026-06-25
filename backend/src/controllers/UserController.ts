@@ -6,10 +6,14 @@ import { AppError } from "../models/AppErrorModel.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { decodeJwt } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
+import { ViolazioneService } from "../services/ViolazioneService.js";
+import { SegnalazioneService } from "../services/SegnalazioneService.js";
 
 export class UserController {
   public readonly datiinviatiService = new DatiInviatiService();
   public readonly imbarcazioneService = new ImbarcazioneService();
+  public readonly violazioneService = new ViolazioneService();
+  public readonly segnalazioneService = new SegnalazioneService();
 
   public async sendData(req: Request, res: Response ){
     try {
@@ -20,7 +24,8 @@ export class UserController {
       const user_id = decodeJwt(token!).user_id;
       // invio dei dati
       await this.datiinviatiService.sendData(data, user_id!);
-
+      await this.violazioneService.checkIfViolazione(data);
+      await this.segnalazioneService.checkIfSegnalazione();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
     } catch (err) {
       if (err instanceof AppError) {

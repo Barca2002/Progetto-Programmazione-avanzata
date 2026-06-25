@@ -40,4 +40,8 @@ export class SegnalazioneService{
         }
         return segnalazioni;
     }
+
+    async checkIfSegnalazione(){
+        
+    }
 }

@@ -6,12 +6,17 @@ import { GeofenceareaService } from './GeofenceareaService.js';
 import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js';
 import { ViolazioneCreationData } from '../models/ViolazioneModel.js';
+import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
+import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
+import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 
 export class ViolazioneService{
 
     private violazioneDAO = new ViolazioneDAO();
     private geofenceareaService = new GeofenceareaService();
     private imbarcazioneService = new ImbarcazioneService();
+    private datiinviatiDAO = new DatiinviatiDAO();
+    private geofenceimbarcazioniDAO = new GeofenceImbarcazioniDAO();
 
     async createViolazione(data: ViolazioneCreationData){
         const t = await DatabaseConnection.getInstance().transaction();
@@ -31,7 +36,6 @@ export class ViolazioneService{
             await t.commit();
             return result;
         } catch (err) {
-            console.log(err);
             await t.rollback();
             if (err instanceof AppError) { 
                 throw err;
@@ -64,5 +68,31 @@ export class ViolazioneService{
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
         return violazioni;
+    }
+
+    async checkIfViolazione(data: DatiinviatiCreationData, ){
+        const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, data.longitudine, data.latitudine);
+        const allowedGeoareas = await this.geofenceimbarcazioniDAO.findAllByMmsi(data.mmsi);
+        if(!geoarea_found){
+            throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+        }
+        /* 
+        * ------------------------------------
+        * In questo momento la funzione genera due violazioni se avvengono entrambe contemporaneamente. Chiedi se va cambiato
+        * -----------------------------------
+        */ 
+
+
+        if(data.velocita_kmh > geoarea_found.max_speed){
+            // Creiamo la violazione per eccesso di velocità
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: geoarea_found.geoarea_id, tipo: 'ECCESSO VELOCITA'};
+            await this.createViolazione(dataViolazione);
+        }
+        // some controlla se almeno un elemento soddisfa la condizione definita.
+        if(!allowedGeoareas.some(g => g.geoarea_id === geoarea_found!.geoarea_id)){
+            // Creiamo la violazione per accesso ad una area non autorizzata
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: geoarea_found.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA'};
+            await this.createViolazione(dataViolazione);
+        }
     }
 }

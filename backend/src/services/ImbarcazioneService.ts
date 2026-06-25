@@ -201,4 +201,8 @@ export class ImbarcazioneService {
     }
     return true;
   }
+
+  async getAllowedGeoareas(){
+    
+  }
 }
