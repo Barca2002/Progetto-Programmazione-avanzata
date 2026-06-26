@@ -7,7 +7,7 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 interface IDatiinviatiDAO {
   create(data: DatiinviatiCreationData, t: Transaction): Promise<Datiinviati>;
   findAllByMmsi(mmsi: number): Promise<Datiinviati[]>;
-  checkLocationInGeoarea(mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null>
+  getGeoareaByPosition(mmsi: number, latitudine: number, longitudine: number): Promise<Geofencearea | null>
 }
 
 export class DatiinviatiDAO implements IDatiinviatiDAO {
@@ -28,7 +28,7 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
   }
 
   // Estrae la geofence area di un'imbarcazione in base alla sua posizione
-  async checkLocationInGeoarea(mmsi: number, longitudine: number, latitudine: number): Promise<Geofencearea | null> {
+  async getGeoareaByPosition(mmsi: number, longitudine: number, latitudine: number): Promise<Geofencearea | null> {
       const db = DatabaseConnection.getInstance();
       const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
       {

@@ -33,7 +33,7 @@ export class DatiInviatiService {
     // -------------------------------
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const current_geoarea = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, data.longitudine, data.latitudine);
+      const current_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
       //Controllo se ha trovato una geoarea in cui risiede il punto
       if(!current_geoarea){
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
@@ -50,7 +50,7 @@ export class DatiInviatiService {
         }
       } else {
         // Dall'ultimo spostamento/dato inivato ricaviamo la sua geoarea.
-        const last_geoarea = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
+        const last_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
         if(!last_geoarea){
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
