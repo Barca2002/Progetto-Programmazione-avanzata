@@ -22,19 +22,24 @@ export class DatabaseConnection {
         throw ErrorFactory.getError(AppErrorEnum.ENV_VARIABLES_MISSING);
       }
       // Istanziamo la connessione con Sequelize
-      this.instance = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-        host: DB_HOST!,
-        port: Number(DB_PORT)!,
-        dialect: 'postgres',
-        timezone: 'Europe/Rome'
+      this.instance = new Sequelize(
+        {
+          database: DB_NAME || "db_app",
+          username: DB_USER || "postgres",
+          password: DB_PASSWORD || "",
+          host: DB_HOST || "localhost",
+          port: Number(DB_PORT) || 5432,
+          dialect: 'postgres',
+          timezone: 'Europe/Rome'
       });
 	}
 
   public static getInstance(): Sequelize {
-      if (!DatabaseConnection.connDB) { //se non esiste la connessione la crea
+      //se non esiste la connessione la crea
+      if (!DatabaseConnection.connDB) { 
           DatabaseConnection.connDB = new DatabaseConnection();
       }
-      return DatabaseConnection.connDB.instance; //torna la connessione attiva
+      return DatabaseConnection.connDB.instance; // torna l'istanza di sequelize
   }
       
 } 
