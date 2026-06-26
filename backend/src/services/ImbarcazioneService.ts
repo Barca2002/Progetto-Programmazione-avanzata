@@ -80,7 +80,6 @@ export class ImbarcazioneService {
             ...
         ]
         */
-
         return {
             mmsi: imb.mmsi,
             name: imb.name,

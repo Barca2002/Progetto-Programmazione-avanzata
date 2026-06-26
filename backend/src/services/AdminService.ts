@@ -7,8 +7,8 @@ import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AuthService } from '../services/AuthService.js';
 
 export class AdminService {
-  private readonly adminDAO = new AdminDAO();
-  private readonly authService = new AuthService();
+  private adminDAO = new AdminDAO();
+  private authService = new AuthService();
 
   public async createUtente (data: UserCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
