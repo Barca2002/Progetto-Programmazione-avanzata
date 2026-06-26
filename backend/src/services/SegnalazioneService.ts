@@ -60,14 +60,9 @@ export class SegnalazioneService{
         }
         const ultimaViolazione = allViolazioni[0]!;
         const penultimaViolazione = allViolazioni[1]!;
-        console.log("ultima violazione");
-        console.log(ultimaViolazione.created_at);
-        console.log("penultima violazione");
-        console.log(penultimaViolazione.created_at);
-        console.log("---------------");
         
         // Se l'ultima violazione è avvenuta al massimo 1 ora dopo la penultima, non deve essere contata.
-        const includiUltimaViolazione = (ultimaViolazione.created_at.getTime() - penultimaViolazione.created_at.getTime()) < 60 * 60 * 1000; // cambia in >
+        const includiUltimaViolazione = (ultimaViolazione.created_at.getTime() - penultimaViolazione.created_at.getTime()) > 60 * 60 * 1000;
 
         // Per definire la finestra temporale bisogna decidere qual'è la violazione di partenza (ultima o penultima).
         const violazioneDiPartenza = includiUltimaViolazione ? penultimaViolazione : ultimaViolazione;
@@ -79,33 +74,24 @@ export class SegnalazioneService{
         const inizioFinestra = startTime;
         const fineFinestra = startTime - 2 * 24 * 60 * 60 * 1000;
 
-        console.log("INIZIO E FINE FINESTRA")
-        console.log(new Date(inizioFinestra));
-        console.log(new Date(fineFinestra));
-        console.log("-----------");
-
         // Filtriamo le violazioni in base al vincolo temporale
         const violazioniValide = allViolazioni.filter(v => {
 
-        const t = new Date(v.created_at).getTime();
-        console.log(new Date(t));
-        console.log(t <= inizioFinestra && t >= fineFinestra);
-        return (t <= inizioFinestra && t >= fineFinestra);
+            const t = new Date(v.created_at).getTime();
+            return (t <= inizioFinestra && t >= fineFinestra);
         });
 
         // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea.
         if (violazioniValide.length > 5) {
             // Se già c'è una segnalazione in corso, non serve ricrearla
-            if (await this.segnalazioneDao.findLastInCorsoByGeoarea){
-                console.log("violazione in corso già presente");
+            if (await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id)){
                 return;
             }
-            console.log("segnalazione in corso non presente, creazione");
             // Se non c'è una segnalazione in corso, la creiamo
             const t = await DatabaseConnection.getInstance().transaction();
             try {
                 const newSegnalazione: SegnalazioneCreationData = {geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO"}
-                await this.segnalazioneDao.create(newSegnalazione,t )
+                await this.segnalazioneDao.create(newSegnalazione, t)
                 await t.commit()
             } catch (err) {
                 await t.rollback();
@@ -113,18 +99,15 @@ export class SegnalazioneService{
                     throw err;
                 }
                 throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-            }
-            
+            } 
         } else {
-            console.log("violazioni valide minori di 6");
             const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id);
             
             if (!lastSegnalazioneInCorso){
-                console.log("nessuna segnalazione in corso");
                 // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
                 return;
             }
-            
+            // Se c'è almeno una violazione (meno di 6), setta lo stato della segnalazione associata a quella geoarea a RIENTRATA.
             const t = await DatabaseConnection.getInstance().transaction();
             try {
                 const data: Partial<SegnalazioneCreationData> = {stato: "RIENTRATA"}

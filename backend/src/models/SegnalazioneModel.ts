@@ -22,7 +22,8 @@ export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreatio
         id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            primaryKey: true
+            primaryKey: true,
+            autoIncrement: true
         },
         geoarea_id: {
             type: DataTypes.INTEGER,

@@ -122,6 +122,9 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Errore diminuzione token." },
     LAST_POSITION_ERROR:
         { statusCode: 400, message: "Ultima posizione non trovata." },
+    ROUTE_NOT_FOUND:
+        { statusCode: 404, message: "Rotta non trovata." },
+
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.

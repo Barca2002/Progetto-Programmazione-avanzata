@@ -26,11 +26,6 @@ export class DatiInviatiService {
     // Passiamo l'user_id estratto dal token JWT per controllare se è il proprietario della barca.
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
     const allowedGeoareas = this.geofenceImbarcazioniDAO.findAllByMmsi(data.mmsi);
-    // -------------------------------
-    // CHIEDERE SE BISOGNA CONTROLLARE CHE LA POSIZIONE INVIATA SIA PER FORZA
-    // DENTRO UNA GEOAREA!
-    // NO, i dati di posizione possono essere dovunque
-    // -------------------------------
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const current_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
@@ -54,9 +49,9 @@ export class DatiInviatiService {
         if(!last_geoarea){
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
-
         // Prima di tutto controlliamo se la geoarea precedente e corrente sono diverse, se lo sono c'è stata un'entrata ed un'uscita. Altrimenti, se sono uguali, non c'è stata nessuna uscita o entrata.
         if(last_geoarea.geoarea_id !== current_geoarea.geoarea_id){
+
           const lastAreaIsAllowed: boolean = (await allowedGeoareas).some(g => g.geoarea_id === last_geoarea.geoarea_id);
           // CASO 1 : entrambe le zone sono autorizzate/associate. Quindi si deve loggare sia l'uscita che l'entrata.
           if(lastAreaIsAllowed && currentAreaIsAllowed){;

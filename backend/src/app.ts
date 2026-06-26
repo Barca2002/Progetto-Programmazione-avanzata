@@ -16,6 +16,8 @@ import { UserRouter } from './routes/UserRoutes.js';
 import { Segnalazione } from './models/SegnalazioneModel.js';
 import { LogSpostamenti } from './models/LogSpostamentiModel.js';
 import { Violazione } from './models/ViolazioneModel.js';
+import { ErrorFactory } from './factory/ErrorFactory.js';
+import { AppErrorEnum } from './utils/StatusMessages.js';
 
 
 dotenv.config();
@@ -52,11 +54,14 @@ app.use("/imbarcazione", imbarcazioneRouter);
 app.use("/user", UserRouter);
 
 
-// Inserire gestione delle rotte mancanti (404)
-// Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR
+// Error handler delle rotte inesistenti (404). Express prova tutte le rotte e se non trova niente, chiama questo middleware, il quale genera questa eccezione e poi la manda all'error handler generale. Va messo prima dell'error handler generale, altrimenti userebbe quello di default di express, il quale include l'HTML.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  next(ErrorFactory.getError(AppErrorEnum.ROUTE_NOT_FOUND));
+});
+// Error handler generale (middleware di errore definito dai parametri nella firma), viene chiamato quando un next(err) gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR con i middleware normali (senza parametro err).
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {
-    err.send(res);
+    return err.send(res);
   } else {
     console.log("Errore imprevisto: ");
     console.log(err);
