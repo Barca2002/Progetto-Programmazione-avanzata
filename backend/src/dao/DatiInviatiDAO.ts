@@ -19,7 +19,6 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
         longitudine: data.longitudine,
         velocita_kmh: data.velocita_kmh,
         stato: data.stato,
-        timestamp: Date.now()
       }, { transaction: t });
   }
 

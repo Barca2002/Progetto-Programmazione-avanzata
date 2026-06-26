@@ -47,7 +47,8 @@ export class Datiinviati extends Model<DatiinviatiAllData, DatiinviatiCreationDa
       },
       timestamp: {
         type: DataTypes.BIGINT,
-        allowNull: false
+        allowNull: false,
+        defaultValue: Date.now() //formato linux epoch
       },
       stato: {
         type: DataTypes.ENUM("IN NAVIGAZIONE", "IN PESCA", "STAZIONARIA"),
