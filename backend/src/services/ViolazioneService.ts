@@ -80,12 +80,14 @@ export class ViolazioneService{
             // Creiamo la violazione per eccesso di velocità
             const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA'};
             await this.createViolazione(dataViolazione);
+            // AGGIUNGI ASSOCIAZIONE DELLA VIOLAZIONE ALLA BARCA
         }
         // .some() controlla se almeno un elemento soddisfa la condizione definita.
         if(!allowedGeoareas.some(g => g.geoarea_id === current_area!.geoarea_id)){
             // Creiamo la violazione per accesso ad una area non autorizzata
             const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA'};
             await this.createViolazione(dataViolazione);
+            // AGGIUNGI ASSOCIAZIONE DELLA VIOLAZIONE ALLA BARCA
         }
         return;
     }
