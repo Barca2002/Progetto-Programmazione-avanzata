@@ -32,6 +32,7 @@ Segnalazione.inizializzaModel(DatabaseConnection.getInstance());
 LogSpostamenti.inizializzaModel(DatabaseConnection.getInstance());
 Violazione.inizializzaModel(DatabaseConnection.getInstance());
 
+
 inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
 const app = express();

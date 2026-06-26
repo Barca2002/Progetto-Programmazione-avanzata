@@ -8,6 +8,7 @@ import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { FeatureCollection } from 'geojson';
+import { ImbarcazioniSegnalazioni } from '../models/ImbarcazioniSegnalazioniModel.js';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
@@ -15,6 +16,7 @@ interface IImbarcazioneDAO {
   findById(mmsi: number): Promise<Imbarcazione | null>;
   findByUserId(user_id: number): Promise<Imbarcazione | null>;
   findAll(): Promise<Imbarcazione[]>;
+  findAllWithSegnalazioni(): Promise<Imbarcazione[]>;
   findAllByUserId(user_id: number): Promise<Imbarcazione[]>;
   update(mmsi: number, data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione>;
   delete(mmsi: number, t: Transaction): Promise<number>;
@@ -54,16 +56,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         as: 'Geofenceareas', //Altrimenti dava problemi e non trovava il model (è un alias dichiarato nel model)
         attributes: ['geoarea_id', 'name'], //Specifica quali attributi mostrare
         through: { attributes: [] } //Così escludo gli attributi della tabella di collegamento
-      }]
-    });
-  }
-
-  async findAllWithSegnalazioni(): Promise<Imbarcazione[]> {
-    return await Imbarcazione.findAll({
-      include: [{
-        model: Segnalazione,
-        as: 'Segnalazioni',
-        attributes: ['geoarea_id', 'stato'], 
       }]
     });
   }
@@ -166,6 +158,23 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         }
       ]
     });
+  }
+
+  async findAllWithSegnalazioni(): Promise<Imbarcazione[]> {
+      return await Imbarcazione.findAll({
+          attributes: ['mmsi', 'name'],
+          include: [
+              {
+                  model: Segnalazione,
+                  as: 'Segnalazioni',
+                  attributes: ['stato'],
+                  through: {
+                      attributes: []
+                  },
+                  required: true
+              }
+          ]
+      });
   }
 
   async update(mmsi: number, data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione> {

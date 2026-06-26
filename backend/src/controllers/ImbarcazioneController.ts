@@ -112,8 +112,8 @@ export class ImbarcazioneController {
 
   public async getAllWithSegnalazioni(req: Request, res: Response){
     try {
-      const imbarcazioni = await this.imbarcazioneService.getAllWithSegnalazioni();
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
+      const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllWithSegnalazioni();
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);

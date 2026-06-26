@@ -7,6 +7,7 @@ import { Segnalazione } from './SegnalazioneModel.js';
 import { Violazione } from './ViolazioneModel.js';
 import { Datiinviati } from './DatiInviatiModel.js';
 
+
 export function inizializzaAssociazioni(): void {
 
     // GEOAREA CON IMBARCAZIONE (N:N)
@@ -66,28 +67,22 @@ export function inizializzaAssociazioni(): void {
         as: 'Geofencearea'
     });
 
-    // IMBARCAZIONE CON SEGNALAZIONE (1:N)
-    Imbarcazione.hasMany(Segnalazione, {
+    // IMBARCAZIONE CON SEGNALAZIONE (N:N)
+    Imbarcazione.belongsToMany(Segnalazione, {
+        through: 'imbarcazioni_segnalazioni',
+        timestamps: false,
         foreignKey: 'mmsi',
+        otherKey: 'id_segnalazione',
         as: 'Segnalazioni'
     });
 
-    // N:1 — Un LogSpostamenti appartiene a una sola Imbarcazione tramite la foreign key mmsi
-    Segnalazione.belongsTo(Imbarcazione, {
-        foreignKey: 'mmsi',
-        as: 'Imbarcazione'
-    });
 
-    // 1:N — Una Geofencearea può avere molte Segnalazioni tramite la foreign key geoarea_id
-    Geofencearea.hasMany(Segnalazione, {
-        foreignKey: 'geoarea_id',
-        as: 'Segnalazioni'
-    });
-
-    // N:1 — Una Segnalazione appartiene a una sola Geofencearea tramite la foreign key geoarea_id
-    Segnalazione.belongsTo(Geofencearea, {
-        foreignKey: 'geoarea_id',
-        as: 'Geofencearea'
+    Segnalazione.belongsToMany(Imbarcazione, {
+        through: 'imbarcazioni_segnalazioni',
+        timestamps: false,
+        foreignKey: 'id_segnalazione',
+        otherKey: 'mmsi',
+        as: 'Imbarcazioni'
     });
 
     // IMBARCAZIONE E GEOAREA CON VIOLAZIONE (1:N)

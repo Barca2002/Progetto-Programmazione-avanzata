@@ -137,7 +137,7 @@ CREATE TABLE log_spostamenti (
 -- ------------------------------------------------------------
 --  TABELLA: segnalazioni_imbarcazioni
 -- ------------------------------------------------------------
-CREATE TABLE segnalazioni_imbarcazioni (
+CREATE TABLE imbarcazioni_segnalazioni (
     id_segnalazione INT NOT NULL,
     mmsi            INT NOT NULL,
 
@@ -578,7 +578,7 @@ INSERT INTO dati_inviati (mmsi, latitudine, longitudine, velocita_kmh, "timestam
 -- ------------------------------------------------------------
 --  segnalazioni_imbarcazioni
 -- ------------------------------------------------------------
-INSERT INTO segnalazioni_imbarcazioni (id_segnalazione, mmsi) VALUES
+INSERT INTO imbarcazioni_segnalazioni (id_segnalazione, mmsi) VALUES
 (1,  247123456),  -- segnalazione 1  (geoarea 1)  → Adriatica Uno
 (2,  247234567),  -- segnalazione 2  (geoarea 1)  → Conero Explorer
 (3,  247345678),  -- segnalazione 3  (geoarea 2)  → San Ciriaco
