@@ -15,10 +15,14 @@ export class AdminController {
   public readonly violazioneService = new ViolazioneService();
   
 
-  public async getUtenti(req: Request, res: Response ){
+  public async getUtenti(req: Request, res: Response) {
     try {
       const utenti = await this.adminService.getUtenti();
-      res.json(utenti);
+      const sanitized = utenti.map(user => {
+      const { password, ...rest } = user.get({ plain: true });
+      return rest;
+    });
+    res.json(sanitized);
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);
@@ -26,7 +30,7 @@ export class AdminController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
-  };
+  }
 
   public async getUtenteById(req: Request, res: Response ){
     try {
