@@ -46,6 +46,7 @@ export class SegnalazioneService{
         return segnalazioni;
     }
 
+    // Funzione per controllare se generare o no una segnalazione per una geoarea.
     async checkIfSegnalazione(data: DatiinviatiCreationData){
         const current_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
         if(!current_geoarea){
