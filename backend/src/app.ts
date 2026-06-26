@@ -1,18 +1,18 @@
 import express, { Response, Request, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/AuthRoutes.js';
-import { adminRoutes } from './routes/AdminRoutes.js';
+import { adminRouter } from './routes/AdminRoutes.js';
 import { AppError } from './models/AppErrorModel.js';
 import { DatabaseConnection } from './singleton/DBConnection.js';
 import { User } from './models/UserModel.js';
 import { Geofencearea } from './models/GeofenceareaModel.js';
-import { geofenceareaRoutes } from './routes/GeofenceareaRoutes.js';
+import { geofenceareaRouter } from './routes/GeofenceareaRoutes.js';
 import { Imbarcazione } from './models/ImbarcazioneModel.js';
-import { imbarcazioneRoutes } from './routes/ImbarcazioneRoutes.js';
+import { imbarcazioneRouter } from './routes/ImbarcazioneRoutes.js';
 import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
 import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioniModel.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
-import { userRoutes } from './routes/UserRoutes.js';
+import { UserRouter } from './routes/UserRoutes.js';
 import { Segnalazione } from './models/SegnalazioneModel.js';
 import { LogSpostamenti } from './models/LogSpostamentiModel.js';
 import { Violazione } from './models/ViolazioneModel.js';
@@ -45,10 +45,10 @@ app.get('/', (req, res) => {
 
 // Rotte varie
 app.use("/auth", authRouter);
-app.use("/admin", adminRoutes);
-app.use("/geoarea", geofenceareaRoutes);
-app.use("/imbarcazione", imbarcazioneRoutes);
-app.use("/user", userRoutes);
+app.use("/admin", adminRouter);
+app.use("/geoarea", geofenceareaRouter);
+app.use("/imbarcazione", imbarcazioneRouter);
+app.use("/user", UserRouter);
 
 
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR

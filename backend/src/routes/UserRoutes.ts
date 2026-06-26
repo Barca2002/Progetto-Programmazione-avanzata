@@ -4,7 +4,7 @@ import { checkUserRole } from "../middlewares/JWTMiddleware.js";
 import { tokenBalanceCheck } from "../middlewares/TokenMiddleware.js";
 import { checkDatiInviati } from "../middlewares/DatiInviatiMiddleware.js";
 
-export const userRoutes = Router();
+export const UserRouter = Router();
 const userController = new UserController();
 
 // Invio dati istantanei (user)
@@ -15,7 +15,7 @@ const userController = new UserController();
 //     "velocita_kmh": 65.34,
 //     "stato": "IN NAVIGAZIONE"
 // }
-userRoutes.get("/sendData", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
+UserRouter.get("/sendData", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
     await userController.sendData(req, res);
 });
 

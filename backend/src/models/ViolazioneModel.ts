@@ -4,7 +4,7 @@ export interface ViolazioneAllData {
     id: number;
     mmsi: number;
     geoarea_id: number;
-    tipo: 'ECCESSO VELOCITA'| 'ACCESSO AREA NON AUTORIZZATA';
+    tipo: string;
     created_at: Date;
 }
 
@@ -15,7 +15,7 @@ export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData>
     declare id: number;
     declare mmsi: number;
     declare geoarea_id: number;
-    declare tipo: 'ECCESSO VELOCITA'| 'ACCESSO AREA NON AUTORIZZATA';
+    declare tipo: string;
     declare created_at: Date;
 
 
@@ -36,7 +36,7 @@ export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData>
             allowNull: false
         },
         tipo: {
-            type: DataTypes.STRING(255),
+            type: DataTypes.ENUM('ECCESSO VELOCITA', 'ACCESSO AREA NON AUTORIZZATA'),
             allowNull: false
         },
         created_at: {
