@@ -8,7 +8,6 @@ import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { FeatureCollection } from 'geojson';
-import { ImbarcazioniSegnalazioni } from '../models/ImbarcazioniSegnalazioniModel.js';
 
 //Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
 interface IImbarcazioneDAO {
@@ -167,7 +166,7 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
               {
                   model: Segnalazione,
                   as: 'Segnalazioni',
-                  attributes: ['stato'],
+                  attributes: ['id', 'stato', 'created_at'],
                   through: {
                       attributes: []
                   },

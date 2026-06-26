@@ -45,7 +45,7 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
   async findLastDatoInviato(mmsi: number): Promise<Datiinviati | null> {
       return await Datiinviati.findOne({
           where: { mmsi: mmsi },
-          order: [['timestamp', 'DESC']], // Ordina dal più recente al più vecchio
+          order: [['created_at', 'DESC']], // Ordina dal più recente al più vecchio
       });
     }
 }

@@ -109,7 +109,7 @@ CREATE TABLE dati_inviati (
     latitudine     DECIMAL(9,6)    NOT NULL,
     longitudine    DECIMAL(9,6)    NOT NULL,
     velocita_kmh   DECIMAL(6,2)    NOT NULL,
-    timestamp      BIGINT          NOT NULL, -- Formato linux epoch
+    created_at      BIGINT          NOT NULL, -- Formato linux epoch
     stato          VARCHAR(15)     NOT NULL,
     
     PRIMARY KEY (id),
@@ -465,7 +465,7 @@ INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
 -- ------------------------------------------------------------
 --  dati_inviati
 -- ------------------------------------------------------------
-INSERT INTO dati_inviati (mmsi, latitudine, longitudine, velocita_kmh, "timestamp", stato) VALUES
+INSERT INTO dati_inviati (mmsi, latitudine, longitudine, velocita_kmh, created_at, stato) VALUES
 -- Adriatica Uno (247123456) - 20/21/22 Giugno 2026
 (247123456, 43.6800, 13.5100, 12.50, 1781942400000, 'IN NAVIGAZIONE'),  -- 2026-06-20 08:00
 (247123456, 43.6850, 13.5150, 15.00, 1781946000000, 'IN NAVIGAZIONE'),  -- 2026-06-20 09:00
