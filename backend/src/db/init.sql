@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 DROP TABLE IF EXISTS log_spostamenti;
 DROP TABLE IF EXISTS violazioni;
 DROP TABLE IF EXISTS dati_inviati;
-DROP TABLE IF EXISTS segnalazioni_imbarcazioni;
+DROP TABLE IF EXISTS imbarcazioni_segnalazioni;
 DROP TABLE IF EXISTS segnalazioni;
 DROP TABLE IF EXISTS geofence_imbarcazioni;
 DROP TABLE IF EXISTS geofence_areas;
@@ -142,6 +142,7 @@ CREATE TABLE imbarcazioni_segnalazioni (
     mmsi            INT NOT NULL,
 
     PRIMARY KEY (id_segnalazione, mmsi),
+    UNIQUE (id_segnalazione), -- Ogni segnalazione è associata a una sola imbarcazione --
     CONSTRAINT fk_si_segnalazione FOREIGN KEY (id_segnalazione) REFERENCES segnalazioni(id) ON DELETE CASCADE,
     CONSTRAINT fk_si_mmsi         FOREIGN KEY (mmsi)            REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE
 );
