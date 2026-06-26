@@ -25,9 +25,9 @@ export class UserController {
       const authHeader = req.headers['authorization'];
       const token = authHeader!.split(' ')[1];
       const user_id = decodeJwt(token!).user_id;
-      // invio dei dati
+      // Invio dei dati con i relativi controlli e logging dello spostamento
       await this.datiinviatiService.sendData(data, user_id!);
-      // Togliamo i token per la richiesta.
+      // Scaliamo i token per la richiesta.
       await this.spendToken(user_id);
       // Controllo se generare una violazione ed eventualmente una segnalazione.
       await this.violazioneService.checkIfViolazione(data);
