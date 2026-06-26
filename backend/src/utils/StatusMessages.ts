@@ -67,7 +67,7 @@ export const ERROR_LIST = {
     INVALID_LONGITUDINE:
     { statusCode: 400, message: "La longitudine deve essere un numero compreso tra -180 e 180." },
     INVALID_STATO:
-    { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIO." },
+    { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIA." },
     INVALID_VELOCITA:
     { statusCode: 400, message: "La velocità deve essere un numero positivo e non superiore a 200 km/h." },
     MAX_SPEED_LIMIT:
@@ -120,6 +120,8 @@ export const ERROR_LIST = {
     { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." },
     TOKEN_SPEND_ERROR:
     { statusCode: 400, message: "Errore diminuzione token." },
+    LAST_POSITION_ERROR:
+    { statusCode: 400, message: "Ultima posizione non trovata." },
 } as const;
 
 // Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.

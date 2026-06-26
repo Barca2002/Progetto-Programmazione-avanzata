@@ -50,7 +50,7 @@ export class Datiinviati extends Model<DatiinviatiAllData, DatiinviatiCreationDa
         allowNull: false
       },
       stato: {
-        type: DataTypes.STRING(15),
+        type: DataTypes.ENUM("IN NAVIGAZIONE", "IN PESCA", "STAZIONARIA"),
         allowNull: false
       }
     }, {

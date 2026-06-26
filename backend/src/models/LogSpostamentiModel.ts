@@ -1,10 +1,18 @@
 import { DataTypes, Sequelize, Model } from 'sequelize';
+export interface LogSpostamentiAllData {
+  id: number;
+  mmsi: number;
+  geoarea_id: number;
+  spostamento: string;
+  created_at: Date;
+}
 
+export interface LogSpostamentiCreationData extends Omit<LogSpostamentiAllData, 'id' | 'created_at'> {}
 export class LogSpostamenti extends Model {
   declare id: number;
   declare mmsi: number;
   declare geoarea_id: number;
-  declare spostamento: 'ENTRATA' | 'USCITA';
+  declare spostamento: string;
   declare created_at: Date;
 
 
@@ -13,7 +21,8 @@ export class LogSpostamenti extends Model {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       mmsi: {
         type: DataTypes.BIGINT,
@@ -24,7 +33,7 @@ export class LogSpostamenti extends Model {
         allowNull: false
       },
       spostamento: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.ENUM("ENTRATA", "USCITA"),
         allowNull: false
       },
       created_at: {

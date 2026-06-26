@@ -9,6 +9,7 @@ import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { TokenService } from "../services/TokenService.js";
+import { LogSpostamentiService } from "../services/LogSpostamentiService.js";
 
 export class UserController {
   public readonly datiinviatiService = new DatiInviatiService();
