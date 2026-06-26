@@ -1,31 +1,33 @@
 import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
-import { checkAdmin } from "../middlewares/JWTMiddleware.js";
+import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 import { tokenValidation } from "../middlewares/TokenMiddleware.js";
 import { checkMmsi } from "../middlewares/ImbarcazioniMiddleware.js";
 
-export const adminRoutes = Router();
+export const adminRouter = Router();
 const adminController = new AdminController();
 
+// Applichiamo i middleware definiti qui in tutte le rotte.
+adminRouter.use(checkAdminRole);
+
 // GET tutti utenti
-adminRoutes.get("/all", checkAdmin, async function(req: Request, res: Response){
+adminRouter.get("/all", async function(req: Request, res: Response){
     await adminController.getUtenti(req, res);
 });
 
 // GET utente per ID
-adminRoutes.get("/:id", checkAdmin, async function(req: Request, res: Response){
+adminRouter.get("/:id", async function(req: Request, res: Response){
     await adminController.getUtenteById(req, res);
 });
 // UPDATE utente
-adminRoutes.patch("/update/:id", checkAdmin, async function(req: Request, res: Response){
+adminRouter.patch("/update/:id", async function(req: Request, res: Response){
     await adminController.updateUtente(req, res);
 }); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perchè put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
 // DELETE utente
-adminRoutes.delete("/delete/:id", checkAdmin, async function(req: Request, res: Response){
+adminRouter.delete("/delete/:id", async function(req: Request, res: Response){
     await adminController.deleteUtente(req, res);
 });
-
 
 // Questa rotta permette di settare il saldo dei token di un utente.
 // Il format della richiesta deve essere:
@@ -33,22 +35,22 @@ adminRoutes.delete("/delete/:id", checkAdmin, async function(req: Request, res: 
 //      newTokenAmount: <valore>,
 //      email: "<email>"
 //  }
-adminRoutes.patch("/updateTokenBalance", checkAdmin, tokenValidation, async function(req: Request, res: Response){
+adminRouter.patch("/updateTokenBalance", tokenValidation, async function(req: Request, res: Response){
     await adminController.updateTokenBalance(req, res);
 });
 
-adminRoutes.get("/checkViolazioni/mmsi/:mmsi", checkAdmin, checkMmsi, async function(req: Request, res: Response){
+adminRouter.get("/checkViolazioni/mmsi/:mmsi", checkMmsi, async function(req: Request, res: Response){
     await adminController.getViolazioniByMmsi(req, res);
 });
 
-adminRoutes.get("/checkViolazioni/geoarea/:geoarea_id", checkAdmin, async function(req: Request, res: Response){
+adminRouter.get("/checkViolazioni/geoarea/:geoarea_id", checkAdminRole, async function(req: Request, res: Response){
     await adminController.getViolazioniByGeoarea(req, res);
 });
 
-adminRoutes.get("/checkSegnalazioni/:geoarea_id", checkAdmin, async function(req: Request, res: Response){
+adminRouter.get("/checkSegnalazioni/:geoarea_id", async function(req: Request, res: Response){
     await adminController.getSegnalazioniByGeoarea(req, res);
 });
 
-adminRoutes.post("/creaViolazione", checkAdmin, async function(req: Request, res: Response){
+adminRouter.post("/creaViolazione", async function(req: Request, res: Response){
     await adminController.createViolazione(req, res);
 });

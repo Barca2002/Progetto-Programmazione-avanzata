@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { UserController } from "../controllers/UserController.js";
-import { checkUser } from "../middlewares/JWTMiddleware.js";
+import { checkUserRole } from "../middlewares/JWTMiddleware.js";
 import { tokenBalanceCheck } from "../middlewares/TokenMiddleware.js";
 import { checkDatiInviati } from "../middlewares/DatiInviatiMiddleware.js";
 
@@ -12,10 +12,10 @@ const userController = new UserController();
 //     "mmsi": 247123456,
 //     "latitudine": 43.680000,
 //     "longitudine": 13.52000,
-//     "velocita_kmh": 65.34243234234223434232,
+//     "velocita_kmh": 65.34,
 //     "stato": "IN NAVIGAZIONE"
 // }
-userRoutes.get("/sendData", checkUser, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
+userRoutes.get("/sendData", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
     await userController.sendData(req, res);
 });
 
