@@ -317,9 +317,6 @@
           "item": [
             {
               "name": "GetUtenteById",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -331,7 +328,7 @@
                     }
                   ]
                 },
-                "method": "GET",
+                "method": "PUT",
                 "header": [],
                 "body": {
                   "mode": "raw",
@@ -444,7 +441,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{JWT_TOKEN_USER}}",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
                       "type": "string"
                     }
                   ]
@@ -676,7 +673,7 @@
               "response": []
             },
             {
-              "name": "getImbarcazioni",
+              "name": "getImbarcazioniInGeofencearea",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               },
@@ -703,15 +700,15 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/all",
+                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazioni/geofence",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
                   "port": "{{PORT}} ",
                   "path": [
-                    "imbarcazione",
-                    "all"
+                    "imbarcazioni",
+                    "geofence"
                   ]
                 }
               },
@@ -854,9 +851,6 @@
       "item": [
         {
           "name": "SendData",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
             "auth": {
               "type": "bearer",
@@ -868,11 +862,11 @@
                 }
               ]
             },
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"longitudine\": 13.8750,\r\n    \"latitudine\": 43.5750,\r\n    \"velocita_kmh\": 10,\r\n    \"stato\": \"dsfds\"\r\n}",
+              "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"longitudine\": 13.5100,\r\n    \"latitudine\": 43.6850,\r\n    \"velocita_kmh\": 100,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
