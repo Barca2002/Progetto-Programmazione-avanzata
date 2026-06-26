@@ -88,12 +88,12 @@ export class SegnalazioneService{
             if (await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id)){
                 return;
             }
-            // Se non c'è una segnalazione in corso, la creiamo
+            // Se non c'è una segnalazione in corso, la creiamo.
             const t = await DatabaseConnection.getInstance().transaction();
             try {
-                const newSegnalazione: SegnalazioneCreationData = {geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO"}
-                await this.segnalazioneDao.create(newSegnalazione, t)
-                await t.commit()
+                const newSegnalazione: SegnalazioneCreationData = {geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO"};
+                await this.createSegnalazione(newSegnalazione);
+                await t.commit();
             } catch (err) {
                 await t.rollback();
                 if (err instanceof AppError) { 

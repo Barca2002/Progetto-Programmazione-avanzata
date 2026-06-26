@@ -28,7 +28,8 @@ export class UserController {
       await this.datiinviatiService.sendData(data, user_id!);
       // Scaliamo i token per la richiesta.
       await this.spendToken(user_id);
-      // Controllo se generare una violazione ed eventualmente una segnalazione.
+      // Controllo se generare una violazione ed eventualmente una segnalazione
+      // INSERIRE CONTROLLO CHE, IN CASO DI DOPPIA VIOLAZIONE, CONTARNE SOLO UNA
       await this.violazioneService.checkIfViolazione(data);
       await this.segnalazioneService.checkIfSegnalazione(data);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
