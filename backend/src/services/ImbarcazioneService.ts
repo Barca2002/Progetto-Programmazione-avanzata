@@ -8,7 +8,6 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
-import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { FeatureCollection } from 'geojson';
 
 

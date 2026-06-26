@@ -1,5 +1,5 @@
 import { AdminService } from "../services/AdminService.js";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
@@ -9,20 +9,21 @@ import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 
 export class AdminController {
-  public readonly adminService = new AdminService();
-  public readonly imbarcazioneService = new ImbarcazioneService();
-  public readonly segnalazioneService = new SegnalazioneService();
-  public readonly violazioneService = new ViolazioneService();
+  private adminService = new AdminService();
+  private imbarcazioneService = new ImbarcazioneService();
+  private segnalazioneService = new SegnalazioneService();
+  private violazioneService = new ViolazioneService();
   
 
   public async getUtenti(req: Request, res: Response) {
     try {
       const utenti = await this.adminService.getUtenti();
-      const sanitized = utenti.map(user => {
-      const { password, ...rest } = user.get({ plain: true });
-      return rest;
+      // Togliamo la password, il parametro plain: true rimuove tutti i metadati inutili di Sequelize.
+      const sanitizedUser = utenti.map(user => {
+        const { password, ...rest } = user.get({ plain: true });
+        return rest;
     });
-    res.json(sanitized);
+    res.json(sanitizedUser);
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);
@@ -37,8 +38,8 @@ export class AdminController {
       const id = Number(req.params.id);
       const responseData = await this.adminService.getUtenteById(id);
       // Ritorno le informazioni dell'utente togliendo info sensibili come la password
-      const { username, email, is_admin } = responseData;
-      res.json({username, email, is_admin});
+      const { username, email, is_admin, tokens } = responseData;
+      res.json({username, email, is_admin, tokens});
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);

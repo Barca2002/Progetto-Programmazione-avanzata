@@ -52,6 +52,7 @@ app.use("/imbarcazione", imbarcazioneRouter);
 app.use("/user", UserRouter);
 
 
+// Inserire gestione delle rotte mancanti (404)
 // Error handler generale, viene chiamato quando un next() gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {

@@ -9,7 +9,6 @@ import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { TokenService } from "../services/TokenService.js";
-import { LogSpostamentiService } from "../services/LogSpostamentiService.js";
 
 export class UserController {
   public readonly datiinviatiService = new DatiInviatiService();
@@ -31,7 +30,7 @@ export class UserController {
       await this.spendToken(user_id);
       // Controllo se generare una violazione ed eventualmente una segnalazione.
       await this.violazioneService.checkIfViolazione(data);
-      await this.segnalazioneService.checkIfSegnalazione();
+      await this.segnalazioneService.checkIfSegnalazione(data);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
     } catch (err) {
       if (err instanceof AppError) {

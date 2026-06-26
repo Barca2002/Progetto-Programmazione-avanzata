@@ -6,7 +6,7 @@ import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 import { Position } from "geojson";
 
 export class GeofenceareaService {
-  public readonly geofenceareaDAO = new GeofenceareaDAO();
+  private geofenceareaDAO = new GeofenceareaDAO();
 
   public async getAree() {
     const aree = await this.geofenceareaDAO.findAll();

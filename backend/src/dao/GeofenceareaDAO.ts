@@ -8,8 +8,10 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 interface IGeofenceareaDAO {
   create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea>;
   findById(geoarea_id: number): Promise<Geofencearea | null>;
+  // Spostare nel service
   findByCoords(coords: Position[][]): Promise<Geofencearea | null>;
   findAll(): Promise<Geofencearea[]>;
+  // Spostare nel service
   findByName(name: string): Promise<Geofencearea | null>;
   update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<Geofencearea>;
   delete(geoarea_id: number, t:Transaction): Promise<number>;

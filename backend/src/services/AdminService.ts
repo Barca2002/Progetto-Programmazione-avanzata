@@ -38,8 +38,10 @@ export class AdminService {
 
   public async getUtenti() {
     const utenti = await this.adminDAO.findAll();
-    if (!utenti || utenti.length === 0)
-      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
+    if (!utenti || utenti.length === 0){
+      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
+    }
+      
     return utenti;
   };
 

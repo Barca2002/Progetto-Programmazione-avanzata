@@ -71,9 +71,9 @@ export class ViolazioneService{
     }
 
     async checkIfViolazione(data: DatiinviatiCreationData, ){
-        const geoarea_found = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+        const current_area = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
         const allowedGeoareas = await this.geofenceimbarcazioniDAO.findAllByMmsi(data.mmsi);
-        if(!geoarea_found){
+        if(!current_area){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
         /* 
@@ -83,15 +83,15 @@ export class ViolazioneService{
         */ 
 
 
-        if(data.velocita_kmh > geoarea_found.max_speed){
+        if(data.velocita_kmh > current_area.max_speed){
             // Creiamo la violazione per eccesso di velocità
-            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: geoarea_found.geoarea_id, tipo: 'ECCESSO VELOCITA'};
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA'};
             await this.createViolazione(dataViolazione);
         }
         // some controlla se almeno un elemento soddisfa la condizione definita.
-        if(!allowedGeoareas.some(g => g.geoarea_id === geoarea_found!.geoarea_id)){
+        if(!allowedGeoareas.some(g => g.geoarea_id === current_area!.geoarea_id)){
             // Creiamo la violazione per accesso ad una area non autorizzata
-            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: geoarea_found.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA'};
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA'};
             await this.createViolazione(dataViolazione);
         }
     }

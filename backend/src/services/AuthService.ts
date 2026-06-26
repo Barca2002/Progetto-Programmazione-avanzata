@@ -7,9 +7,9 @@ import { User, UserCreationData } from '../models/UserModel.js';
 
 
 export class AuthService{
-    public readonly adminDao = new AdminDAO();
+    private adminDao = new AdminDAO();
     private privateKey: string;
-    public readonly saltRounds = 12;
+    private saltRounds = 12;
 
      constructor() {
         // Lettura della chiave privata dal .env

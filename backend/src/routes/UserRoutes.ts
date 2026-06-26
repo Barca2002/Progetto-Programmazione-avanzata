@@ -15,7 +15,7 @@ const userController = new UserController();
 //     "velocita_kmh": 65.34,
 //     "stato": "IN NAVIGAZIONE"
 // }
-UserRouter.get("/sendData", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
+UserRouter.post("/sendData", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
     await userController.sendData(req, res);
 });
 

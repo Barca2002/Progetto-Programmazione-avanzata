@@ -26,7 +26,7 @@ export class ViolazioneDAO implements IViolazioneDAO {
   }
 
   async findAllByGeoarea(geoarea_id: number): Promise<Violazione[] | null> {
-    return await Violazione.findAll({ where: { geoarea_id } });
+    return await Violazione.findAll({ where: { geoarea_id }, order: [["created_at", "DESC"]] });
   }
 
   async findAll(): Promise<Violazione[]> {

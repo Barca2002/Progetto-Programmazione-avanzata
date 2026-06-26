@@ -11,7 +11,6 @@ export class TokenService{
         const t = await DatabaseConnection.getInstance().transaction();
         try{
             const result = await this.userDAO.decrToken(user_id, t);
-            console.log(result);
             if(!result){
                 await t.rollback();
                 throw ErrorFactory.getError(AppErrorEnum.TOKEN_SPEND_ERROR);

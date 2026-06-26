@@ -47,6 +47,7 @@ export class AdminDAO implements IAdminDAO {
     return affectedRows[0]!;
   }
 
+  // Spostare nel service ed usare l'update
   async updateTokenBalance(email: string, tokenAmount: number, t: Transaction): Promise<User> {
     const [, affectedRows] = await User.update({ tokens: tokenAmount}, { where: { email }, transaction: t, returning: true });
     return affectedRows[0]!;

@@ -5,11 +5,16 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { SegnalazioneCreationData } from '../models/SegnalazioneModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
+import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
+import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
+import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class SegnalazioneService{
 
     private segnalazioneDao = new SegnalazioneDAO();
     private geofenceareaService = new GeofenceareaService();
+    private datiinviatiDAO = new DatiinviatiDAO();
+    private violazioneDAO = new ViolazioneDAO();
 
     async createSegnalazione(data: SegnalazioneCreationData){
         const t = await DatabaseConnection.getInstance().transaction();
@@ -41,7 +46,97 @@ export class SegnalazioneService{
         return segnalazioni;
     }
 
-    async checkIfSegnalazione(){
+    async checkIfSegnalazione(data: DatiinviatiCreationData){
+        const current_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+        if(!current_geoarea){
+            throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+        }
+
+        const allViolazioni = await this.violazioneDAO.findAllByGeoarea(current_geoarea.geoarea_id);
+
+        // Se non ci sono violazioni o sono < di 5 non bisogna generare una segnalazione
+        if(!allViolazioni || allViolazioni?.length <= 5){
+            return;
+        }
+        const ultimaViolazione = allViolazioni[0]!;
+        const penultimaViolazione = allViolazioni[1]!;
+        console.log("ultima violazione");
+        console.log(ultimaViolazione.created_at);
+        console.log("penultima violazione");
+        console.log(penultimaViolazione.created_at);
+        console.log("---------------");
         
+        // Se l'ultima violazione è avvenuta al massimo 1 ora dopo la penultima, non deve essere contata.
+        const includiUltimaViolazione = (ultimaViolazione.created_at.getTime() - penultimaViolazione.created_at.getTime()) < 60 * 60 * 1000; // cambia in >
+
+        // Per definire la finestra temporale bisogna decidere qual'è la violazione di partenza (ultima o penultima).
+        const violazioneDiPartenza = includiUltimaViolazione ? penultimaViolazione : ultimaViolazione;
+
+        // Definizione della data iniziale in cui far partire la finestra temporale in base alla violazione di partenza (Linux epoch).
+        const startTime = new Date(violazioneDiPartenza.created_at).getTime();
+
+        // Definizione finestra di 2 giorni. Dallo startTime andiamo indietro di 2 giorni.
+        const inizioFinestra = startTime;
+        const fineFinestra = startTime - 2 * 24 * 60 * 60 * 1000;
+
+        console.log("INIZIO E FINE FINESTRA")
+        console.log(new Date(inizioFinestra));
+        console.log(new Date(fineFinestra));
+        console.log("-----------");
+
+        // Filtriamo le violazioni in base al vincolo temporale
+        const violazioniValide = allViolazioni.filter(v => {
+
+        const t = new Date(v.created_at).getTime();
+        console.log(new Date(t));
+        console.log(t <= inizioFinestra && t >= fineFinestra);
+        return (t <= inizioFinestra && t >= fineFinestra);
+        });
+
+        // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea.
+        if (violazioniValide.length > 5) {
+            // Se già c'è una segnalazione in corso, non serve ricrearla
+            if (await this.segnalazioneDao.findLastInCorsoByGeoarea){
+                console.log("violazione in corso già presente");
+                return;
+            }
+            console.log("segnalazione in corso non presente, creazione");
+            // Se non c'è una segnalazione in corso, la creiamo
+            const t = await DatabaseConnection.getInstance().transaction();
+            try {
+                const newSegnalazione: SegnalazioneCreationData = {geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO"}
+                await this.segnalazioneDao.create(newSegnalazione,t )
+                await t.commit()
+            } catch (err) {
+                await t.rollback();
+                if (err instanceof AppError) { 
+                    throw err;
+                }
+                throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
+            }
+            
+        } else {
+            console.log("violazioni valide minori di 6");
+            const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id);
+            
+            if (!lastSegnalazioneInCorso){
+                console.log("nessuna segnalazione in corso");
+                // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
+                return;
+            }
+            
+            const t = await DatabaseConnection.getInstance().transaction();
+            try {
+                const data: Partial<SegnalazioneCreationData> = {stato: "RIENTRATA"}
+                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, data, t);
+                await t.commit();
+            } catch (err) {
+                await t.rollback();
+                if (err instanceof AppError) { 
+                    throw err;
+                }
+                throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
+            }
+        }
     }
 }
