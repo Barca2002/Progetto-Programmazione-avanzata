@@ -3,11 +3,12 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 
 DROP TABLE IF EXISTS log_spostamenti;
 DROP TABLE IF EXISTS violazioni;
-DROP TABLE IF EXISTS dati_inviati;      
+DROP TABLE IF EXISTS dati_inviati;
+DROP TABLE IF EXISTS segnalazioni_imbarcazioni;
 DROP TABLE IF EXISTS segnalazioni;
 DROP TABLE IF EXISTS geofence_imbarcazioni;
 DROP TABLE IF EXISTS geofence_areas;
-DROP TABLE IF EXISTS imbarcazioni;      
+DROP TABLE IF EXISTS imbarcazioni;
 DROP TABLE IF EXISTS users;
 
 -- ------------------------------------------------------------
@@ -132,6 +133,18 @@ CREATE TABLE log_spostamenti (
     CONSTRAINT chk_spostamento CHECK (spostamento IN ('USCITA', 'ENTRATA'))
 );
 
+
+-- ------------------------------------------------------------
+--  TABELLA: segnalazioni_imbarcazioni
+-- ------------------------------------------------------------
+CREATE TABLE segnalazioni_imbarcazioni (
+    id_segnalazione INT NOT NULL,
+    mmsi            INT NOT NULL,
+
+    PRIMARY KEY (id_segnalazione, mmsi),
+    CONSTRAINT fk_si_segnalazione FOREIGN KEY (id_segnalazione) REFERENCES segnalazioni(id) ON DELETE CASCADE,
+    CONSTRAINT fk_si_mmsi         FOREIGN KEY (mmsi)            REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE
+);
 
 -- ============================================================
 --  SEEDING
@@ -560,3 +573,34 @@ INSERT INTO dati_inviati (mmsi, latitudine, longitudine, velocita_kmh, "timestam
 (247122233, 43.4600, 13.7600,  9.00, 1781942400000, 'IN PESCA'),        -- 2026-06-20 08:00
 (247122233, 43.4620, 13.7620, 11.00, 1781946000000, 'IN NAVIGAZIONE'),  -- 2026-06-20 09:00
 (247122233, 43.4640, 13.7640,  4.00, 1782028800000, 'STAZIONARIA');     -- 2026-06-21 08:00
+
+
+-- ------------------------------------------------------------
+--  segnalazioni_imbarcazioni
+-- ------------------------------------------------------------
+INSERT INTO segnalazioni_imbarcazioni (id_segnalazione, mmsi) VALUES
+(1,  247123456),  -- segnalazione 1  (geoarea 1)  → Adriatica Uno
+(2,  247234567),  -- segnalazione 2  (geoarea 1)  → Conero Explorer
+(3,  247345678),  -- segnalazione 3  (geoarea 2)  → San Ciriaco
+(4,  215456789),  -- segnalazione 4  (geoarea 2)  → Marche Star
+(5,  247567890),  -- segnalazione 5  (geoarea 3)  → Riviera Blu
+(6,  247890123),  -- segnalazione 6  (geoarea 3)  → Bora Bora
+(7,  247789012),  -- segnalazione 7  (geoarea 4)  → Don Bosco II
+(8,  247112233),  -- segnalazione 8  (geoarea 4)  → Medusa
+(9,  247567890),  -- segnalazione 9  (geoarea 5)  → Riviera Blu
+(10, 247112233),  -- segnalazione 10 (geoarea 5)  → Medusa
+(11, 247789012),  -- segnalazione 11 (geoarea 6)  → Don Bosco II
+(12, 247112233),  -- segnalazione 12 (geoarea 6)  → Medusa
+(13, 247123456),  -- segnalazione 13 (geoarea 7)  → Adriatica Uno
+(14, 247345678),  -- segnalazione 14 (geoarea 7)  → San Ciriaco
+(15, 215456789),  -- segnalazione 15 (geoarea 7)  → Marche Star
+(16, 247901234),  -- segnalazione 16 (geoarea 7)  → Eurocargo Ancona
+(17, 247123456),  -- segnalazione 17 (geoarea 8)  → Adriatica Uno
+(18, 215456789),  -- segnalazione 18 (geoarea 8)  → Marche Star
+(19, 247114455),  -- segnalazione 19 (geoarea 9)  → Vento di Levante
+(20, 247117788),  -- segnalazione 20 (geoarea 9)  → Orizzonte Blu
+(21, 247115566),  -- segnalazione 21 (geoarea 10) → Porto Recanati
+(22, 247118899),  -- segnalazione 22 (geoarea 10) → Punta Trave
+(23, 247113344),  -- segnalazione 23 (geoarea 1)  → Stella del Mare
+(24, 247119900),  -- segnalazione 24 (geoarea 8)  → Mare Nostrum
+(25, 247120011);  -- segnalazione 25 (geoarea 2)  → Costa Conero
