@@ -220,7 +220,7 @@ export class ImbarcazioneService {
   }
 
   async checkOwnershipImbarcazione(user_id: number, mmsi: number): Promise<boolean>{
-    // Controlliamo se l'user_id dell'imbarcazione e l'user_id dell'utente sono uguali, veificando quindi se l'imbarcazione è di proprietà dell'utente.
+    // Controlliamo se l'user_id dell'imbarcazione e l'user_id dell'utente sono uguali, verificando quindi se l'imbarcazione è di proprietà dell'utente.
     const imbarcazione = await this.getImbarcazioneByMmsi(mmsi);
     if(imbarcazione?.user_id !== user_id){
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_OWNERSHIP_ERROR);

@@ -66,7 +66,7 @@ export function inizializzaAssociazioni(): void {
         as: 'Geofencearea'
     });
 
-    // IMBARCAZIONE E GEOAREA CON SEGNALAZIONE (1:N)
+    // IMBARCAZIONE CON SEGNALAZIONE (1:N)
     Imbarcazione.hasMany(Segnalazione, {
         foreignKey: 'mmsi',
         as: 'Segnalazioni'
@@ -78,13 +78,13 @@ export function inizializzaAssociazioni(): void {
         as: 'Imbarcazione'
     });
 
-    // 1:N — Una Geofencearea può avere molti LogSpostamenti tramite la foreign key geoarea_id
+    // 1:N — Una Geofencearea può avere molte Segnalazioni tramite la foreign key geoarea_id
     Geofencearea.hasMany(Segnalazione, {
         foreignKey: 'geoarea_id',
         as: 'Segnalazioni'
     });
 
-    // N:1 — Un LogSpostamenti appartiene a una sola Geofencearea tramite la foreign key geoarea_id
+    // N:1 — Una Segnalazione appartiene a una sola Geofencearea tramite la foreign key geoarea_id
     Segnalazione.belongsTo(Geofencearea, {
         foreignKey: 'geoarea_id',
         as: 'Geofencearea'
@@ -96,31 +96,32 @@ export function inizializzaAssociazioni(): void {
         as: 'Violazioni'
     });
 
-    // N:1 — Un LogSpostamenti appartiene a una sola Imbarcazione tramite la foreign key mmsi
+    // N:1 — Una violazione appartiene a una sola Imbarcazione tramite la foreign key mmsi
     Violazione.belongsTo(Imbarcazione, {
         foreignKey: 'mmsi',
         as: 'Imbarcazione'
     });
 
-    // 1:N — Una Geofencearea può avere molti LogSpostamenti tramite la foreign key geoarea_id
+    // 1:N — Una Geofencearea può avere molte violazioni tramite la foreign key geoarea_id
     Geofencearea.hasMany(Violazione, {
         foreignKey: 'geoarea_id',
         as: 'Violazioni'
     });
 
-    // N:1 — Un LogSpostamenti appartiene a una sola Geofencearea tramite la foreign key geoarea_id
+    // N:1 — Una violazione appartiene a una sola Geofencearea tramite la foreign key geoarea_id
     Violazione.belongsTo(Geofencearea, {
         foreignKey: 'geoarea_id',
         as: 'Geofencearea'
     });
 
-    // 1:N — Una Geofencearea può avere molti LogSpostamenti tramite la foreign key geoarea_id
+    // IMBARCAZIONE CON DATI INVIATI (1:N)
+    // 1:N — Una imbarcazione può avere molti DatiInviati tramite la foreign key geoarea_id
     Imbarcazione.hasMany(Datiinviati, {
         foreignKey: 'mmsi',
         as: 'ImbarcazioneDeiDati'
     });
 
-    // N:1 — Un LogSpostamenti appartiene a una sola Geofencearea tramite la foreign key geoarea_id
+    // N:1 — Un dato inviato appartiene a una sola imbarcazione tramite la foreign key geoarea_id
     Datiinviati.belongsTo(Imbarcazione, {
         foreignKey: 'mmsi',
         as: 'DatoInviatoImbarcazione'

@@ -74,7 +74,7 @@ export class ImbarcazioneController {
       }
 
       await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_E_USER_ADDED, links as any));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);
