@@ -22,7 +22,7 @@ export class SegnalazioneDAO implements ISegnalazioneDAO {
   }
 
   async findAllByGeoarea(geoarea_id: number): Promise<Segnalazione[] | null> {
-    return await Segnalazione.findAll({ where: { geoarea_id } });
+    return await Segnalazione.findAll({ where: { geoarea_id }, order: [["timestamp", "DESC"]]} );
   }
 
   async findAll(): Promise<Segnalazione[]> {

@@ -71,7 +71,7 @@ export class ViolazioneService{
     }
 
     async checkIfViolazione(data: DatiinviatiCreationData, ){
-        const geoarea_found = await this.datiinviatiDAO.checkLocationInGeoarea(data.mmsi, data.longitudine, data.latitudine);
+        const geoarea_found = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
         const allowedGeoareas = await this.geofenceimbarcazioniDAO.findAllByMmsi(data.mmsi);
         if(!geoarea_found){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);

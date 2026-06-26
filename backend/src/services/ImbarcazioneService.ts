@@ -165,18 +165,18 @@ export class ImbarcazioneService {
         //Controllo che tutte le geoareas esistano e che non siano già presenti
         for (const geoarea_id of geoarea_ids) {
           const geoarea = await this.geofenceareaDAO.findById(geoarea_id);
-          if (!geoarea)
+          if (!geoarea){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
-
-          const associazioneEsistente = await this.geofenceImbarcazioniDAO.findAssociation(geoarea_id, mmsi);
+          }
+          // Passiamo anche la transazione perché ad ogni iterazione ci sono dei dati in sospeso e per controllarli serve la transazione. Altrimenti le associazioni in sospeso non vengono controllate, quindi si possono inserire associazioni duplicate.
+          const associazioneEsistente = await this.geofenceImbarcazioniDAO.findAssociation(geoarea_id, mmsi, t);
 
           if (associazioneEsistente) {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_ASSOCIATION);
           }
+          //Associo le geoaree
+        await this.geofenceImbarcazioniDAO.create(geoarea_id, mmsi, t);
         }
-
-        //Associo le geoaree
-        await this.imbarcazioneDAO.linkGeoareas(mmsi, geoarea_ids, t);
       }
 
       await t.commit(); //se tutto è andato a buon fine viene scritto sul db
@@ -206,14 +206,14 @@ export class ImbarcazioneService {
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
 
       //Controllo che l'associazione esista
-      const associazione = await this.imbarcazioneDAO.findGeoareaAssociation(mmsi, geoarea_id);
+      const associazione = await this.geofenceImbarcazioniDAO.findAssociation(mmsi, geoarea_id, t);
       if (!associazione)
         throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
 
-      await this.imbarcazioneDAO.deleteGeoareaAssociation(mmsi, geoarea_id, t);
-      await t.commit(); //se tutto è andato a buon fine scrivo sul db
+      await this.geofenceImbarcazioniDAO.delete(mmsi, geoarea_id, t);
+      await t.commit();
     } catch (err) {
-      await t.rollback(); //se è andato male faccio il rollback della transazione
+      await t.rollback();
       if (err instanceof AppError) throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
@@ -226,9 +226,5 @@ export class ImbarcazioneService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_OWNERSHIP_ERROR);
     }
     return true;
-  }
-
-  async getAllowedGeoareas(){
-    
   }
 }

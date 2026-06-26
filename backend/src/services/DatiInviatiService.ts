@@ -8,7 +8,6 @@ import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js'; 
 import { LogSpostamentiService } from './LogSpostamentiService.js';
-import { LogSpostamenti, LogSpostamentiCreationData } from '../models/LogSpostamentiModel.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
@@ -40,7 +39,7 @@ export class DatiInviatiService {
       }
       const currentAreaIsAllowed: boolean = (await allowedGeoareas).some(g => g.geoarea_id === current_geoarea.geoarea_id);
       // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
-      const lastSpostamento = await this.imbarcazioneDAO.findLastDatoInviato(data.mmsi);
+      const lastSpostamento = await this.datiinviatiDAO.findLastDatoInviato(data.mmsi);
       // Se non viene trova uno spostamento precedente, vuol dire che è il primo invio di dati.
       if(!lastSpostamento){
         if(currentAreaIsAllowed){

@@ -20,9 +20,6 @@ interface IImbarcazioneDAO {
   delete(mmsi: number, t: Transaction): Promise<number>;
   findAllGeofences(): Promise<Imbarcazione[]>;
   findAllWithUserWithGeofences(user_id: number): Promise<Imbarcazione[]>;
-  linkGeoareas(mmsi: number, geoarea_ids: number[], t: Transaction): Promise<GeofenceImbarcazioni[]>;
-  findGeoareaAssociation(mmsi: number, geoarea_id: number): Promise<GeofenceImbarcazioni | null>;
-  deleteGeoareaAssociation(mmsi: number, geoarea_id: number, t: Transaction): Promise<number>;
 }
 
 export class ImbarcazioneDAO implements IImbarcazioneDAO {
@@ -114,13 +111,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
     });
   }
 
-  async findLastDatoInviato(mmsi: number): Promise<Datiinviati | null> {
-    return await Datiinviati.findOne({
-        where: { mmsi: mmsi },
-        order: [['timestamp', 'DESC']], // Ordina dal più recente al più vecchio
-    });
-  }
-
   async getGeofenceAreasGeoJson(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
   const db = DatabaseConnection.getInstance();
   const startEpoch = start_date.getTime();
@@ -158,8 +148,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
     return row!.geojson;
   }
 
-
-
   async findAllWithUserWithGeofences(user_id: number): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll({
       // Filtriamo le imbarcazioni che appartengono a questo utente
@@ -178,22 +166,6 @@ export class ImbarcazioneDAO implements IImbarcazioneDAO {
         }
       ]
     });
-  }
-
-  async linkGeoareas(mmsi: number, geoarea_ids: number[], t: Transaction): Promise<GeofenceImbarcazioni[]> {
-    //bulkCreate è utile quando devo fare più insert contemporaneamente, come in questo caso. Uso map cosi ad ogni id associo l'oggetto { mmsi: mmsi, geoarea_id: geoarea_id } che bulkCreate inserirà nella tabella molti a molti di collegamento
-    return await GeofenceImbarcazioni.bulkCreate(
-      geoarea_ids.map(geoarea_id => ({ mmsi: mmsi, geoarea_id: geoarea_id })),
-      { ignoreDuplicates: true, transaction: t }
-    );
-  }
-
-  async findGeoareaAssociation(mmsi: number, geoarea_id: number): Promise<GeofenceImbarcazioni | null> {
-    return await GeofenceImbarcazioni.findOne({ where: { mmsi: mmsi, geoarea_id: geoarea_id }});
-  }
-
-  async deleteGeoareaAssociation(mmsi: number, geoarea_id: number, t: Transaction): Promise<number> {
-    return await GeofenceImbarcazioni.destroy({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t });
   }
 
   async update(mmsi: number, data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione> {

@@ -42,11 +42,10 @@ export class DatiinviatiDAO implements IDatiinviatiDAO {
       return results.length > 0 ? results[0]! : null;
   }
 
-  //Funzione che in base ai dati inseriti, controlla se la velocità inserita supera quella massima consentita, se presente
-  async checkSpeed(geoarea: Geofencearea, speed: number): Promise<boolean> {
-      if (geoarea.max_speed === null){
-        return true; // non è in nessuna geoarea o non ha limite, velocità ok
-      }
-      return speed <= geoarea.max_speed;
-  }
+  async findLastDatoInviato(mmsi: number): Promise<Datiinviati | null> {
+      return await Datiinviati.findOne({
+          where: { mmsi: mmsi },
+          order: [['timestamp', 'DESC']], // Ordina dal più recente al più vecchio
+      });
+    }
 }

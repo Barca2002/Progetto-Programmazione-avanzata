@@ -4,7 +4,7 @@ import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 // Interfaccia del DAO per l'associazione Geofence-Imbarcazione
 interface IGeofenceImbarcazioniDAO {
   create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni>;
-  findAssociation(geoarea_id: number, mmsi: number): Promise<GeofenceImbarcazioni | null>;
+  findAssociation(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni | null>;
   findIsInMmsi(mmsi: number): Promise<GeofenceImbarcazioni | null>;
   findAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]>;
   delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<number>;
@@ -15,10 +15,10 @@ export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
       return await GeofenceImbarcazioni.create({ geoarea_id, mmsi }, {transaction:t});
   }
 
-  // Funzione per trovare l'associazione tra la geoarea e l'imbarcazione
-  async findAssociation(geoarea_id: number, mmsi: number): Promise<GeofenceImbarcazioni | null> {
+  // Funzione per trovare l'associazione tra la geoarea e l'imbarcazione. Bisogna passare anche la transazione perché lavoriamo con operazioni sospese e bisogna controllare anche in esse.
+  async findAssociation(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni | null> {
       return await GeofenceImbarcazioni.findOne({
-        where: { geoarea_id, mmsi }
+        where: { geoarea_id, mmsi }, transaction: t
       });
   }
 
@@ -40,4 +40,5 @@ export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
       transaction: t
     });
   }
+
 }
