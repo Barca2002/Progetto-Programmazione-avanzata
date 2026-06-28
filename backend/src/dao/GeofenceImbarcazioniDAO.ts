@@ -1,44 +1,44 @@
 import { Transaction } from 'sequelize';
-import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
+import { GeofenceImbarcazioni, GeofenceImbarcazioniCreationData } from '../models/GeofenceImbarcazioniModel.js';
+import { InterfacciaDAO } from './InterfacciaDAO.js';
 
-// Interfaccia del DAO per l'associazione Geofence-Imbarcazione
-interface IGeofenceImbarcazioniDAO {
-  create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni>;
-  findAssociation(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni | null>;
-  findIsInMmsi(mmsi: number): Promise<GeofenceImbarcazioni | null>;
-  findAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]>;
-  delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<number>;
+/*
+export interface InterfacciaDAO<T>{
+    create(item: T, t: Transaction): Promise<T>;
+    get(item_id1: number, item_id2?: number): Promise<T | null>;
+    getAll(): Promise<T[]>; 
+    update(item_id: number, item_id2?: number, new_data?: Partial<T>, t?: Transaction): Promise<T | null>;
+    delete(item_id1: number, item_id2?: number, t?: Transaction): Promise<T | null>;
 }
+*/
 
-export class GeofenceImbarcazioniDAO implements IGeofenceImbarcazioniDAO {
-  async create(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni> {
-      return await GeofenceImbarcazioni.create({ geoarea_id, mmsi }, {transaction:t});
+export class GeofenceImbarcazioniDAO implements InterfacciaDAO<GeofenceImbarcazioni> {
+  async create(data: GeofenceImbarcazioniCreationData, t: Transaction): Promise<GeofenceImbarcazioni> {
+      return await GeofenceImbarcazioni.create(data, {transaction:t});
   }
 
   // Funzione per trovare l'associazione tra la geoarea e l'imbarcazione. Bisogna passare anche la transazione perché lavoriamo con operazioni sospese e bisogna controllare anche in esse.
-  async findAssociation(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni | null> {
+  async get(geoarea_id: number, mmsi: number): Promise<GeofenceImbarcazioni | null> {
       return await GeofenceImbarcazioni.findOne({
-        where: { geoarea_id, mmsi }, transaction: t
-      });
+        where: { geoarea_id, mmsi }});
   }
 
-  async findIsInMmsi(mmsi: number): Promise<GeofenceImbarcazioni | null>{
-    return await GeofenceImbarcazioni.findOne({
-      where: {mmsi, is_in: true}
-    })
+  async getAll(): Promise<GeofenceImbarcazioni[]> {
+      return await GeofenceImbarcazioni.findAll();
   }
 
   async findAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]> {
-    return await GeofenceImbarcazioni.findAll({
-      where: { mmsi }
-    });
+    return await GeofenceImbarcazioni.findAll({where: { mmsi }});
   }
   
-  async delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<number> {
-    return await GeofenceImbarcazioni.destroy({
-      where: { geoarea_id, mmsi },
-      transaction: t
-    });
+  async update(geoarea_id: number, mmsi: number, new_data: Partial<GeofenceImbarcazioniCreationData>, t: Transaction): Promise<GeofenceImbarcazioni | null> {
+    const geoarea_imbarcazione = await GeofenceImbarcazioni.findOne({where: { geoarea_id, mmsi }});
+    return await geoarea_imbarcazione!.update(new_data, {transaction: t});
   }
-
+    
+  async delete(geoarea_id: number, mmsi: number, t: Transaction): Promise<GeofenceImbarcazioni | null> {
+    const geoarea_imbarcazione = await GeofenceImbarcazioni.findOne({where: { geoarea_id, mmsi }});
+    await geoarea_imbarcazione!.destroy({transaction: t});
+    return geoarea_imbarcazione;
+  }
 }

@@ -1,24 +1,29 @@
 import { Transaction } from 'sequelize';
 import { Segnalazione, SegnalazioneCreationData } from '../models/SegnalazioneModel.js';
+import { InterfacciaDAO } from './InterfacciaDAO.js';
 
-//Qui ci si occupa solo dell'esecuzione delle query, è il layer che parla col db
-interface ISegnalazioneDAO {
-  create(data: SegnalazioneCreationData, t: Transaction): Promise<Segnalazione>;
-  findById(id: number): Promise<Segnalazione | null>;
-  findAllByGeoarea(mmsi: number): Promise<Segnalazione[] | null>;
-  findAll(): Promise<Segnalazione[]>;
-  update(id: number, data: Partial<SegnalazioneCreationData>, t: Transaction): Promise<Segnalazione>;
-  delete(id: number, t: Transaction): Promise<number>;
+/*
+export interface InterfacciaDAO<T>{
+    create(item: T, t: Transaction): Promise<T>;
+    get(item_id1: number, item_id2?: number): Promise<T | null>;
+    getAll(): Promise<T[]>; 
+    update(item_id: number, item_id2?: number, new_data?: Partial<T>, t?: Transaction): Promise<T | null>;
+    delete(item_id1: number, item_id2?: number, t?: Transaction): Promise<T | null>;
 }
+*/
 
-export class SegnalazioneDAO implements ISegnalazioneDAO {
+export class SegnalazioneDAO implements InterfacciaDAO<Segnalazione> {
 
   async create(data: SegnalazioneCreationData, t: Transaction): Promise<Segnalazione> {
     return await Segnalazione.create(data, {transaction: t});
   }
 
-  async findById(id: number): Promise<Segnalazione | null> {
-    return await Segnalazione.findByPk(id);
+  async get(segnalazione_id: number): Promise<Segnalazione | null> {
+    return await Segnalazione.findByPk(segnalazione_id);
+  }
+
+  async getAll(): Promise<Segnalazione[]> {
+    return await Segnalazione.findAll();
   }
 
   async findAllByGeoarea(geoarea_id: number): Promise<Segnalazione[] | null> {
@@ -33,12 +38,14 @@ export class SegnalazioneDAO implements ISegnalazioneDAO {
     return await Segnalazione.findAll();
   }
 
-  async update(id: number, data: Partial<SegnalazioneCreationData>, t: Transaction): Promise<Segnalazione> {
-    const [, affectedRows] = await Segnalazione.update(data, { where: { id: id }, transaction: t, returning: true });
-    return affectedRows[0]!;
+  async update(segnalazione_id: number, _item_id2?: number, new_data?:Partial<SegnalazioneCreationData>, t?: Transaction): Promise<Segnalazione | null> {
+      const segnalazione = await Segnalazione.findByPk(segnalazione_id);
+      return await segnalazione!.update(new_data!, {transaction: t!});
   }
-
-  async delete(id: number, t: Transaction): Promise<number> {
-    return await Segnalazione.destroy({ where: { id: id }, transaction: t });
+  
+  async delete(segnalazione_id: number, _item_id2?: number, t?: Transaction): Promise<Segnalazione | null> {
+    const segnalazione = await Segnalazione.findByPk(segnalazione_id);
+    await segnalazione!.destroy({ transaction: t! });
+    return segnalazione;
   }
 }

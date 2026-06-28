@@ -1,52 +1,47 @@
-import { QueryTypes, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
-import { Position } from 'geojson';
-import { DatabaseConnection } from '../singleton/DBConnection.js';
+import { InterfacciaDAO } from './InterfacciaDAO.js';
 
-interface IGeofenceareaDAO {
-  create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea>;
-  findById(geoarea_id: number): Promise<Geofencearea | null>;
-  // Spostare nel service
-  findByCoords(coords: Position[][]): Promise<Geofencearea | null>;
-  findAll(): Promise<Geofencearea[]>;
-  // Spostare nel service
-  findByName(name: string): Promise<Geofencearea | null>;
-  update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t:Transaction): Promise<Geofencearea>;
-  delete(geoarea_id: number, t:Transaction): Promise<number>;
+/*
+export interface InterfacciaDAO<T>{
+    create(item: T, t: Transaction): Promise<T>;
+    get(id: number): Promise<T | null>;
+    getAll(): Promise<T[]>; 
+    update(item_id: number, new_data: Partial<T>, t: Transaction): Promise<T | null>;
+    delete(item_id: number, t: Transaction): Promise<T | null>;
 }
+*/
 
-export class GeofenceareaDAO implements IGeofenceareaDAO {
+export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
     return await Geofencearea.create(data, {transaction: t});
 }
 
-  async findById(geoarea_id: number): Promise<Geofencearea | null> {
+  async get(geoarea_id: number, _item_id2?: number): Promise<Geofencearea | null> {
     return await Geofencearea.findByPk(geoarea_id);
   }
 
-  async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
-    const geoJson = {
-      type: "Polygon",
-      coordinates: coords 
-    };
-    const db = DatabaseConnection.getInstance();
-    const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Covers(ga.area, ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326)) LIMIT 1`,
-      {
-        replacements: 
-        {
-          geojson: JSON.stringify(geoJson)
-        },
-        type: QueryTypes.SELECT,
-        model: Geofencearea,
-        mapToModel: true
-      }
-    );
-    return results.length > 0 ? results[0]! : null;
-  }
+  // async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
+  //   const geoJson = {
+  //     type: "Polygon",
+  //     coordinates: coords 
+  //   };
+  //   const db = DatabaseConnection.getInstance();
+  //   const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Covers(ga.area, ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326)) LIMIT 1`,
+  //     {
+  //       replacements: 
+  //       {
+  //         geojson: JSON.stringify(geoJson)
+  //       },
+  //       type: QueryTypes.SELECT,
+  //       model: Geofencearea,
+  //       mapToModel: true
+  //     }
+  //   );
+  //   return results.length > 0 ? results[0]! : null;
+  // }
 
-  async findAll(): Promise<Geofencearea[]> {
+  async getAll(): Promise<Geofencearea[]> {
     return await Geofencearea.findAll();
   }
   
@@ -56,12 +51,14 @@ export class GeofenceareaDAO implements IGeofenceareaDAO {
     return await Geofencearea.findOne({ where: { name } });
   }
 
-  async update(geoarea_id: number, data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea> {
-      const [, affectedRows] = await Geofencearea.update(data, { where: { geoarea_id }, transaction: t, returning: true });
-      return affectedRows[0]!;
+  async update(geoarea_id: number, _item_id2?: number, new_data?:Partial<GeofenceareaCreationData>, t?: Transaction): Promise<Geofencearea | null> {
+      const geoarea = await Geofencearea.findByPk(geoarea_id);
+      return await geoarea!.update(new_data!, {transaction: t!});
   }
 
-  async delete(geoarea_id: number, t:Transaction): Promise<number> {
-    return await Geofencearea.destroy({ where: { geoarea_id }, transaction: t });
+  async delete(geoarea_id: number, _item_id2?: number, t?: Transaction): Promise<Geofencearea | null> {
+    const geoarea = await Geofencearea.findByPk(geoarea_id);
+    await geoarea!.destroy({ transaction: t! });
+    return geoarea;
   }
 }
