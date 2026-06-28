@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "0539ea81-b29a-4474-9c6e-fd4dc2b0551a",
+    "_postman_id": "dc3312fd-4d90-45b0-929a-ddb54afa74a3",
     "name": "Collection_ProgettoPA",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "53270562",
-    "_collection_link": "https://go.postman.co/collection/53270562-0539ea81-b29a-4474-9c6e-fd4dc2b0551a?source=collection_link"
+    "_exporter_id": "54073076",
+    "_collection_link": "https://go.postman.co/collection/54073076-dc3312fd-4d90-45b0-929a-ddb54afa74a3?source=collection_link"
   },
   "item": [
     {
@@ -317,6 +317,9 @@
           "item": [
             {
               "name": "GetUtenteById",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -328,7 +331,7 @@
                     }
                   ]
                 },
-                "method": "PUT",
+                "method": "GET",
                 "header": [],
                 "body": {
                   "mode": "raw",
@@ -340,7 +343,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/2",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/3",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -348,7 +351,7 @@
                   "port": "{{PORT}}",
                   "path": [
                     "admin",
-                    "2"
+                    "3"
                   ]
                 }
               },
@@ -491,7 +494,7 @@
                   "raw": "{\r\n    \"mmsi\": 247901234,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 40,\r\n    \"velocita_kmh\": 65.34243,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}"
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /admin/checkSegnalazioni/1",
+                  "raw": "http://{{HOST}}:{{PORT}} /admin/checkSegnalazioni/5",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -500,7 +503,7 @@
                   "path": [
                     "admin",
                     "checkSegnalazioni",
-                    "1"
+                    "5"
                   ]
                 }
               },
@@ -756,6 +759,90 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "getStatusPerGeoarea",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/location",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}} ",
+                  "path": [
+                    "imbarcazione",
+                    "location"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getPointsAsGeoJson",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"mmsi\": 247123456,\r\n  \"start_date\": \"2026-06-20T00:00:00.000Z\",\r\n  \"end_date\": \"2026-06-22T21:59:59.000Z\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/positions",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}} ",
+                  "path": [
+                    "imbarcazione",
+                    "positions"
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         },
@@ -779,7 +866,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "[\r\n  {\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_ids\": [5]\r\n  },\r\n  {\r\n    \"mmsi\": 215456789,\r\n    \"geoarea_ids\": [1]\r\n  }\r\n]",
+                  "raw": "[\r\n  {\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_ids\": [5, 3]\r\n  },\r\n  {\r\n    \"mmsi\": 215456789,\r\n    \"geoarea_ids\": [1, 4]\r\n  }\r\n]",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -819,7 +906,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_id\": 2\r\n}",
+                  "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_id\": 1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
