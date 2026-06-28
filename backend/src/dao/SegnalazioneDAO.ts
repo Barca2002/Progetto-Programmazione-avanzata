@@ -42,9 +42,11 @@ export class SegnalazioneDAO implements InterfacciaDAO<Segnalazione> {
 
   async findAllByMmsi(mmsi: number): Promise<Segnalazione[]> {
     const db = DatabaseConnection.getInstance();
+    //Si sfrutta il fatto che a runtime sequelize crea un model per la tabella imbarcazioni_segnalazioni. Da links si trovano tutte le imbarcazioni con segnalazioni
     const links = await db.model('imbarcazioni_segnalazioni').findAll({ where: { mmsi } });
     const ids: number[] = [];
     for (const l of links) {
+      //Popolo ids mettendoci tutti gli id_segnalazione trovati in links, ovvero tutti gli id_segnalazione delle imbarcazioni con segnalazioni
       ids.push(l.get('id_segnalazione') as number);
     }
     return await Segnalazione.findAll({ where: { id: ids } });
