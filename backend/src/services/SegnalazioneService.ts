@@ -5,7 +5,6 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { SegnalazioneCreationData } from '../models/SegnalazioneModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
-import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
@@ -13,7 +12,6 @@ export class SegnalazioneService{
 
     private segnalazioneDao = new SegnalazioneDAO();
     private geofenceareaService = new GeofenceareaService();
-    private datiinviatiDAO = new DatiinviatiDAO();
     private violazioneDAO = new ViolazioneDAO();
 
     async createSegnalazione(data: SegnalazioneCreationData){
@@ -48,7 +46,7 @@ export class SegnalazioneService{
 
     // Funzione per controllare se generare o no una segnalazione per una geoarea.
     async checkIfSegnalazione(data: DatiinviatiCreationData){
-        const current_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+        const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
         if(!current_geoarea){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
@@ -112,7 +110,7 @@ export class SegnalazioneService{
             const t = await DatabaseConnection.getInstance().transaction();
             try {
                 const data: Partial<SegnalazioneCreationData> = {stato: "RIENTRATA"}
-                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, data, t);
+                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, undefined, data, t);
                 await t.commit();
             } catch (err) {
                 await t.rollback();

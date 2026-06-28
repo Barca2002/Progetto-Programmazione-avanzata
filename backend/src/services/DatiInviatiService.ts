@@ -5,37 +5,49 @@ import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { ImbarcazioneDAO } from '../dao/ImbarcazioneDAO.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
-import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
+import { Datiinviati, DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js'; 
 import { LogSpostamentiService } from './LogSpostamentiService.js';
+import { GeofenceareaService } from './GeofenceareaService.js';
 
 export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
+  private geofenceareaService = new GeofenceareaService();
   private imbarcazioneDAO = new ImbarcazioneDAO();
   private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
   private imbarcazioniService = new ImbarcazioneService();
   private logspostamentoService = new LogSpostamentiService();
 
-  // Si controlla se l'imbarcazione esiste (con l'mmsi), se l'utente che ha inviato la richiesta è il proprietario di essa e se le coordinate ricadono dentro una geoarea.
+  public async findLastDatoInviato(mmsi: number): Promise<Datiinviati | undefined> {
+    const dati = await this.datiinviatiDAO.findAllByMmsi(mmsi);
+
+    if (dati.length === 0 || !dati) {
+      throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
+    }
+
+    return dati.sort((a, b) => b.created_at - a.created_at)[0];
+}
+
+
   public async sendData(data: DatiinviatiCreationData, user_id: number): Promise<void> {
     
-    const imbarcazione = await this.imbarcazioneDAO.findById(data.mmsi);
+    const imbarcazione = await this.imbarcazioneDAO.get(data.mmsi);
     if (!imbarcazione){
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     }
     // Passiamo l'user_id estratto dal token JWT per controllare se è il proprietario della barca.
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
-    const allowedGeoareas = this.geofenceImbarcazioniDAO.findAllByMmsi(data.mmsi);
+    const allowedGeoareas = this.geofenceImbarcazioniDAO.getAllByMmsi(data.mmsi);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const current_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+      const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
       //Controllo se ha trovato una geoarea in cui risiede il punto
       if(!current_geoarea){
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
       }
       const currentAreaIsAllowed: boolean = (await allowedGeoareas).some(g => g.geoarea_id === current_geoarea.geoarea_id);
       // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
-      const lastSpostamento = await this.datiinviatiDAO.findLastDatoInviato(data.mmsi);
+      const lastSpostamento = await this.findLastDatoInviato(data.mmsi);
       // Se non viene trova uno spostamento precedente, vuol dire che è il primo invio di dati.
       if(!lastSpostamento){
         if(currentAreaIsAllowed){
@@ -45,7 +57,7 @@ export class DatiInviatiService {
         }
       } else {
         // Dall'ultimo spostamento/dato inivato ricaviamo la sua geoarea.
-        const last_geoarea = await this.datiinviatiDAO.getGeoareaByPosition(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
+        const last_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
         if(!last_geoarea){
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
@@ -61,7 +73,7 @@ export class DatiInviatiService {
               // Si esce dall'ultima area di cui è stata inviata la posizione.
               await this.logspostamentoService.create({mmsi: data.mmsi, geoarea_id: last_geoarea.geoarea_id, spostamento: "USCITA"});
             }
-            // CASO 2: la posione precedente non era autorizzata, ma la corrente si. Quindi si logga solo l'entrata nell'area corrente.
+            // CASO 2: la posizione precedente non era autorizzata, ma la corrente si. Quindi si logga solo l'entrata nell'area corrente.
             if(!lastAreaIsAllowed && currentAreaIsAllowed){
               await this.logspostamentoService.create({mmsi: data.mmsi, 
               geoarea_id:current_geoarea.geoarea_id, spostamento: "ENTRATA"});

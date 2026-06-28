@@ -27,7 +27,7 @@ export class GeofenceImbarcazioniDAO implements InterfacciaDAO<GeofenceImbarcazi
       return await GeofenceImbarcazioni.findAll();
   }
 
-  async findAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]> {
+  async getAllByMmsi(mmsi: number): Promise<GeofenceImbarcazioni[]> {
     return await GeofenceImbarcazioni.findAll({where: { mmsi }});
   }
   

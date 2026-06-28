@@ -43,26 +43,6 @@ export class DatiinviatiDAO implements InterfacciaDAO<Datiinviati> {
   }
 
 }
+  
 
- // Estrae la geofence area di un'imbarcazione in base alla sua posizione
-  // async getGeoareaByPosition(mmsi: number, longitudine: number, latitudine: number): Promise<Geofencearea | null> {
-  //     const db = DatabaseConnection.getInstance();
-  //     const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Within(ST_SetSRID(ST_MakePoint(:longitudine, :latitudine), 4326), ga.area)`, 
-  //     {
-  //       // Mappiamo il risultato al model Geofencearea, così otteniamo l'oggetto come risultato. Replacement sostituisce i parametri con i valori associati.
-  //         replacements: { mmsi: mmsi, latitudine: latitudine, longitudine: longitudine },
-  //         type: QueryTypes.SELECT,
-  //         model: Geofencearea,
-  //         mapToModel: true
-  //     });
-  //     // Per estrarre un solo oggetto, vediamo la lunghezza del risultato della query.
-  //     // Se è > 0, prendiamo la prima geofencearea (può estrarre al massimo una sola geofencearea), altrimenti restituiamo null.
-  //     return results.length > 0 ? results[0]! : null;
-  // }
 
-  // async findLastDatoInviato(mmsi: number): Promise<Datiinviati | null> {
-  //     return await Datiinviati.findOne({
-  //         where: { mmsi: mmsi },
-  //         order: [['created_at', 'DESC']], // Ordina dal più recente al più vecchio
-  //     });
-  // }

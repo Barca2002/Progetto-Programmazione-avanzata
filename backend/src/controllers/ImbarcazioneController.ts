@@ -1,5 +1,5 @@
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
@@ -123,9 +123,9 @@ export class ImbarcazioneController {
     }
   }
 
-  async getLocationPerGeoarea(req: Request, res: Response){
+  async getStatusPerGeoarea(req: Request, res: Response){
     try {
-        const result = await this.imbarcazioneService.getLocationPerGeoarea();
+        const result = await this.imbarcazioneService.getStatusPerGeoarea();
         res.json(SuccessFactory.getSuccess(AppSuccessEnum.LOG_SPOSTAMENTI_FOUND, result));
     } catch (err) {
       if (err instanceof AppError) {
@@ -136,7 +136,7 @@ export class ImbarcazioneController {
     }
   }
 
-  public async getPosizioniImbarcazione(req: Request, res: Response): Promise<void> {
+  public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {
     try {
         const { mmsi, start_date } = req.body;
 

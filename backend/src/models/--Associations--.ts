@@ -102,7 +102,7 @@ export function inizializzaAssociazioni(): void {
     // IMBARCAZIONE CON DATI INVIATI (1:N)
     Imbarcazione.hasMany(Datiinviati, {
         foreignKey: 'mmsi',
-        as: 'ImbarcazioneDeiDati'
+        as: 'ImbarcazioneDati'
     });
 
     Datiinviati.belongsTo(Imbarcazione, {

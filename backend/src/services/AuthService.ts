@@ -27,7 +27,7 @@ export class AuthService{
     }
     // Si prende l'utente, identificato univocamente dall'email, per comparare la password e poi prendere i suoi dati per generare il token JWT
     public async checkCreds(email: string, password: string): Promise<string> {
-        const user = await this.adminDao.findByEmail(email);
+        const user = await this.adminDao.getByEmail(email);
         if (!user)
             throw ErrorFactory.getError(AppErrorEnum.EMAIL_NOT_EXIST);
         const pwdMatch = await bcrypt.compare(password.trim(), user.password);
@@ -74,11 +74,11 @@ export class AuthService{
     if (!email || !username || !password)
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     // Controlliamo se l'email già esiste
-    if(await this.adminDao.findByEmail(email)){
+    if(await this.adminDao.getByEmail(email)){
         throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
     }
     // Controlliamo se l'username già esiste
-    if(await this.adminDao.findByUsername(username)){
+    if(await this.adminDao.getByUsername(username)){
         throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
     }
     // Se le credenziali inserite non esistono già, si calcola l'hash della password e si ritorna quella.

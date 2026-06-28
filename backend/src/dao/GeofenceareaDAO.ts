@@ -21,26 +21,6 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
     return await Geofencearea.findByPk(geoarea_id);
   }
 
-  // async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
-  //   const geoJson = {
-  //     type: "Polygon",
-  //     coordinates: coords 
-  //   };
-  //   const db = DatabaseConnection.getInstance();
-  //   const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Covers(ga.area, ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326)) LIMIT 1`,
-  //     {
-  //       replacements: 
-  //       {
-  //         geojson: JSON.stringify(geoJson)
-  //       },
-  //       type: QueryTypes.SELECT,
-  //       model: Geofencearea,
-  //       mapToModel: true
-  //     }
-  //   );
-  //   return results.length > 0 ? results[0]! : null;
-  // }
-
   async getAll(): Promise<Geofencearea[]> {
     return await Geofencearea.findAll();
   }

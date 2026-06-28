@@ -19,8 +19,8 @@ export interface InterfacciaDAO<T>{
 */
 
 export class AdminDAO implements InterfacciaDAO<User> {
-  async create(data: UserCreationData, t: Transaction ): Promise<User> {
-     return await User.create(data, {transaction: t});
+  async create(data: UserCreationData, t: Transaction): Promise<User> {
+    return await User.create(data, { transaction: t });
   }
 
   async get(user_id: number, _item_id2?: number): Promise<User | null> {
@@ -31,9 +31,9 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return await User.findAll();
   }
 
-  async update(user_id: number, _item_id2?: number, new_data?:Partial<UserCreationData>, t?: Transaction): Promise<User | null> {
+  async update(user_id: number, _item_id2?: number, new_data?: Partial<UserCreationData>, t?: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
-    return await user!.update(new_data!, {transaction: t!});
+    return await user!.update(new_data!, { transaction: t! });
   }
 
   async delete(user_id: number, _item_id2?: number, t?: Transaction): Promise<User | null> {
@@ -42,20 +42,15 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return user;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({ where: { email: email } });
   }
 
-  async findByUsername(username: string): Promise<User | null> {
-    return await User.findOne({ where: { username: username } });      
+  async getByUsername(username: string): Promise<User | null> {
+    return await User.findOne({ where: { username: username } });
   }
 
 }
 
 
 
-//   // Spostare nel service ed usare l'update
-//   async updateTokenBalance(email: string, tokenAmount: number, t: Transaction): Promise<User> {
-//     const [, affectedRows] = await User.update({ tokens: tokenAmount}, { where: { email }, transaction: t, returning: true });
-//     return affectedRows[0]!;
-//   }

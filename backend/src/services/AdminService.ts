@@ -2,15 +2,17 @@ import { AdminDAO } from "../dao/AdminDAO.js";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
-import { UserCreationData } from "../models/UserModel.js";
+import { User, UserCreationData } from "../models/UserModel.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AuthService } from '../services/AuthService.js';
+import { Transaction } from "sequelize";
+import { AppError } from "../models/AppErrorModel.js";
 
 export class AdminService {
   private adminDAO = new AdminDAO();
   private authService = new AuthService();
 
-  public async createUtente (data: UserCreationData) {
+  public async createUtente(data: UserCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.adminDAO.create(data, t);
@@ -22,60 +24,60 @@ export class AdminService {
     }
   };
 
-  public async findByEmail (email: string) {
-    const utente = await this.adminDAO.findByEmail(email);
+  public async findByEmail(email: string) {
+    const utente = await this.adminDAO.getByEmail(email);
     if (!utente)
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     return utente;
   };
 
-  public async findByUsername (username: string) {
-    const utente = await this.adminDAO.findByUsername(username);
+  public async findByUsername(username: string) {
+    const utente = await this.adminDAO.getByUsername(username);
     if (!utente)
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     return utente;
   };
 
   public async getUtenti() {
-    const utenti = await this.adminDAO.findAll();
-    if (!utenti || utenti.length === 0){
+    const utenti = await this.adminDAO.getAll();
+    if (!utenti || utenti.length === 0) {
       throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
     }
-      
+
     return utenti;
   };
 
-  public async getUtenteById (id: number) {
+  public async getUtenteById(id: number) {
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
-    const utente = await this.adminDAO.findById(id);
+    const utente = await this.adminDAO.get(id);
     if (!utente) {
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
     }
     return utente;
   };
 
-  public async updateUtente (id: number, data: Partial<UserCreationData>){
+  public async updateUtente(id: number, data: Partial<UserCreationData>) {
     if (!data || Object.keys(data).length === 0)
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono
-    if(data.username && await this.adminDAO.findByUsername(data.username)){
+    if (data.username && await this.adminDAO.getByUsername(data.username)) {
       throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
     }
-    if(data.email && await this.adminDAO.findByEmail(data.email)){
+    if (data.email && await this.adminDAO.getByEmail(data.email)) {
       throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
     }
     // Se si vuole modificare la password, viene hashata prima della modifica.
-    if(data.password){
+    if (data.password) {
       data.password = await this.authService.hashPassword(data.password!);
     }
     // Iniziamo la transazione e se va a buon fine ritorna l'user aggiornato,
     // altrimenti si fa il rollback.
     const t = await DatabaseConnection.getInstance().transaction();
-    try{
-      const result = await this.adminDAO.update(id, data, t);
+    try {
+      const result = await this.adminDAO.update(id, undefined, data, t);
       await t.commit();
       return result;
     } catch (err) {
@@ -84,12 +86,12 @@ export class AdminService {
     }
   };
 
-  public async deleteUtente (id: number){
+  public async deleteUtente(id: number) {
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      await this.adminDAO.delete(id, t);
+      await this.adminDAO.delete(id, undefined, t);
       await t.commit();
       return SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null);
     } catch (err) {
@@ -98,19 +100,37 @@ export class AdminService {
     }
   };
 
-  public async updateTokenAmount(email: string, tokenAmount: number){
+  public async updateTokenBalance(email: string, tokenAmount: number, t: Transaction): Promise<User | null> {
+    const user = await User.findOne({
+      where: { email },
+      transaction: t
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    await user.update({ tokens: tokenAmount }, { transaction: t });
+    return user;
+  }
+
+  public async updateTokenAmount(email: string, tokenAmount: number) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      // Controllo se l'id è un numero e se esiste un utente con quell'id
-      if(!email || !await this.adminDAO.findByEmail(email)){
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA)
-      }
-      const data = await this.adminDAO.updateTokenBalance(email, tokenAmount, t);
+      if (!email || !await this.adminDAO.getByEmail(email))
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+
+      const user = await this.adminDAO.getByEmail(email);
+      if (user!.tokens <= 0)
+        throw ErrorFactory.getError(AppErrorEnum.TOKEN_SPEND_ERROR);
+
+      const result = await this.updateTokenBalance(email, tokenAmount, t);
       await t.commit();
-      // Restituisce anche il saldo aggiornato
-      return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, data.tokens);
+      return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, result!.tokens);
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   }

@@ -3,14 +3,12 @@ import { Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
-import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 
 export class AdminController {
   private adminService = new AdminService();
-  private imbarcazioneService = new ImbarcazioneService();
   private segnalazioneService = new SegnalazioneService();
   private violazioneService = new ViolazioneService();
   

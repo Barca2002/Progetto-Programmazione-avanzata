@@ -9,7 +9,7 @@ import { Geofencearea } from './models/GeofenceareaModel.js';
 import { geofenceareaRouter } from './routes/GeofenceareaRoutes.js';
 import { Imbarcazione } from './models/ImbarcazioneModel.js';
 import { imbarcazioneRouter } from './routes/ImbarcazioneRoutes.js';
-import { inizializzaAssociazioni } from './models/TableAssociationsModel.js';
+import { inizializzaAssociazioni } from './models/--Associations--.js';
 import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioniModel.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
 import { UserRouter } from './routes/UserRoutes.js';

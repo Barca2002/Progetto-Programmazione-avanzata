@@ -1,6 +1,7 @@
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
+import { Datiinviati } from '../models/DatiInviatiModel.js';
 
 /*
 export interface InterfacciaDAO<T>{
@@ -31,102 +32,24 @@ export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
     });
   }
 
-  async findAllByUserId(user_id: number): Promise<Imbarcazione[]> {
+  async getAllByUserId(user_id: number): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll({
       where: { user_id: user_id }
     });
   }
+  
+  async getPositionsByMmsiAndDateRange(mmsi: number, date_start: Date, date_end: Date): Promise<Datiinviati[]> {
+    const start_date = date_start.getTime();
+    const end_date = date_end.getTime();
 
-  // async findAllGeofences(): Promise<Imbarcazione[]> {
-  //   return await Imbarcazione.findAll({
-  //     include: [{
-  //       model: Geofencearea,
-  //       as: 'Geofenceareas', //Altrimenti dava problemi e non trovava il model (è un alias dichiarato nel model)
-  //       attributes: ['geoarea_id', 'name'], //Specifica quali attributi mostrare
-  //       through: { attributes: [] } //Così escludo gli attributi della tabella di collegamento
-  //     }]
-  //   });
-  // }
-
-  //Prendo per ogni coppia (mmsi, geoarea) l'ultimo spostamento fatto
-
-  /*
-  [
-    {
-        "mmsi": 247123456,
-        "name": "Adriatica Uno",
-        "Spostamenti": [
-            { "geoarea_id": 1, "spostamento": "ENTRATA", "created_at": "2026-06-22 06:10:00" },
-            { "geoarea_id": 7, "spostamento": "USCITA",  "created_at": "2026-06-20 18:30:00" }
-        ]
-    },
-    {
-        "mmsi": 247234567,
-        "name": "Conero Explorer",
-        "Spostamenti": [
-            { "geoarea_id": 2, "spostamento": "ENTRATA", "created_at": "2026-06-22 07:45:00" }
-        ]
-    },
-    {
-        "mmsi": 247345678,
-        "name": "San Ciriaco",
-        "Spostamenti": []
+  return await Datiinviati.findAll({
+    where: {
+      mmsi,
+      created_at: { [Op.between]: [start_date, end_date] }
     }
-  ]
-  */
+  });
+}
 
-  // async findAllLastSpostamento(): Promise<Imbarcazione[]> {
-  //   const db = DatabaseConnection.getInstance();
-  //   return await Imbarcazione.findAll({
-  //       include: [{
-  //           model: LogSpostamenti,
-  //           as: 'Spostamenti',
-  //           attributes: ['geoarea_id', 'spostamento', 'created_at'],
-  //           where: db.literal(`"Spostamenti"."created_at" = (
-  //               SELECT MAX(ls.created_at) FROM log_spostamenti ls
-  //               WHERE ls.mmsi = "Spostamenti"."mmsi"
-  //               AND ls.geoarea_id = "Spostamenti"."geoarea_id"
-  //           )`),
-  //       }]
-  //   });
-  // }
-
-  // async getGeofenceAreasGeoJson(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
-  // const db = DatabaseConnection.getInstance();
-  // const startEpoch = start_date.getTime();
-  // const endEpoch = end_date.getTime();
-
-  // const [row] = await db.query<{ geojson: FeatureCollection }>(
-  //     `SELECT json_build_object(
-  //         'type', 'FeatureCollection',
-  //         'features', COALESCE(
-  //           json_agg(
-  //             json_build_object(
-  //               'type', 'Feature',
-  //               'geometry', json_build_object(
-  //                 'type', 'Point',
-  //                 'coordinates', ARRAY[d.longitudine, d.latitudine]
-  //               )
-  //             )
-  //           ),
-  //           '[]'::json
-  //         )
-  //       ) AS geojson
-  //       FROM dati_inviati d
-  //       WHERE d.mmsi = :mmsi
-  //         AND d."timestamp" BETWEEN :startEpoch AND :endEpoch;
-  //     `,
-  //     {
-  //       replacements: {
-  //         mmsi,
-  //         startEpoch,
-  //         endEpoch
-  //       },
-  //       type: QueryTypes.SELECT
-  //     }
-  //   );
-  //   return row!.geojson;
-  // }
 
   // async findAllWithUserWithGeofences(user_id: number): Promise<Imbarcazione[]> {
   //   return await Imbarcazione.findAll({
@@ -146,23 +69,6 @@ export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
   //       }
   //     ]
   //   });
-  // }
-
-  // async findAllWithSegnalazioni(): Promise<Imbarcazione[]> {
-  //     return await Imbarcazione.findAll({
-  //         attributes: ['mmsi', 'name'],
-  //         include: [
-  //             {
-  //                 model: Segnalazione,
-  //                 as: 'Segnalazioni',
-  //                 attributes: ['id', 'stato', 'created_at'],
-  //                 through: {
-  //                     attributes: []
-  //                 },
-  //                 required: true
-  //             }
-  //         ]
-  //     });
   // }
 
   async update(mmsi: number, _item_id2?: number, new_data?: Partial<ImbarcazioneCreationData>, t?: Transaction): Promise<Imbarcazione | null> {

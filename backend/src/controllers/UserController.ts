@@ -8,16 +8,17 @@ import { decodeJwt } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
-import { TokenService } from "../services/TokenService.js";
+import AdminService from "../services/AdminService.js";
 
 export class UserController {
   public readonly datiinviatiService = new DatiInviatiService();
   public readonly imbarcazioneService = new ImbarcazioneService();
   public readonly violazioneService = new ViolazioneService();
   public readonly segnalazioneService = new SegnalazioneService();
-  public readonly tokenService = new TokenService();
+  public readonly adminService = new AdminService();
 
-  public async sendData(req: Request, res: Response ){
+
+  public async sendData(req: Request, res: Response) {
     try {
       const data = req.body;
       // Prendiamo l'user_id dal token JWT per controllare se è il proprietario della barca.
@@ -42,8 +43,9 @@ export class UserController {
     }
   };
 
-  public async spendToken(user_id: number){
-    await this.tokenService.spendToken(user_id);
+  public async spendToken(user_id: number) {
+    const user = await this.adminService.getUtenteById(user_id);
+    await this.adminService.updateTokenAmount(user.email, user.tokens - 1);
     return true;
   }
 }
