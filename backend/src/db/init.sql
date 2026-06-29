@@ -46,16 +46,34 @@ CREATE TABLE imbarcazioni (
 );
 
 -- ------------------------------------------------------------
+--  TABELLA: violazioni
+-- ------------------------------------------------------------
+CREATE TABLE violazioni (
+    id    INT GENERATED ALWAYS AS IDENTITY,
+    tipo  VARCHAR(255)          NOT NULL,
+    mmsi               INT          NOT NULL,
+    geoarea_id         INT          NOT NULL,
+    conta_in_segnalazione BOOLEAN     NOT NULL DEFAULT TRUE,
+    created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    CONSTRAINT fk_viol_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
+    CONSTRAINT chk_tipo     CHECK (tipo IN ('ECCESSO VELOCITA', 'ACCESSO AREA NON AUTORIZZATA'))
+);
+
+-- ------------------------------------------------------------
 --  TABELLA: geofence_areas
 -- ------------------------------------------------------------
 CREATE TABLE geofence_areas (
     geoarea_id INT GENERATED ALWAYS AS IDENTITY,
     name       VARCHAR(255)            NOT NULL,
     area       GEOMETRY(Polygon, 4326) NOT NULL,
-    max_speed  INT NULL, -- La velocità max è opzionale  
+    max_speed  INT NULL, -- La velocità max è opzionale 
+    ultima_violazione_valida_id INT    NULL, 
     created_at TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (geoarea_id),
+    
     CONSTRAINT geoarea_name_key UNIQUE (name)
 );
 
@@ -82,23 +100,6 @@ CREATE TABLE segnalazioni (
     PRIMARY KEY (id),
     CONSTRAINT fk_seg_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT chk_stato      CHECK (stato IN ('IN CORSO', 'RIENTRATA'))
-);
-
--- ------------------------------------------------------------
---  TABELLA: violazioni
--- ------------------------------------------------------------
-CREATE TABLE violazioni (
-    id    INT GENERATED ALWAYS AS IDENTITY,
-    tipo  VARCHAR(255)          NOT NULL,
-    mmsi               INT          NOT NULL,
-    geoarea_id         INT          NOT NULL,
-    conta_in_segnalazione BOOLEAN     NOT NULL DEFAULT TRUE,
-    created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (id),
-    CONSTRAINT fk_viol_mmsi    FOREIGN KEY (mmsi)       REFERENCES imbarcazioni(mmsi)         ON DELETE CASCADE,
-    CONSTRAINT fk_viol_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
-    CONSTRAINT chk_tipo     CHECK (tipo IN ('ECCESSO VELOCITA', 'ACCESSO AREA NON AUTORIZZATA'))
 );
 
 -- ------------------------------------------------------------
@@ -133,16 +134,6 @@ CREATE TABLE log_spostamenti (
     CONSTRAINT fk_geoid FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
     CONSTRAINT chk_spostamento CHECK (spostamento IN ('USCITA', 'ENTRATA'))
 );
-
--- Questa tabella tiene traccia dell'ultima violazione valida per ogni geoarea
-CREATE TABLE violazione_geofencearea (
-    geoarea_id     INT NOT NULL,
-    ultima_violazione_valida_id INT NOT NULL,
-    
-    PRIMARY KEY (id),
-    CONSTRAINT fk_geoid FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
-    CONSTRAINT fk_violaz FOREIGN KEY (ultima_violazione_valida) REFERENCES violazioni(id) ON DELETE CASCADE,
-);
 -- ------------------------------------------------------------
 --  TABELLA: segnalazioni_imbarcazioni
 -- ------------------------------------------------------------
@@ -155,6 +146,7 @@ CREATE TABLE imbarcazioni_segnalazioni (
     CONSTRAINT fk_si_segnalazione FOREIGN KEY (id_segnalazione) REFERENCES segnalazioni(id) ON DELETE CASCADE,
     CONSTRAINT fk_si_mmsi         FOREIGN KEY (mmsi)            REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE
 );
+
 
 -- ============================================================
 --  SEEDING
@@ -201,117 +193,7 @@ INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity, user_id) VALUES
 (247122233, 'Tritone','ricerca_ittica','Nave per lo studio biologico delle risorse marine',   20, 10);
 
 -- ------------------------------------------------------------
---  geofence_areas
--- ------------------------------------------------------------
-INSERT INTO geofence_areas (name, area, max_speed) VALUES
-('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((13.4700 43.7000, 13.5500 43.7000, 13.5600 43.6700, 13.4900 43.6600, 13.4700 43.7000))', 4326), 20),
-('Zona Marittima Est Porto', ST_GeomFromText('POLYGON((13.5600 43.6600, 13.6400 43.6600, 13.6500 43.6300, 13.5800 43.6200, 13.5600 43.6600))', 4326), 20),
-('Area Offshore Conero Nord', ST_GeomFromText('POLYGON((13.6200 43.6000, 13.7000 43.6000, 13.7100 43.5600, 13.6400 43.5500, 13.6200 43.6000))', 4326), 50),
-('Area Offshore Portonovo', ST_GeomFromText('POLYGON((13.6500 43.5600, 13.7300 43.5600, 13.7400 43.5200, 13.6700 43.5100, 13.6500 43.5600))', 4326), 50),
-('Area Offshore Sirolo', ST_GeomFromText('POLYGON((13.6800 43.5200, 13.7600 43.5200, 13.7700 43.4800, 13.7000 43.4700, 13.6800 43.5200))', 4326), 50),
-('Area Offshore Numana', ST_GeomFromText('POLYGON((13.7000 43.4700, 13.7900 43.4700, 13.8000 43.4300, 13.7200 43.4200, 13.7000 43.4700))', 4326), 50),
-('Adriatico Centrale 1', ST_GeomFromText('POLYGON((13.8000 43.6500, 13.9500 43.6500, 13.9500 43.5000, 13.8000 43.5000, 13.8000 43.6500))', 4326), NULL),
-('Adriatico Centrale 2', ST_GeomFromText('POLYGON((13.8500 43.4800, 14.0000 43.4800, 14.0000 43.3500, 13.8500 43.3500, 13.8500 43.4800))', 4326), NULL),
-('Canale di Fano', ST_GeomFromText('POLYGON((13.8000 43.8500, 13.9500 43.8500, 13.9500 43.7500, 13.8000 43.7500, 13.8000 43.8500))', 4326), NULL),
-('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((12.8000 43.9500, 13.0000 43.9500, 13.0000 43.8500, 12.8000 43.8500, 12.8000 43.9500))', 4326), NULL);
-
--- ------------------------------------------------------------
---  geofence_imbarcazioni
--- ------------------------------------------------------------
-INSERT INTO geofence_imbarcazioni (geoarea_id, mmsi) VALUES
--- Zona Marittima Nord Ancona (id=1)
-(1, 247123456),  -- Adriatica Uno
-(1, 247901234),  -- Eurocargo Ancona
-(1, 247113344),  -- Stella del Mare
-(1, 247119900),  -- Mare Nostrum
-
--- Zona Marittima Est Porto (id=2)
-(2, 247345678),  -- San Ciriaco
-(2, 215456789),  -- Marche Star
-(2, 247012345),  -- Falco Marino
-(2, 247114455),  -- Vento di Levante
-(2, 247120011),  -- Costa Conero
-
--- Area Offshore Conero Nord (id=3)
-(3, 247567890),  -- Riviera Blu
-(3, 247890123),  -- Bora Bora
-(3, 247116677),  -- Sirena Adriatica
-(3, 247118899),  -- Punta Trave
-
--- Area Offshore Portonovo (id=4)
-(4, 247789012),  -- Don Bosco II
-(4, 247890123),  -- Bora Bora
-(4, 247112233),  -- Medusa
-(4, 247117788),  -- Orizzonte Blu
-
--- Area Offshore Sirolo (id=5)
-(5, 247567890),  -- Riviera Blu
-(5, 247112233),  -- Medusa
-(5, 247115566),  -- Porto Recanati
-(5, 247122233),  -- Tritone
-
--- Area Offshore Numana (id=6)
-(6, 247789012),  -- Don Bosco II
-(6, 247112233),  -- Medusa
-(6, 247121122),  -- Albatros Due
-
--- Adriatico Centrale 1 (id=7)
-(7, 247123456),  -- Adriatica Uno
-(7, 247345678),  -- San Ciriaco
-(7, 215456789),  -- Marche Star
-(7, 247901234),  -- Eurocargo Ancona
-(7, 247113344),  -- Stella del Mare
-
--- Adriatico Centrale 2 (id=8)
-(8, 247123456),  -- Adriatica Uno
-(8, 215456789),  -- Marche Star
-(8, 247901234),  -- Eurocargo Ancona
-(8, 247119900),  -- Mare Nostrum
-
--- Canale di Fano (id=9)
-(9, 247114455),  -- Vento di Levante
-(9, 247117788),  -- Orizzonte Blu
-(9, 247120011),  -- Costa Conero
-
--- Acque Territoriali Pesaro (id=10)
-(10, 247115566), -- Porto Recanati
-(10, 247118899), -- Punta Trave
-(10, 247122233); -- Tritone
-
--- ------------------------------------------------------------
---  segnalazioni
--- DA RIVEDERE
--- ------------------------------------------------------------
-INSERT INTO segnalazioni (geoarea_id, stato, created_at) VALUES
-(1, 'RIENTRATA',  '2025-01-10 08:15:00'),  -- Adriatica Uno      in Zona Nord Ancona
-(1, 'IN CORSO',   '2025-01-15 10:30:00'),  -- Conero Explorer    in Zona Nord Ancona
-(2, 'RIENTRATA',  '2025-01-20 14:00:00'),  -- San Ciriaco        in Zona Est Porto
-(2, 'IN CORSO',   '2025-02-01 09:00:00'),  -- Marche Star        in Zona Est Porto
-(3, 'RIENTRATA',  '2025-02-05 16:45:00'),  -- Riviera Blu        in Offshore Conero Nord
-(3, 'IN CORSO',   '2025-02-10 11:20:00'),  -- Bora Bora          in Offshore Conero Nord
-(4, 'RIENTRATA',  '2025-02-14 07:30:00'),  -- Don Bosco II       in Offshore Portonovo
-(4, 'IN CORSO',   '2025-02-20 13:00:00'),  -- Medusa             in Offshore Portonovo
-(5, 'RIENTRATA',  '2025-03-01 09:15:00'),  -- Riviera Blu        in Offshore Sirolo
-(5, 'IN CORSO',   '2025-03-05 15:00:00'),  -- Medusa             in Offshore Sirolo
-(6, 'RIENTRATA',  '2025-03-10 08:00:00'),  -- Don Bosco II       in Offshore Numana
-(6, 'IN CORSO',   '2025-03-15 12:30:00'),  -- Medusa             in Offshore Numana
-(7, 'RIENTRATA',  '2025-03-20 10:00:00'),  -- Adriatica Uno      in Adriatico Centrale 1
-(7, 'IN CORSO',   '2025-03-25 14:45:00'),  -- San Ciriaco        in Adriatico Centrale 1
-(7, 'RIENTRATA',  '2025-04-01 09:30:00'),  -- Marche Star        in Adriatico Centrale 1
-(7, 'IN CORSO',   '2025-04-05 11:00:00'),  -- Eurocargo Ancona   in Adriatico Centrale 1
-(8, 'RIENTRATA',  '2025-04-10 08:45:00'),  -- Adriatica Uno      in Adriatico Centrale 2
-(8, 'IN CORSO',   '2025-04-15 13:15:00'),  -- Marche Star        in Adriatico Centrale 2
-(9, 'RIENTRATA',  '2025-04-20 10:30:00'),  -- Vento di Levante   in Canale di Fano
-(9, 'IN CORSO',   '2025-04-25 15:00:00'),  -- Orizzonte Blu      in Canale di Fano
-(10, 'RIENTRATA', '2025-05-01 09:00:00'),  -- Porto Recanati     in Acque Pesaro
-(10, 'IN CORSO',  '2025-05-05 11:30:00'),  -- Punta Trave        in Acque Pesaro
-(1,  'RIENTRATA', '2025-05-10 08:00:00'),  -- Stella del Mare    in Zona Nord Ancona
-(8,  'IN CORSO',  '2025-05-15 14:00:00'),  -- Mare Nostrum       in Adriatico Centrale 2
-(2,  'RIENTRATA', '2025-05-20 10:15:00');  -- Costa Conero       in Zona Est Porto
-
--- ------------------------------------------------------------
 --  violazioni
--- DA RIVEDERE (VEDI LA CONDIZIONE DELL'ORA DOPO UNA VIOLAZIONE)
 -- ------------------------------------------------------------
 INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
 ('ACCESSO AREA NON AUTORIZZATA', 215456789, 2, '2025-01-30 17:00:00'),
@@ -388,7 +270,6 @@ INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
 ('ECCESSO VELOCITA', 247120011, 2, '2025-05-19 18:40:00'),
 ('ECCESSO VELOCITA', 247120011, 2, '2025-05-20 04:15:00'),
 ('ECCESSO VELOCITA', 247120011, 2, '2025-05-20 10:15:00'),
-('ECCESSO VELOCITA', 247121122, 6, '2025-06-10 10:00:00'),
 ('ECCESSO VELOCITA', 247123456, 1, '2025-01-08 16:15:00'),
 ('ECCESSO VELOCITA', 247123456, 1, '2025-01-09 04:15:00'),
 ('ECCESSO VELOCITA', 247123456, 1, '2025-01-09 16:15:00'),
@@ -457,6 +338,116 @@ INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
 ('ACCESSO AREA NON AUTORIZZATA', 247901234, 7, '2025-04-05 11:00:00');
 
 -- ------------------------------------------------------------
+--  geofence_areas
+-- ------------------------------------------------------------
+INSERT INTO geofence_areas (name, area, max_speed, ultima_violazione_valida_id) VALUES
+('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((13.4700 43.7000, 13.5500 43.7000, 13.5600 43.6700, 13.4900 43.6600, 13.4700 43.7000))', 4326), 20, 135),
+('Zona Marittima Est Porto', ST_GeomFromText('POLYGON((13.5600 43.6600, 13.6400 43.6600, 13.6500 43.6300, 13.5800 43.6200, 13.5600 43.6600))', 4326), 20, 74),
+('Area Offshore Conero Nord', ST_GeomFromText('POLYGON((13.6200 43.6000, 13.7000 43.6000, 13.7100 43.5600, 13.6400 43.5500, 13.6200 43.6000))', 4326), 50, 51),
+('Area Offshore Portonovo', ST_GeomFromText('POLYGON((13.6500 43.5600, 13.7300 43.5600, 13.7400 43.5200, 13.6700 43.5100, 13.6500 43.5600))', 4326), 50, 22),
+('Area Offshore Sirolo', ST_GeomFromText('POLYGON((13.6800 43.5200, 13.7600 43.5200, 13.7700 43.4800, 13.7000 43.4700, 13.6800 43.5200))', 4326), 50, 28),
+-- TESTARE SE LA SEGNALAZIONE PER QUESTA GEOAREA (ID 6) VA IN RITIRATA!
+('Area Offshore Numana', ST_GeomFromText('POLYGON((13.7000 43.4700, 13.7900 43.4700, 13.8000 43.4300, 13.7200 43.4200, 13.7000 43.4700))', 4326), 50, 75),
+('Adriatico Centrale 1', ST_GeomFromText('POLYGON((13.8000 43.6500, 13.9500 43.6500, 13.9500 43.5000, 13.8000 43.5000, 13.8000 43.6500))', 4326), NULL, 140),
+('Adriatico Centrale 2', ST_GeomFromText('POLYGON((13.8500 43.4800, 14.0000 43.4800, 14.0000 43.3500, 13.8500 43.3500, 13.8500 43.4800))', 4326), NULL, 68),
+('Canale di Fano', ST_GeomFromText('POLYGON((13.8000 43.8500, 13.9500 43.8500, 13.9500 43.7500, 13.8000 43.7500, 13.8000 43.8500))', 4326), NULL, 57),
+('Acque Territoriali Pesaro', ST_GeomFromText('POLYGON((12.8000 43.9500, 13.0000 43.9500, 13.0000 43.8500, 12.8000 43.8500, 12.8000 43.9500))', 4326), NULL, 63);
+
+-- ------------------------------------------------------------
+--  geofence_imbarcazioni
+-- ------------------------------------------------------------
+INSERT INTO geofence_imbarcazioni (geoarea_id, mmsi) VALUES
+-- Zona Marittima Nord Ancona (id=1)
+(1, 247123456),  -- Adriatica Uno
+(1, 247901234),  -- Eurocargo Ancona
+(1, 247113344),  -- Stella del Mare
+(1, 247119900),  -- Mare Nostrum
+
+-- Zona Marittima Est Porto (id=2)
+(2, 247345678),  -- San Ciriaco
+(2, 215456789),  -- Marche Star
+(2, 247012345),  -- Falco Marino
+(2, 247114455),  -- Vento di Levante
+(2, 247120011),  -- Costa Conero
+
+-- Area Offshore Conero Nord (id=3)
+(3, 247567890),  -- Riviera Blu
+(3, 247890123),  -- Bora Bora
+(3, 247116677),  -- Sirena Adriatica
+(3, 247118899),  -- Punta Trave
+
+-- Area Offshore Portonovo (id=4)
+(4, 247789012),  -- Don Bosco II
+(4, 247890123),  -- Bora Bora
+(4, 247112233),  -- Medusa
+(4, 247117788),  -- Orizzonte Blu
+
+-- Area Offshore Sirolo (id=5)
+(5, 247567890),  -- Riviera Blu
+(5, 247112233),  -- Medusa
+(5, 247115566),  -- Porto Recanati
+(5, 247122233),  -- Tritone
+
+-- Area Offshore Numana (id=6)
+(6, 247789012),  -- Don Bosco II
+(6, 247112233),  -- Medusa
+(6, 247121122),  -- Albatros Due
+
+-- Adriatico Centrale 1 (id=7)
+(7, 247123456),  -- Adriatica Uno
+(7, 247345678),  -- San Ciriaco
+(7, 215456789),  -- Marche Star
+(7, 247901234),  -- Eurocargo Ancona
+(7, 247113344),  -- Stella del Mare
+
+-- Adriatico Centrale 2 (id=8)
+(8, 247123456),  -- Adriatica Uno
+(8, 215456789),  -- Marche Star
+(8, 247901234),  -- Eurocargo Ancona
+(8, 247119900),  -- Mare Nostrum
+
+-- Canale di Fano (id=9)
+(9, 247114455),  -- Vento di Levante
+(9, 247117788),  -- Orizzonte Blu
+(9, 247120011),  -- Costa Conero
+
+-- Acque Territoriali Pesaro (id=10)
+(10, 247115566), -- Porto Recanati
+(10, 247118899), -- Punta Trave
+(10, 247122233); -- Tritone
+
+
+-- ------------------------------------------------------------
+--  segnalazioni
+-- ------------------------------------------------------------
+INSERT INTO segnalazioni (geoarea_id, stato, created_at) VALUES
+(1, 'RIENTRATA',  '2025-01-10 08:15:00'),  -- Adriatica Uno      in Zona Nord Ancona
+(1, 'IN CORSO',   '2025-01-15 10:30:00'),  -- Conero Explorer    in Zona Nord Ancona
+(2, 'RIENTRATA',  '2025-01-20 14:00:00'),  -- San Ciriaco        in Zona Est Porto
+(2, 'IN CORSO',   '2025-02-01 09:00:00'),  -- Marche Star        in Zona Est Porto
+(3, 'RIENTRATA',  '2025-02-05 16:45:00'),  -- Riviera Blu        in Offshore Conero Nord
+(3, 'IN CORSO',   '2025-02-10 11:20:00'),  -- Bora Bora          in Offshore Conero Nord
+(4, 'RIENTRATA',  '2025-02-14 07:30:00'),  -- Don Bosco II       in Offshore Portonovo
+(4, 'IN CORSO',   '2025-02-20 13:00:00'),  -- Medusa             in Offshore Portonovo
+(5, 'RIENTRATA',  '2025-03-01 09:15:00'),  -- Riviera Blu        in Offshore Sirolo
+(5, 'IN CORSO',   '2025-03-05 15:00:00'),  -- Medusa             in Offshore Sirolo
+(6, 'RIENTRATA',  '2025-03-10 08:00:00'),  -- Don Bosco II       in Offshore Numana
+(6, 'IN CORSO',   '2025-03-15 12:30:00'),  -- Medusa             in Offshore Numana
+(7, 'RIENTRATA',  '2025-03-20 10:00:00'),  -- Adriatica Uno      in Adriatico Centrale 1
+(7, 'IN CORSO',   '2025-03-25 14:45:00'),  -- San Ciriaco        in Adriatico Centrale 1
+(7, 'RIENTRATA',  '2025-04-01 09:30:00'),  -- Marche Star        in Adriatico Centrale 1
+(7, 'IN CORSO',   '2025-04-05 11:00:00'),  -- Eurocargo Ancona   in Adriatico Centrale 1
+(8, 'RIENTRATA',  '2025-04-10 08:45:00'),  -- Adriatica Uno      in Adriatico Centrale 2
+(8, 'IN CORSO',   '2025-04-15 13:15:00'),  -- Marche Star        in Adriatico Centrale 2
+(9, 'RIENTRATA',  '2025-04-20 10:30:00'),  -- Vento di Levante   in Canale di Fano
+(9, 'IN CORSO',   '2025-04-25 15:00:00'),  -- Orizzonte Blu      in Canale di Fano
+(10, 'RIENTRATA', '2025-05-01 09:00:00'),  -- Porto Recanati     in Acque Pesaro
+(10, 'IN CORSO',  '2025-05-05 11:30:00'),  -- Punta Trave        in Acque Pesaro
+(1,  'RIENTRATA', '2025-05-10 08:00:00'),  -- Stella del Mare    in Zona Nord Ancona
+(8,  'IN CORSO',  '2025-05-15 14:00:00'),  -- Mare Nostrum       in Adriatico Centrale 2
+(2,  'RIENTRATA', '2025-05-20 10:15:00');  -- Costa Conero       in Zona Est Porto
+
+-- ------------------------------------------------------------
 --  log_spostamenti
 -- ------------------------------------------------------------
 INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
@@ -464,7 +455,7 @@ INSERT INTO log_spostamenti (mmsi, geoarea_id, spostamento, created_at) VALUES
 (247123456, 1, 'USCITA',  '2026-06-20 18:30:00'),
 (247123456, 1, 'ENTRATA', '2026-06-21 05:45:00'),
 (247123456, 1, 'USCITA',  '2026-06-21 19:15:00'),
-(247123456, 1, 'ENTRATA', '2026-06-22 06:10:00'), --ultimo per geoid 1
+(247123456, 1, 'ENTRATA', '2026-06-22 06:10:00'),
 (247234567, 2, 'ENTRATA', '2026-06-20 08:00:00'),
 (247234567, 2, 'USCITA',  '2026-06-20 12:00:00'),
 (247234567, 2, 'ENTRATA', '2026-06-21 08:15:00'),
@@ -614,3 +605,13 @@ INSERT INTO imbarcazioni_segnalazioni (id_segnalazione, mmsi) VALUES
 (23, 247113344),  -- segnalazione 23 (geoarea 1)  → Stella del Mare
 (24, 247119900),  -- segnalazione 24 (geoarea 8)  → Mare Nostrum
 (25, 247120011);  -- segnalazione 25 (geoarea 2)  → Costa Conero
+
+-- ============================================================
+--  Aggiunta foreign keys dopo la creazione per evitare problemi tra geofence_areas
+--  e violazioni.
+-- ============================================================
+ALTER TABLE geofence_areas
+ADD CONSTRAINT fk_violaz FOREIGN KEY (ultima_violazione_valida_id) REFERENCES violazioni(id) ON DELETE SET NULL; -- Per evitare che se cancelliamo la violazione associata si cancelli anche la geoarea
+
+ALTER TABLE violazioni
+ADD CONSTRAINT fk_viol_geoarea FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE;
