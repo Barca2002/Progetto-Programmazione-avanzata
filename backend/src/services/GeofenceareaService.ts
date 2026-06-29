@@ -81,7 +81,7 @@ export class GeofenceareaService {
     await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      await this.geofenceareaDAO.update(id,undefined, data, t);
+      await this.geofenceareaDAO.update(id, data, t);
       await t.commit();
       return await this.geofenceareaDAO.get(id);
     } catch (err) {
@@ -96,7 +96,7 @@ export class GeofenceareaService {
     await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const result = await this.geofenceareaDAO.delete(id, undefined, t);
+      const result = await this.geofenceareaDAO.delete(id, t);
       await t.commit();
       return result;
     } catch (err) {

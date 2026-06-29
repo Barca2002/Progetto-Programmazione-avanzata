@@ -6,7 +6,6 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
-import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
@@ -20,9 +19,13 @@ export class ImbarcazioneService {
   private imbarcazioneDAO = new ImbarcazioneDAO();
   private adminDAO = new AdminDAO();
   private geofenceareaDAO = new GeofenceareaDAO();
-  private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
   private logSpostamentiDAO = new LogSpostamentiDAO();
   private segnalazioneDAO = new SegnalazioneDAO();
+  //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo, nel momento in cui si lancia new ImbarcazioneService()
+  private get geofence_imbarcazioni() {
+    return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
+  }
+
 
   async createImbarcazione(data: ImbarcazioneCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
@@ -64,7 +67,7 @@ export class ImbarcazioneService {
     const result = [];
 
     for (const imbarcazione of imbarcazioni) {
-      const associazioni = await this.geofenceImbarcazioniDAO.getAllByMmsi(imbarcazione.mmsi);
+      const associazioni = await this.geofence_imbarcazioni.findAll({ where: { mmsi: imbarcazione.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
 
       const geoareas: Geofencearea[] = [];
       for (const associazione of associazioni) {
@@ -92,11 +95,11 @@ export class ImbarcazioneService {
     const result = [];
 
     for (const imbarcazione of my_imbarcazioni) {
-      const associazioni = await this.geofenceImbarcazioniDAO.getAllByMmsi(imbarcazione.mmsi);
+      const associazioni = await this.geofence_imbarcazioni.findAll({ where: { mmsi: imbarcazione.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
 
       // Se si vogliono escludere le imbarcazioni con 0 geoaree associate decommentare
-      // if (associazioni.length === 0)
-      //   continue;
+      if (associazioni.length === 0)
+        continue;
 
       const geoareas: { geoarea_id: number, name: string }[] = [];
       for (const associazione of associazioni) {
@@ -250,7 +253,7 @@ export class ImbarcazioneService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      await this.imbarcazioneDAO.update(mmsi, undefined, data, t);
+      await this.imbarcazioneDAO.update(mmsi, data, t);
       await t.commit();
       return await this.imbarcazioneDAO.get(mmsi);
     } catch (err) {
@@ -267,7 +270,7 @@ export class ImbarcazioneService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const result = await this.imbarcazioneDAO.delete(mmsi, undefined, t);
+      const result = await this.imbarcazioneDAO.delete(mmsi, t);
       await t.commit();
       return result;
     } catch (err) {
@@ -295,13 +298,13 @@ export class ImbarcazioneService {
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
           }
           // Passiamo anche la transazione perché ad ogni iterazione ci sono dei dati in sospeso e per controllarli serve la transazione. Altrimenti le associazioni in sospeso non vengono controllate, quindi si possono inserire associazioni duplicate.
-          const associazioneEsistente = await this.geofenceImbarcazioniDAO.get(geoarea_id, mmsi);
+          const associazioneEsistente = await this.geofence_imbarcazioni.findOne({ where: { geoarea_id: geoarea_id, mmsi: imbarcazione.mmsi } }) as unknown as { geoarea_id: number; mmsi: number } | null;
 
           if (associazioneEsistente) {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_ASSOCIATION);
           }
           //Associo le geoaree
-          await this.geofenceImbarcazioniDAO.create({ geoarea_id, mmsi }, t);
+          await this.geofence_imbarcazioni.create({ geoarea_id, mmsi }, {transaction: t});
         }
       }
 
@@ -341,11 +344,11 @@ export class ImbarcazioneService {
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
 
       //Controllo che l'associazione esista
-      const associazione = await this.geofenceImbarcazioniDAO.get(geoarea_id, mmsi);
+      const associazione = await this.geofence_imbarcazioni.findOne({ where: { mmsi: imbarcazione.mmsi, geoarea_id: geoarea_id } }) as unknown as { geoarea_id: number; mmsi: number } | null;
       if (!associazione)
         throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
 
-      await this.geofenceImbarcazioniDAO.delete(geoarea_id, mmsi, t);
+      await this.geofence_imbarcazioni.destroy({ where: { mmsi: mmsi, geoarea_id: geoarea_id }, transaction: t });
       await t.commit();
     } catch (err) {
       await t.rollback();

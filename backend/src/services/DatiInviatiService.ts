@@ -4,7 +4,6 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { ImbarcazioneDAO } from '../dao/ImbarcazioneDAO.js';
-import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 import { Datiinviati, DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js'; 
 import { LogSpostamentiService } from './LogSpostamentiService.js';
@@ -14,7 +13,6 @@ export class DatiInviatiService {
   private datiinviatiDAO = new DatiinviatiDAO();
   private geofenceareaService = new GeofenceareaService();
   private imbarcazioneDAO = new ImbarcazioneDAO();
-  private geofenceImbarcazioniDAO = new GeofenceImbarcazioniDAO();
   private imbarcazioniService = new ImbarcazioneService();
   private logspostamentoService = new LogSpostamentiService();
 
@@ -37,7 +35,8 @@ export class DatiInviatiService {
     }
     // Passiamo l'user_id estratto dal token JWT per controllare se è il proprietario della barca.
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
-    const allowedGeoareas = this.geofenceImbarcazioniDAO.getAllByMmsi(data.mmsi);
+    const geofence_imbarcazioni = DatabaseConnection.getInstance().model('geofence_imbarcazioni');
+    const allowedGeoareas = await geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number }[];
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
@@ -56,7 +55,7 @@ export class DatiInviatiService {
           geoarea_id:current_geoarea.geoarea_id, spostamento: "ENTRATA"});
         }
       } else {
-        // Dall'ultimo spostamento/dato inivato ricaviamo la sua geoarea.
+        // Dall'ultimo spostamento/dato inviato ricaviamo la sua geoarea.
         const last_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
         if(!last_geoarea){
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
@@ -82,7 +81,7 @@ export class DatiInviatiService {
             if(lastAreaIsAllowed && !currentAreaIsAllowed){
               await this.logspostamentoService.create({mmsi: data.mmsi, geoarea_id: last_geoarea.geoarea_id, spostamento: "USCITA"});
             }
-            // CASO 4: nessuna delle due areee è autorizzata, quindi non salviamo nulla.
+            // CASO 4: nessuna delle due aree è autorizzata, quindi non salviamo nulla.
         }
       }
       await this.datiinviatiDAO.create(data, t);

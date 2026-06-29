@@ -9,7 +9,6 @@ import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class SegnalazioneService{
-
     private segnalazioneDao = new SegnalazioneDAO();
     private geofenceareaService = new GeofenceareaService();
     private violazioneDAO = new ViolazioneDAO();
@@ -113,7 +112,7 @@ export class SegnalazioneService{
             const t = await DatabaseConnection.getInstance().transaction();
             try {
                 const data: Partial<SegnalazioneCreationData> = {stato: "RIENTRATA"}
-                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, undefined, data, t);
+                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, data, t);
                 await t.commit();
             } catch (err) {
                 await t.rollback();

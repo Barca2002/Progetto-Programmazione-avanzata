@@ -1,7 +1,6 @@
 import { Imbarcazione } from '../models/ImbarcazioneModel.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { User } from '../models/UserModel.js';
-import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
 import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 import { Segnalazione } from '../models/SegnalazioneModel.js';
 import { Violazione } from '../models/ViolazioneModel.js';
@@ -12,7 +11,7 @@ export function inizializzaAssociazioni(): void {
 
     // GEOAREA CON IMBARCAZIONE (N:N)
     Imbarcazione.belongsToMany(Geofencearea, {
-        through: GeofenceImbarcazioni,
+        through: 'geofence_imbarcazioni',
         timestamps: false,
         foreignKey: 'mmsi',
         otherKey: 'geoarea_id',
@@ -21,7 +20,7 @@ export function inizializzaAssociazioni(): void {
 
 
     Geofencearea.belongsToMany(Imbarcazione, {
-        through: GeofenceImbarcazioni,
+        through: 'geofence_imbarcazioni',
         timestamps: false,
         foreignKey: 'geoarea_id',
         otherKey: 'mmsi',

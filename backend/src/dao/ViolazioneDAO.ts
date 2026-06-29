@@ -33,12 +33,12 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
     return await Violazione.findAll();
   }
 
-  async update(violazione_id: number, _item_id2?: number, new_data?:Partial<ViolazioneCreationData>, t?: Transaction): Promise<Violazione> {
+  async update(violazione_id: number, new_data:Partial<ViolazioneCreationData>, t: Transaction): Promise<Violazione> {
     const violazione = await Violazione.findByPk(violazione_id);
     return await violazione!.update(new_data!, {transaction: t!});
   }
 
-  async delete(user_id: number, _item_id2?: number, t?: Transaction): Promise<Violazione | null> {
+  async delete(user_id: number, t: Transaction): Promise<Violazione | null> {
       const violazione = await Violazione.findByPk(user_id);
       await violazione!.destroy({ transaction: t! });
       return violazione;
