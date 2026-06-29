@@ -2,10 +2,9 @@ import { AdminDAO } from "../dao/AdminDAO.js";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
-import { User, UserCreationData } from "../models/UserModel.js";
+import { UserCreationData } from "../models/UserModel.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AuthService } from '../services/AuthService.js';
-import { Transaction } from "sequelize";
 import { AppError } from "../models/AppErrorModel.js";
 
 export class AdminService {
