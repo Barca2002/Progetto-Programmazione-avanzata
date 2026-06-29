@@ -92,7 +92,7 @@ CREATE TABLE violazioni (
     tipo  VARCHAR(255)          NOT NULL,
     mmsi               INT          NOT NULL,
     geoarea_id         INT          NOT NULL,
-    contaInSegnalazione BOOLEAN     NOT NULL DEFAULT TRUE,
+    conta_in_segnalazione BOOLEAN     NOT NULL DEFAULT TRUE,
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),

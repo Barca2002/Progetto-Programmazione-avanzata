@@ -38,6 +38,7 @@ export class ViolazioneService{
             if (err instanceof AppError) { 
                 throw err;
             }
+            console.log(err);
             throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
         }
     }
@@ -78,14 +79,14 @@ export class ViolazioneService{
         let violazioneGiaRegistrata = false;
         if(data.velocita_kmh > current_area.max_speed){
             // Creiamo la violazione per eccesso di velocità
-            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA', contaInSegnalazione: true};
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA', conta_in_segnalazione: true};
             await this.createViolazione(dataViolazione);
             violazioneGiaRegistrata = true;
         }
         // .some() controlla se almeno un elemento soddisfa la condizione definita.
         if(!allowedGeoareas.some(g => g.geoarea_id === current_area!.geoarea_id)){
             // Creiamo la violazione per accesso ad una area non autorizzata. Se è già stata registrata la violazione per eccesso di velocità, il campo contaInSegnalazione sarà false, altrimenti sarà true e quindi conterà.
-            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA', contaInSegnalazione: !violazioneGiaRegistrata};
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA', conta_in_segnalazione: !violazioneGiaRegistrata};
             await this.createViolazione(dataViolazione);
         }
         return;

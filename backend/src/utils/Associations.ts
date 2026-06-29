@@ -1,11 +1,11 @@
-import { Imbarcazione } from './ImbarcazioneModel.js';
-import { Geofencearea } from './GeofenceareaModel.js';
-import { User } from './UserModel.js';
-import { GeofenceImbarcazioni } from './GeofenceImbarcazioniModel.js';
-import { LogSpostamenti } from './LogSpostamentiModel.js';
-import { Segnalazione } from './SegnalazioneModel.js';
-import { Violazione } from './ViolazioneModel.js';
-import { Datiinviati } from './DatiInviatiModel.js';
+import { Imbarcazione } from '../models/ImbarcazioneModel.js';
+import { Geofencearea } from '../models/GeofenceareaModel.js';
+import { User } from '../models/UserModel.js';
+import { GeofenceImbarcazioni } from '../models/GeofenceImbarcazioniModel.js';
+import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
+import { Segnalazione } from '../models/SegnalazioneModel.js';
+import { Violazione } from '../models/ViolazioneModel.js';
+import { Datiinviati } from '../models/DatiInviatiModel.js';
 
 
 export function inizializzaAssociazioni(): void {
