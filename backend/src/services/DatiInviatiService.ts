@@ -18,11 +18,11 @@ export class DatiInviatiService {
 
   //Torna l'ultimo dato inviato per quella imbarcazione
   public async findLastDatoInviatoByMmsi(mmsi: number): Promise<Datiinviati> {
-    const dato = await this.datiinviatiDAO.getLastDatoByMmsi(mmsi);
-    if (!dato) {
+    const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(mmsi);
+    if (!last_dato) {
       throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
     }
-    return dato;
+    return last_dato;
   }
 
 

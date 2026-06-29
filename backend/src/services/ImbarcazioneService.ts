@@ -10,6 +10,7 @@ import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
+import { GeofenceareaService } from './GeofenceareaService.js';
 
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
@@ -18,6 +19,9 @@ export class ImbarcazioneService {
   private readonly adminDAO = new AdminDAO();
   private readonly geofenceareaDAO = new GeofenceareaDAO();
   private readonly segnalazioneDAO = new SegnalazioneDAO();
+  private readonly geofenceareaService = new GeofenceareaService();
+
+
   //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo
   private get geofence_imbarcazioni() {
     return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
@@ -106,6 +110,33 @@ export class ImbarcazioneService {
     }
     return result;
   }
+
+
+  async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
+    const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
+
+    if (!my_imbarcazioni || my_imbarcazioni.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+
+    const results = [];
+    for (const imbarcazione of my_imbarcazioni) {
+      try {
+        const status = await this.geofenceareaService.getGeoareaByLastDatoImbarcazione(imbarcazione.mmsi, geoarea_id);
+        results.push(status);
+      } catch (err) {
+        if (err instanceof AppError)
+          continue; // Per evitare che alla prima geoarea che non trova, anche se ne ha trovata una, non dia subito l'errore
+        throw err;
+      }
+    }
+
+    //Mando l'errore solo se effettivamente non ne ha trovata nessuna
+    if (results.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
+
+    return results;
+  }
+
 
   async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
     if (!Number.isFinite(mmsi) || mmsi <= 0)
@@ -270,7 +301,7 @@ export class ImbarcazioneService {
       await t.commit();
     } catch (err) {
       await t.rollback();
-      if (err instanceof AppError) 
+      if (err instanceof AppError)
         throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }

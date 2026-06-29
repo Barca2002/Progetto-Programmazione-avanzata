@@ -16,7 +16,7 @@ export interface GeofenceareaAllData {
   created_at: Date;
 }
 
-export interface GeofenceareaCreationData extends Omit<Optional<GeofenceareaAllData, 'max_speed'>, 'geoarea_id' | 'created_at'> {}
+export interface GeofenceareaCreationData extends Omit<Optional<GeofenceareaAllData, 'max_speed'>, 'geoarea_id' | 'created_at' | 'ultima_violazione_valida_id'> {}
 
 export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreationData> implements GeofenceareaAllData {
   declare geoarea_id: number;

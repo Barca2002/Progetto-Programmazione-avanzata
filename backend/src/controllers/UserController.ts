@@ -48,4 +48,22 @@ export class UserController {
     await this.adminService.updateTokenBalance(user.email, user.tokens - 0.025);
     return true;
   }
+
+  public async myImbarcazioniStatus(req: Request, res: Response) {
+    try {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader!.split(' ')[1];
+      const user_id = decodeJwt(token!).user_id;
+      const geoarea_id = req.body.geoarea_id;
+      const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, my_imbarcazioni_status));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+
+  }
 }

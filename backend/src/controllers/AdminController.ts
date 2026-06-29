@@ -13,7 +13,7 @@ export class AdminController {
   private readonly violazioneService = new ViolazioneService();
   
 
-  public async getUsers(req: Request, res: Response) {
+  public async getUsers(_req: Request, res: Response) {
     try {
       const utenti = await this.adminService.getUtenti();
       // Togliamo la password, il parametro plain: true rimuove tutti i metadati inutili di Sequelize.
@@ -91,7 +91,6 @@ export class AdminController {
   }
 
   public async getSegnalazioniByGeoarea(req: Request, res: Response){
-    // L'mmsi va castato in number per lavorarci con le altre funzioni
     try {
       const geoarea_id = Number(req.params.geoarea_id);
       const segnalazioni = await this.segnalazioneService.getSegnalazioniByGeoarea(geoarea_id);
@@ -121,7 +120,6 @@ export class AdminController {
   }
 
   public async getViolazioniByGeoarea(req: Request, res: Response){
-    // L'mmsi va castato in number per lavorarci con le altre funzioni
     try {
       const geoarea_id = Number(req.params.geoarea_id);
       const violazioni = await this.violazioneService.getViolazioniByGeoarea(geoarea_id);

@@ -19,3 +19,7 @@ UserRouter.post("/sendData", checkUserRole, tokenBalanceCheck, checkDatiInviati,
     await userController.sendData(req, res);
 });
 
+UserRouter.get("/imbarcazioni/status", checkUserRole, tokenBalanceCheck, checkUserRole, async function(req: Request, res: Response) {
+    await userController.myImbarcazioniStatus(req, res);
+});
+
