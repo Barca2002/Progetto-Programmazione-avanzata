@@ -10,10 +10,10 @@ import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class ViolazioneService {
 
-    private violazioneDAO = new ViolazioneDAO();
-    private geofenceareaService = new GeofenceareaService();
-    private imbarcazioneService = new ImbarcazioneService();
-    //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo, nel momento in cui si lancia new ViolazioneService().
+    private readonly violazioneDAO = new ViolazioneDAO();
+    private readonly geofenceareaService = new GeofenceareaService();
+    private readonly imbarcazioneService = new ImbarcazioneService();
+    //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo.
     private get geofence_imbarcazioni() {
         return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
     }
@@ -46,12 +46,12 @@ export class ViolazioneService {
     }
 
     async getViolazioniByMmsi(mmsi: number) {
-        if (!mmsi || isNaN(mmsi) || mmsi <= 0) {
+        if (!mmsi || Number.isNaN(mmsi) || mmsi <= 0) {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
         }
         // Controllo che esiste l'imbarcazione
         await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
-        const violazioni = this.violazioneDAO.findAllByMmsi(mmsi);
+        const violazioni = await this.violazioneDAO.findAllByMmsi(mmsi);
         if (!violazioni) {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
@@ -59,12 +59,12 @@ export class ViolazioneService {
     }
 
     async getViolazioniByGeoarea(geoarea_id: number) {
-        if (!geoarea_id || isNaN(geoarea_id) || geoarea_id <= 0) {
+        if (!geoarea_id || Number.isNaN(geoarea_id) || geoarea_id <= 0) {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
         }
         // Controllo che esista la geoarea
         await this.geofenceareaService.getAreaById(geoarea_id);
-        const violazioni = this.violazioneDAO.findAllByGeoarea(geoarea_id);
+        const violazioni = await this.violazioneDAO.findAllByGeoarea(geoarea_id);
         if (!violazioni) {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
@@ -87,11 +87,10 @@ export class ViolazioneService {
             violazioneGiaRegistrata = true;
         }
         // .some() controlla se almeno un elemento soddisfa la condizione definita.
-        if (!allowedGeoareas.some(g => g.geoarea_id === current_area!.geoarea_id)) {
+        if (!allowedGeoareas.some(g => g.geoarea_id === current_area.geoarea_id)) {
             // Creiamo la violazione per accesso ad una area non autorizzata. Se è già stata registrata la violazione per eccesso di velocità, il campo contaInSegnalazione sarà false, altrimenti sarà true e quindi conterà.
             const dataViolazione: ViolazioneCreationData = { mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA', conta_in_segnalazione: !violazioneGiaRegistrata };
             await this.createViolazione(dataViolazione);
         }
-        return;
     }
 }

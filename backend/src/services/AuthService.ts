@@ -8,9 +8,9 @@ import { AppError } from '../models/AppErrorModel.js';
 
 
 export class AuthService{
-    private adminDao = new AdminDAO();
-    private privateKey: string;
-    private saltRounds = 12;
+    private readonly adminDao = new AdminDAO();
+    private readonly privateKey: string;
+    private readonly saltRounds = 12;
 
      constructor() {
         // Lettura della chiave privata dal .env
@@ -60,7 +60,7 @@ export class AuthService{
 
     public async checkUserId (id: number){
     // Controlla se l'user id è valido, cioè se è un numero e se non è minore o uguale a 0.
-    if (isNaN(id) || id <= 0) {
+    if (Number.isNaN(id) || id <= 0) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
     }
     return true;

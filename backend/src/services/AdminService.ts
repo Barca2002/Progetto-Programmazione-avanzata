@@ -2,15 +2,14 @@ import { AdminDAO } from "../dao/AdminDAO.js";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
-import { User, UserCreationData } from "../models/UserModel.js";
+import { UserCreationData } from "../models/UserModel.js";
 import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { AuthService } from '../services/AuthService.js';
-import { Transaction } from "sequelize";
 import { AppError } from "../models/AppErrorModel.js";
 
 export class AdminService {
-  private adminDAO = new AdminDAO();
-  private authService = new AuthService();
+  private readonly adminDAO = new AdminDAO();
+  private readonly authService = new AuthService();
 
   public async createUtente(data: UserCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
@@ -74,13 +73,13 @@ export class AdminService {
     }
     // Se si vuole modificare la password, viene hashata prima della modifica.
     if (data.password) {
-      data.password = await this.authService.hashPassword(data.password!);
+      data.password = await this.authService.hashPassword(data.password);
     }
     // Iniziamo la transazione e se va a buon fine ritorna l'user aggiornato,
     // altrimenti si fa il rollback.
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const result = await this.adminDAO.update(id, undefined, data, t);
+      const result = await this.adminDAO.update(id, data, t);
       await t.commit();
       return result;
     } catch (err) {
@@ -96,7 +95,7 @@ export class AdminService {
     await this.authService.checkUserId(id);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      await this.adminDAO.delete(id, undefined, t);
+      await this.adminDAO.delete(id, t);
       await t.commit();
       return SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null);
     } catch (err) {
@@ -114,13 +113,13 @@ export class AdminService {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
       const user = await this.findByEmail(email);
-      if (user!.tokens <= 0){
+      if (user.tokens <= 0){
         throw ErrorFactory.getError(AppErrorEnum.TOKEN_SPEND_ERROR);
       }
       // Aggiornamento del saldo dei token dell'utente
       const result = await user.update({ tokens: tokenAmount }, { transaction: t });
       await t.commit();
-      return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, result!.tokens);
+      return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, result.tokens);
     } catch (err) {
       await t.rollback();
       if (err instanceof AppError)

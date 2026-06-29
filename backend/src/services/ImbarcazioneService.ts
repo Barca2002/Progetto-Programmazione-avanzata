@@ -16,12 +16,12 @@ import { Geofencearea } from '../models/GeofenceareaModel.js';
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
 export class ImbarcazioneService {
-  private imbarcazioneDAO = new ImbarcazioneDAO();
-  private adminDAO = new AdminDAO();
-  private geofenceareaDAO = new GeofenceareaDAO();
-  private logSpostamentiDAO = new LogSpostamentiDAO();
-  private segnalazioneDAO = new SegnalazioneDAO();
-  //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo, nel momento in cui si lancia new ImbarcazioneService()
+  private readonly imbarcazioneDAO = new ImbarcazioneDAO();
+  private readonly adminDAO = new AdminDAO();
+  private readonly geofenceareaDAO = new GeofenceareaDAO();
+  private readonly logSpostamentiDAO = new LogSpostamentiDAO();
+  private readonly segnalazioneDAO = new SegnalazioneDAO();
+  //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo
   private get geofence_imbarcazioni() {
     return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
   }
@@ -50,7 +50,7 @@ export class ImbarcazioneService {
   }
 
   async getImbarcazioneByMmsi(mmsi: number) {
-    if (isNaN(mmsi) || mmsi <= 0)
+    if (Number.isNaN(mmsi) || mmsi <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
     const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
     if (!imbarcazione) {
@@ -76,15 +76,13 @@ export class ImbarcazioneService {
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         geoareas.push(geoarea);
       }
-
       result.push({ imbarcazione: imbarcazione.toJSON(), Geoareas: geoareas });
     }
-
     return result;
   }
 
-  async getMyImbarcazioniWithGeofences(user_id: number): Promise<Imbarcazione[]> {
-    if (isNaN(user_id) || user_id <= 0)
+  async getMyImbarcazioniWithGeofences(user_id: number) {
+    if (Number.isNaN(user_id) || user_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
 
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
@@ -97,7 +95,6 @@ export class ImbarcazioneService {
     for (const imbarcazione of my_imbarcazioni) {
       const associazioni = await this.geofence_imbarcazioni.findAll({ where: { mmsi: imbarcazione.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
 
-      // Se si vogliono escludere le imbarcazioni con 0 geoaree associate decommentare
       if (associazioni.length === 0)
         continue;
 
@@ -107,12 +104,9 @@ export class ImbarcazioneService {
         if (!geoarea)
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         geoareas.push({ geoarea_id: geoarea.geoarea_id, name: geoarea.name });
-
       }
-
-      result.push({ ...imbarcazione.toJSON(), Geofenceareas: geoareas });
+      result.push({ imbarcazione: imbarcazione.toJSON(), Geofenceareas: geoareas });
     }
-
     return result;
   }
 
@@ -197,10 +191,10 @@ export class ImbarcazioneService {
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-    if (!(start_date instanceof Date) || isNaN(start_date.getTime()))
+    if (!(start_date instanceof Date) || Number.isNaN(start_date.getTime()))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE);
 
-    if (!(end_date instanceof Date) || isNaN(end_date.getTime()))
+    if (!(end_date instanceof Date) || Number.isNaN(end_date.getTime()))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE);
 
     if (start_date >= end_date)
@@ -231,11 +225,11 @@ export class ImbarcazioneService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     }
 
-    if (!(start_date instanceof Date) || isNaN(start_date.getTime())) {
+    if (!(start_date instanceof Date) || Number.isNaN(start_date.getTime())) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE);
     }
 
-    if (!(end_date instanceof Date) || isNaN(end_date.getTime())) {
+    if (!(end_date instanceof Date) || Number.isNaN(end_date.getTime())) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE);
     }
 
@@ -344,7 +338,7 @@ export class ImbarcazioneService {
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
 
       //Controllo che l'associazione esista
-      const associazione = await this.geofence_imbarcazioni.findOne({ where: { mmsi: imbarcazione.mmsi, geoarea_id: geoarea_id } }) as unknown as { geoarea_id: number; mmsi: number } | null;
+      const associazione = await this.geofence_imbarcazioni.findOne({ where: { mmsi: imbarcazione.mmsi, geoarea_id: geoarea.geoarea_id } }) as unknown as { geoarea_id: number; mmsi: number } | null;
       if (!associazione)
         throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
 

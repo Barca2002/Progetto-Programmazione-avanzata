@@ -37,6 +37,7 @@ inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
 const app = express();
 
+app.disable('x-powered-by'); //Nasconde agli attaccanti che il server usa Express
 app.use(express.json());
 
 app.get('/', (_req, res) => {
