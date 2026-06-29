@@ -10,7 +10,6 @@ import { geofenceareaRouter } from './routes/GeofenceareaRoutes.js';
 import { Imbarcazione } from './models/ImbarcazioneModel.js';
 import { imbarcazioneRouter } from './routes/ImbarcazioneRoutes.js';
 import { inizializzaAssociazioni } from './utils/Associations.js';
-import { GeofenceImbarcazioni } from './models/GeofenceImbarcazioniModel.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
 import { UserRouter } from './routes/UserRoutes.js';
 import { Segnalazione } from './models/SegnalazioneModel.js';
@@ -28,7 +27,6 @@ const PORT = process.env.APP_PORT;
 User.inizializzaModel(DatabaseConnection.getInstance());
 Geofencearea.inizializzaModel(DatabaseConnection.getInstance());
 Imbarcazione.inizializzaModel(DatabaseConnection.getInstance());
-GeofenceImbarcazioni.inizializzaModel(DatabaseConnection.getInstance());
 Datiinviati.inizializzaModel(DatabaseConnection.getInstance());
 Segnalazione.inizializzaModel(DatabaseConnection.getInstance());
 LogSpostamenti.inizializzaModel(DatabaseConnection.getInstance());
@@ -39,6 +37,7 @@ inizializzaAssociazioni(); //serve per inizializzare le molti a molti
 
 const app = express();
 
+app.disable('x-powered-by'); //Nasconde agli attaccanti che il server usa Express
 app.use(express.json());
 
 app.get('/', (_req, res) => {

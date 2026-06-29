@@ -22,7 +22,7 @@ adminRouter.get("/:id", async function(req: Request, res: Response){
 // UPDATE utente
 adminRouter.patch("/update/:id", async function(req: Request, res: Response){
     await adminController.updateUser(req, res);
-}); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perchè put sostituisce l'intera istanza con i dati nuovi che inserisco.
+}); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perché put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
 // DELETE utente
 adminRouter.delete("/delete/:id", async function(req: Request, res: Response){

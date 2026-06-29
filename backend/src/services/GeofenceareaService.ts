@@ -8,7 +8,7 @@ import { QueryTypes } from "sequelize";
 import { AppError } from "../models/AppErrorModel.js";
 
 export class GeofenceareaService {
-  private geofenceareaDAO = new GeofenceareaDAO();
+  private readonly geofenceareaDAO = new GeofenceareaDAO();
 
   public async getAree() {
     const aree = await this.geofenceareaDAO.getAll();
@@ -46,7 +46,7 @@ export class GeofenceareaService {
   };
 
   public async getAreaById(id: number) {
-    if (isNaN(id) || id <= 0)
+    if (Number.isNaN(id) || id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
     const area = await this.geofenceareaDAO.get(id);
     if (!area){
@@ -81,7 +81,7 @@ export class GeofenceareaService {
     await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      await this.geofenceareaDAO.update(id,undefined, data, t);
+      await this.geofenceareaDAO.update(id, data, t);
       await t.commit();
       return await this.geofenceareaDAO.get(id);
     } catch (err) {
@@ -96,7 +96,7 @@ export class GeofenceareaService {
     await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const result = await this.geofenceareaDAO.delete(id, undefined, t);
+      const result = await this.geofenceareaDAO.delete(id, t);
       await t.commit();
       return result;
     } catch (err) {

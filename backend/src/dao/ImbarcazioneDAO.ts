@@ -48,12 +48,12 @@ export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
     });
   }
 
-  async update(mmsi: number, _item_id2?: number, new_data?: Partial<ImbarcazioneCreationData>, t?: Transaction): Promise<Imbarcazione | null> {
+  async update(mmsi: number, new_data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione | null> {
     const imbarcazione = await Imbarcazione.findByPk(mmsi);
     return await imbarcazione!.update(new_data!, { transaction: t! });
   }
 
-  async delete(mmsi: number, _item_id2?: number, t?: Transaction): Promise<Imbarcazione | null> {
+  async delete(mmsi: number, t: Transaction): Promise<Imbarcazione | null> {
     const imbarcazione = await Imbarcazione.findByPk(mmsi);
     await imbarcazione!.destroy({ transaction: t! });
     return imbarcazione;
