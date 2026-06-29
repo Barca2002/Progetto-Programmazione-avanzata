@@ -15,7 +15,7 @@ const passwordSchema = z.string().min(8).max(32).regex(/^(?=.*[A-Za-z])(?=.*\d)\
 const usernameSchema = z.string().min(4).max(50).regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]+$/);
 
 // Validazione username. Controlla se l'username è presente e segue lo schema definito con Zod.
-function checkUsername(req: Request, res: Response, next: NextFunction) {
+function checkUsername(req: Request, _res: Response, next: NextFunction) {
     const username = req.body.username;
     
     if (!username || !usernameSchema.safeParse(username).success) {
@@ -25,7 +25,7 @@ function checkUsername(req: Request, res: Response, next: NextFunction) {
 }
 
 // Validazione email. Controlla se l'email è presente e segue lo schema definito con Zod.
-function checkEmail(req: Request, res: Response, next: NextFunction) {
+function checkEmail(req: Request, _res: Response, next: NextFunction) {
     const email = req.body.email;
     // Non serve controllare se è una stringa perché zod già lo fa
     if (!email || !emailSchema.safeParse(email).success) {
@@ -36,7 +36,7 @@ function checkEmail(req: Request, res: Response, next: NextFunction) {
 }
 
 // Validazione password. Controlla se la password è presente e segue lo schema definito con Zod.
-function checkPassword(req: Request, res: Response, next: NextFunction) {
+function checkPassword(req: Request, _res: Response, next: NextFunction) {
     const password = req.body.password;
     
     if (!password || !passwordSchema.safeParse(password).success) {

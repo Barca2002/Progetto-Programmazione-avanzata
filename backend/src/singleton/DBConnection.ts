@@ -7,7 +7,7 @@ dotenv.config();
 
 export class DatabaseConnection {
     private static connDB: DatabaseConnection; //PATTERN SINGLETON: unica istanza di connessione (attributo statico con lo stesso tipo della classe); 
-    private instance: Sequelize; //connessione con ORM Sequelize
+    private readonly instance: Sequelize; //connessione con ORM Sequelize
     
     private constructor() {
       const {

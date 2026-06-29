@@ -26,7 +26,7 @@ export class AuthController {
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_LOGGED_IN, responseData));
         } catch (err) {
             if (err instanceof AppError){
-                (err as AppError).send(res)
+                err.send(res)
             } else {
                 res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
             }
@@ -44,7 +44,7 @@ export class AuthController {
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));
         } catch (err) {
             if (err instanceof AppError){
-                (err as AppError).send(res)
+                err.send(res)
             } else {
                 res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
             }

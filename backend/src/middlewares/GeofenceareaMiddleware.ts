@@ -73,8 +73,7 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     }
     // Controllo che il primo e l'ultimo punto coincidono per chiudere l'area
     const primoPunto = punti[0];
-    const ultimoPunto = punti[punti.length - 1];
-
+    const ultimoPunto = punti.at(-1);
     if (!primoPunto || !ultimoPunto || primoPunto[0] !== ultimoPunto[0] || primoPunto[1] !== ultimoPunto[1]) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
     }

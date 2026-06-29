@@ -9,7 +9,6 @@ import { ViolazioneCreationData } from '../models/ViolazioneModel.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class ViolazioneService {
-
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaService = new GeofenceareaService();
     private readonly imbarcazioneService = new ImbarcazioneService();

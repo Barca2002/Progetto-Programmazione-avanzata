@@ -1,21 +1,10 @@
-import { User } from '../models/UserModel.js';
-import { UserCreationData } from '../models/UserModel.js';
+import { User, UserCreationData } from '../models/UserModel.js';
 import { Transaction } from 'sequelize';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
 
 /*
 * I DAO devono solo occuparsi effettuare operazioni basilari (CRUD) con i dati,
 * quindi le eccezioni/errori devono essere gestiti nei service o controllers.
-*/
-
-/*
-export interface InterfacciaDAO<T>{
-    create(item: T, t: Transaction): Promise<T>;
-    get(item_id1: number, item_id2?: number): Promise<T | null>;
-    getAll(): Promise<T[]>; 
-    update(item_id: number, item_id2?: number, new_data?: Partial<T>, t?: Transaction): Promise<T | null>;
-    delete(item_id1: number, item_id2?: number, t?: Transaction): Promise<T | null>;
-}
 */
 
 export class AdminDAO implements InterfacciaDAO<User> {
@@ -33,12 +22,12 @@ export class AdminDAO implements InterfacciaDAO<User> {
 
   async update(user_id: number,new_data: Partial<UserCreationData>, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
-    return await user!.update(new_data!, { transaction: t! });
+    return await user!.update(new_data, { transaction: t });
   }
 
   async delete(user_id: number, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
-    await user!.destroy({ transaction: t! });
+    await user!.destroy({ transaction: t });
     return user;
   }
 

@@ -16,7 +16,7 @@ export class ImbarcazioneController {
       res.json(imbarcazione);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -29,7 +29,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -43,7 +43,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -77,7 +77,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -103,7 +103,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi, geoarea_id }));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -116,7 +116,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -129,7 +129,7 @@ export class ImbarcazioneController {
         res.json(SuccessFactory.getSuccess(AppSuccessEnum.LOG_SPOSTAMENTI_FOUND, result));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -149,7 +149,7 @@ export class ImbarcazioneController {
         const startDate = new Date(start_date);
         const endDate = new Date(end_date);
 
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
             throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
         }
 
@@ -177,7 +177,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazione));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -200,7 +200,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -211,7 +211,7 @@ export class ImbarcazioneController {
     try {
       const mmsi = Number(req.params.mmsi);
 
-      if (isNaN(mmsi) || mmsi <= 0) {
+      if (Number.isNaN(mmsi) || mmsi <= 0) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
 
@@ -220,7 +220,7 @@ export class ImbarcazioneController {
       res.json(imbarcazioneAggiornata);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -231,7 +231,7 @@ export class ImbarcazioneController {
     try {
       const mmsi = Number(req.params.mmsi);
 
-      if (isNaN(mmsi) || mmsi <= 0) {
+      if (Number.isNaN(mmsi) || mmsi <= 0) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
 
@@ -239,7 +239,7 @@ export class ImbarcazioneController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_DELETED, null));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }

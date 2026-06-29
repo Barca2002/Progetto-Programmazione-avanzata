@@ -11,7 +11,7 @@ const adminService = new AdminService();
 // Controllo valore token nella ricarica del saldo (rotta admin). Usata solo internamente.
 function checkTokenAmount(req: Request, _res: Response, next: NextFunction){
     const tokenAmount = req.body.newTokenAmount;
-    if(!tokenAmount || isNaN(tokenAmount) || typeof tokenAmount != 'number'){
+    if(!tokenAmount || Number.isNaN(tokenAmount)){
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     }
     if(tokenAmount < 0.025 || tokenAmount > 100) {

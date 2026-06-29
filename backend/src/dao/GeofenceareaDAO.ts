@@ -2,16 +2,6 @@ import { Transaction } from 'sequelize';
 import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
 
-/*
-export interface InterfacciaDAO<T>{
-    create(item: T, t: Transaction): Promise<T>;
-    get(id: number): Promise<T | null>;
-    getAll(): Promise<T[]>; 
-    update(item_id: number, new_data: Partial<T>, t: Transaction): Promise<T | null>;
-    delete(item_id: number, t: Transaction): Promise<T | null>;
-}
-*/
-
 export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
     return await Geofencearea.create(data, {transaction: t});
@@ -33,12 +23,12 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
 
   async update(geoarea_id: number, new_data:Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea | null> {
       const geoarea = await Geofencearea.findByPk(geoarea_id);
-      return await geoarea!.update(new_data!, {transaction: t!});
+      return await geoarea!.update(new_data, {transaction: t});
   }
 
   async delete(geoarea_id: number, t: Transaction): Promise<Geofencearea | null> {
     const geoarea = await Geofencearea.findByPk(geoarea_id);
-    await geoarea!.destroy({ transaction: t! });
+    await geoarea!.destroy({ transaction: t });
     return geoarea;
   }
 }

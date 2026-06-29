@@ -9,9 +9,9 @@ import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 
 export class SegnalazioneService{
-    private segnalazioneDao = new SegnalazioneDAO();
-    private geofenceareaService = new GeofenceareaService();
-    private violazioneDAO = new ViolazioneDAO();
+    private readonly segnalazioneDao = new SegnalazioneDAO();
+    private readonly geofenceareaService = new GeofenceareaService();
+    private readonly violazioneDAO = new ViolazioneDAO();
 
     async createSegnalazione(data: SegnalazioneCreationData){
         const t = await DatabaseConnection.getInstance().transaction();
@@ -33,10 +33,10 @@ export class SegnalazioneService{
     }
 
     async getSegnalazioniByGeoarea(geoarea_id: number){
-        if(!geoarea_id || isNaN(geoarea_id) || geoarea_id <= 0){
+        if(!geoarea_id || Number.isNaN(geoarea_id) || geoarea_id <= 0){
             throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
         }
-        const segnalazioni = this.segnalazioneDao.findAllByGeoarea(geoarea_id);
+        const segnalazioni = await this.segnalazioneDao.findAllByGeoarea(geoarea_id);
         if(!segnalazioni){
             throw ErrorFactory.getError(AppErrorEnum.SEGNALAZIONE_NOT_FOUND);
         }

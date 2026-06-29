@@ -4,7 +4,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { hasMaxDecimals } from '../utils/DecimalChecker.js';
 import { z } from 'zod';
 
-export async function checkDatiInviati(req: Request, res: Response, next: NextFunction){
+export async function checkDatiInviati(req: Request, _res: Response, next: NextFunction){
     const result = datiInviatiSchema.safeParse(req.body);
 
     if (!result.success) {

@@ -5,7 +5,7 @@ import * as z from 'zod';
 // L'mmsi deve essere una stringa di 9 caratteri che contiene solo numeri.
 const mmsiSchema = z.string().length(9).regex(/^\d+$/);
 
-export async function checkMmsi(req: Request, res: Response, next: NextFunction){
+export async function checkMmsi(req: Request, _res: Response, next: NextFunction){
     const mmsi = req.params.mmsi;
     const result = mmsiSchema.safeParse(mmsi);
     if(!result.success){
