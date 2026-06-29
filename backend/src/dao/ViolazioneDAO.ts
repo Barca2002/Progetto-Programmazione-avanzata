@@ -16,22 +16,19 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
     return await Violazione.findAll();
   }
 
-  async findAllByMmsi(mmsi: number): Promise<Violazione[] | null> {
+  async getAllByMmsi(mmsi: number): Promise<Violazione[] | null> {
     return await Violazione.findAll({ where: { mmsi } });
   }
 
-  // Ne ritorna al massimo 7 perché per le violazioni non ce ne servono di più
-  async findByGeoareaLimit7(geoarea_id: number): Promise<Violazione[] | null> {
-    return await Violazione.findAll({ where: { geoarea_id }, order: [["created_at", "DESC"]], limit: 7 });
+  // Ritorna al massimo 7 violazioni (con conta_in_segnalazione = true per evitare doppi conteggi) perché per il calcolo delle segnalazioni non ce ne servono di più.
+  async getByGeoareaLimit7(geoarea_id: number): Promise<Violazione[] | null> {
+    return await Violazione.findAll({ where: { geoarea_id, conta_in_segnalazione: true }, order: [["created_at", "DESC"]], limit: 7 });
   }
 
-  async findAllByGeoarea(geoarea_id: number): Promise<Violazione[] | null> {
+  async getAllByGeoarea(geoarea_id: number): Promise<Violazione[] | null> {
     return await Violazione.findAll({ where: { geoarea_id }, order: [["created_at", "DESC"]] });
   }
 
-  async findAll(): Promise<Violazione[]> {
-    return await Violazione.findAll();
-  }
 
   async update(violazione_id: number, new_data:Partial<ViolazioneCreationData>, t: Transaction): Promise<Violazione> {
     const violazione = await Violazione.findByPk(violazione_id);

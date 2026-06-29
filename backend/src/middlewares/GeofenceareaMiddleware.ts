@@ -86,7 +86,6 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
         throw ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON);
     }
 
-    // Ritorna il controllo al controller
     next();
 }
 

@@ -69,8 +69,8 @@ export class ViolazioneService {
         }
         return violazioni;
     }
-    // Controlla se generare una violazione.
-    async checkIfViolazione(data: DatiinviatiCreationData,) {
+    // Controlla se generare una violazione per eccesso di velocità o accesso ad una geoarea non autorizzata.
+    async checkIfViolazione(data: DatiinviatiCreationData, ){
         const current_area = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
         const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];;
 

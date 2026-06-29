@@ -134,7 +134,15 @@ CREATE TABLE log_spostamenti (
     CONSTRAINT chk_spostamento CHECK (spostamento IN ('USCITA', 'ENTRATA'))
 );
 
-
+-- Questa tabella tiene traccia dell'ultima violazione valida per ogni geoarea
+CREATE TABLE violazione_geofencearea (
+    geoarea_id     INT NOT NULL,
+    ultima_violazione_valida_id INT NOT NULL,
+    
+    PRIMARY KEY (id),
+    CONSTRAINT fk_geoid FOREIGN KEY (geoarea_id) REFERENCES geofence_areas(geoarea_id) ON DELETE CASCADE,
+    CONSTRAINT fk_violaz FOREIGN KEY (ultima_violazione_valida) REFERENCES violazioni(id) ON DELETE CASCADE,
+);
 -- ------------------------------------------------------------
 --  TABELLA: segnalazioni_imbarcazioni
 -- ------------------------------------------------------------
