@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
+import { DataTypes, Sequelize, Model } from 'sequelize';
 
 export interface DatiinviatiAllData {
   id: number;
@@ -10,7 +10,7 @@ export interface DatiinviatiAllData {
   stato: string;
 }
 
-export interface DatiinviatiCreationData extends Omit<Optional<DatiinviatiAllData, 'id' | 'created_at'>, never> {}
+export interface DatiinviatiCreationData extends Omit<DatiinviatiAllData, 'id' | 'created_at'> {}
 
 export class Datiinviati extends Model<DatiinviatiAllData, DatiinviatiCreationData> implements DatiinviatiAllData {
   declare id: number;

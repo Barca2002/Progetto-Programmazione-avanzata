@@ -1,3 +1,5 @@
+/* global process */ //Commento per non considerare questo file enel lint 
+
 // Questo script serve per resettare il database eseguendo gli script SQL di inizializzazione e popolazione. Viene eseguito con il comando "npm run db:reset" definito nel package.json.
 // --------------------- DA RIMUOVERE IL PRODUZIONE -----------------
 import { execSync } from "child_process";

@@ -255,6 +255,8 @@ export class ImbarcazioneService {
       return await this.imbarcazioneDAO.get(mmsi);
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   }
@@ -270,6 +272,8 @@ export class ImbarcazioneService {
       return result;
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   }
@@ -345,7 +349,8 @@ export class ImbarcazioneService {
       await t.commit();
     } catch (err) {
       await t.rollback();
-      if (err instanceof AppError) throw err;
+      if (err instanceof AppError) 
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   }

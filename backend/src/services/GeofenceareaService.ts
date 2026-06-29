@@ -5,6 +5,7 @@ import { DatabaseConnection } from "../singleton/DBConnection.js";
 import { Geofencearea, GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 import { Position } from "geojson";
 import { QueryTypes } from "sequelize";
+import { AppError } from "../models/AppErrorModel.js";
 
 export class GeofenceareaService {
   private geofenceareaDAO = new GeofenceareaDAO();
@@ -67,6 +68,8 @@ export class GeofenceareaService {
       return result;
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
   };
@@ -83,6 +86,8 @@ export class GeofenceareaService {
       return await this.geofenceareaDAO.get(id);
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   };
@@ -96,6 +101,8 @@ export class GeofenceareaService {
       return result;
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   };

@@ -18,7 +18,7 @@ export class AdminController {
       const utenti = await this.adminService.getUtenti();
       // Togliamo la password, il parametro plain: true rimuove tutti i metadati inutili di Sequelize.
       const sanitizedUser = utenti.map(user => {
-        const { password, ...rest } = user.get({ plain: true });
+        const { password: _password, ...rest } = user.get({ plain: true });
         return rest;
     });
     res.json(sanitizedUser);

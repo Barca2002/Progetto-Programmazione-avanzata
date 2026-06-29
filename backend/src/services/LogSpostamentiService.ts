@@ -3,6 +3,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { LogSpostamentiCreationData } from '../models/LogSpostamentiModel.js';
+import { AppError } from '../models/AppErrorModel.js';
 
 export class LogSpostamentiService {
   private logSpostamentiDAO = new LogSpostamentiDAO();
@@ -19,6 +20,8 @@ export class LogSpostamentiService {
       return result;
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR);
     }
     
