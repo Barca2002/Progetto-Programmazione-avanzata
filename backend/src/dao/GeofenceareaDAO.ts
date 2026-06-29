@@ -29,12 +29,12 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
 
   async update(geoarea_id: number, new_data:Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea | null> {
       const geoarea = await Geofencearea.findByPk(geoarea_id);
-      return await geoarea!.update(new_data!, {transaction: t!});
+      return await geoarea!.update(new_data, {transaction: t});
   }
 
   async delete(geoarea_id: number, t: Transaction): Promise<Geofencearea | null> {
     const geoarea = await Geofencearea.findByPk(geoarea_id);
-    await geoarea!.destroy({ transaction: t! });
+    await geoarea!.destroy({ transaction: t });
     return geoarea;
   }
 }

@@ -2,8 +2,8 @@
 
 // Questo script serve per resettare il database eseguendo gli script SQL di inizializzazione e popolazione. Viene eseguito con il comando "npm run db:reset" definito nel package.json.
 // --------------------- DA RIMUOVERE IL PRODUZIONE -----------------
-import { execSync } from "child_process";
-import fs from "fs";
+import { execSync } from "node:child_process";
+import fs from "node:fs";
 import dotenv from "dotenv";
 
 dotenv.config();

@@ -26,7 +26,7 @@ export class UserController {
       const token = authHeader!.split(' ')[1];
       const user_id = decodeJwt(token!).user_id;
       // Invio dei dati con i relativi controlli e logging dello spostamento
-      await this.datiinviatiService.sendData(data, user_id!);
+      await this.datiinviatiService.sendData(data, user_id);
       // Scaliamo i token per la richiesta.
       await this.spendToken(user_id);
       // Controllo se generare una violazione ed eventualmente una segnalazione
@@ -36,7 +36,7 @@ export class UserController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }

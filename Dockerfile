@@ -1,5 +1,5 @@
 # Immagine base di Node
-FROM node:22-bullseye-slim
+FROM node:22-alpine
 
 ######### DEV ############
 WORKDIR /app
@@ -9,6 +9,9 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+#Se non ce lo metto, il container viene eseguito come root, quindi è una buona pratica creare un utente non privilegiato per eseguire l'applicazione.
+USER node 
 
 # Porta dell'applicazione
 EXPOSE 3000

@@ -3,16 +3,6 @@ import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneMo
 import { InterfacciaDAO } from './InterfacciaDAO.js';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 
-/*
-export interface InterfacciaDAO<T>{
-    create(item: T, t: Transaction): Promise<T>;
-    get(item_id1: number, item_id2?: number): Promise<T | null>;
-    getAll(): Promise<T[]>; 
-    update(item_id: number, item_id2?: number, new_data?: Partial<T>, t?: Transaction): Promise<T | null>;
-    delete(item_id1: number, item_id2?: number, t?: Transaction): Promise<T | null>;
-}
-*/
-
 export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
   async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione> {
     return await Imbarcazione.create(data, { transaction: t });
@@ -50,12 +40,12 @@ export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
 
   async update(mmsi: number, new_data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione | null> {
     const imbarcazione = await Imbarcazione.findByPk(mmsi);
-    return await imbarcazione!.update(new_data!, { transaction: t! });
+    return await imbarcazione!.update(new_data, { transaction: t });
   }
 
   async delete(mmsi: number, t: Transaction): Promise<Imbarcazione | null> {
     const imbarcazione = await Imbarcazione.findByPk(mmsi);
-    await imbarcazione!.destroy({ transaction: t! });
+    await imbarcazione!.destroy({ transaction: t });
     return imbarcazione;
   }
 }

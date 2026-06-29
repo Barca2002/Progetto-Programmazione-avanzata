@@ -8,9 +8,9 @@ import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 
 export class AdminController {
-  private adminService = new AdminService();
-  private segnalazioneService = new SegnalazioneService();
-  private violazioneService = new ViolazioneService();
+  private readonly adminService = new AdminService();
+  private readonly segnalazioneService = new SegnalazioneService();
+  private readonly violazioneService = new ViolazioneService();
   
 
   public async getUsers(req: Request, res: Response) {
@@ -24,7 +24,7 @@ export class AdminController {
     res.json(sanitizedUser);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -40,7 +40,7 @@ export class AdminController {
       res.json({username, email, is_admin, tokens});
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -54,7 +54,7 @@ export class AdminController {
       res.json(utenteAggiornato);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -68,7 +68,7 @@ export class AdminController {
       res.json(result);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -83,7 +83,7 @@ export class AdminController {
     res.json(await this.adminService.updateTokenBalance(email, Number(user.tokens) + tokenAmount));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -98,7 +98,7 @@ export class AdminController {
       res.json(segnalazioni);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -113,7 +113,7 @@ export class AdminController {
       res.json(violazioni);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -128,7 +128,7 @@ export class AdminController {
       res.json(violazioni);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -142,7 +142,7 @@ export class AdminController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.VIOLAZIONE_CREATED, result));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }

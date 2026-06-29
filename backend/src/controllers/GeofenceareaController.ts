@@ -16,7 +16,7 @@ export class GeofenceAreaController {
       res.json(aree);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -30,7 +30,7 @@ export class GeofenceAreaController {
       res.json(area);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -65,7 +65,7 @@ export class GeofenceAreaController {
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         console.log(err);
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
@@ -80,7 +80,7 @@ export class GeofenceAreaController {
       res.json(areaAggiornata);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
@@ -95,7 +95,7 @@ export class GeofenceAreaController {
       res.json(success);
     } catch (err) {
       if (err instanceof AppError) {
-        (err as AppError).send(res);
+        err.send(res);
       } else {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }

@@ -6,7 +6,7 @@ import { LogSpostamentiCreationData } from '../models/LogSpostamentiModel.js';
 import { AppError } from '../models/AppErrorModel.js';
 
 export class LogSpostamentiService {
-  private logSpostamentiDAO = new LogSpostamentiDAO();
+  private readonly logSpostamentiDAO = new LogSpostamentiDAO();
 
   async create(data: LogSpostamentiCreationData){
 ;
