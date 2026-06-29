@@ -7,11 +7,13 @@ import { SegnalazioneCreationData } from '../models/SegnalazioneModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
+import { GeofenceareaDAO } from '../dao/GeofenceareaDAO.js';
 
 export class SegnalazioneService{
     private segnalazioneDao = new SegnalazioneDAO();
     private geofenceareaService = new GeofenceareaService();
     private violazioneDAO = new ViolazioneDAO();
+    private geofenceareaDAO = new GeofenceareaDAO();
 
     async createSegnalazione(data: SegnalazioneCreationData){
         const t = await DatabaseConnection.getInstance().transaction();
@@ -46,42 +48,54 @@ export class SegnalazioneService{
     // Funzione per controllare se generare o no una segnalazione per una geoarea.
     async checkIfSegnalazione(data: DatiinviatiCreationData){
         const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
-        const violazione_geofencearea = await DatabaseConnection.getInstance().model('violazione_geofencearea');
         
         if(!current_geoarea){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
-        const ultimaViolazioneValida = await violazione_geofencearea.findOne({where:{ geoarea_id: current_geoarea.geoarea_id}}) as unknown as {geoarea_id: number, ultima_violazione_valida_id: number};
+        // Prendo l'ultima violazione valida della geoarea corrente.
+        let ultimaViolazioneValida = await this.geofenceareaDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
+
+        if(!ultimaViolazioneValida){
+            throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
+        }
         
-        const recentViolazioni = await this.violazioneDAO.getByGeoareaLimit7(current_geoarea.geoarea_id);
-        // Se non ci sono violazioni o sono < di 5 non bisogna generare una segnalazione
-        if(!recentViolazioni || recentViolazioni?.length <= 5){
+        // Prendo le violazioni della geoarea che sono vecchie al massimo 2 giorni perché eùle altre non servono.
+        const violazioniRecenti = await this.violazioneDAO.getRecentByGeoarea(current_geoarea.geoarea_id);
+        // Se non ci sono violazioni o sono < di 5 non bisogna generare una segnalazione.
+        if(!violazioniRecenti || violazioniRecenti?.length <= 5){
             return;
         }
-        const ultimaViolazione = recentViolazioni[0]!;
-        const penultimaViolazione = recentViolazioni[1]!;
+
+        const ultimaViolazione = violazioniRecenti[0]!;
+        // Se l'ultima violazione è avvenuta al massimo 1 ora dopo l'ultima violazione valida, non deve essere contata. Di conseguenza anche tutte le violazioni avvenute prima di essa.
+        const ultimaViolazioneIsValid = (ultimaViolazione.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 60 * 60 * 1000;
         
-        // Se l'ultima violazione è avvenuta al massimo 1 ora dopo la penultima, non deve essere contata.
-        const includiUltimaViolazione = (ultimaViolazione.created_at.getTime() - penultimaViolazione.created_at.getTime()) > 60 * 60 * 1000;
+        if(ultimaViolazioneIsValid){
+            const t = await DatabaseConnection.getInstance().transaction();
+            await this.geofenceareaDAO.update(current_geoarea.geoarea_id, {ultima_violazione_valida_id: ultimaViolazione.id}, t);
+            await t.commit();
+            ultimaViolazioneValida = ultimaViolazione;
+        }
 
-        // Per definire la finestra temporale bisogna decidere qual'è la violazione di partenza (ultima o penultima).
-        const violazioneDiPartenza = includiUltimaViolazione ? ultimaViolazione : penultimaViolazione;
-
+        // Per definire la finestra temporale bisogna decidere qual'è la violazione di partenza (l'ultima trovata o l'ultima valida salvata).
         // Definizione della data iniziale in cui far partire la finestra temporale in base alla violazione di partenza (Linux epoch).
-        const startTime = new Date(violazioneDiPartenza.created_at).getTime();
 
-        // Definizione finestra di 2 giorni. Dallo startTime andiamo indietro di 2 giorni.
-        const inizioFinestra = startTime;
-        const fineFinestra = startTime - 2 * 24 * 60 * 60 * 1000;
+        // Definizione finestra di 2 giorni. Dal inizioFinestra andiamo indietro di 2 giorni.
+        const inizioFinestra = new Date(ultimaViolazioneValida.created_at).getTime();
+        const fineFinestra = inizioFinestra - 2 * 24 * 60 * 60 * 1000;
 
-        // Filtriamo le violazioni in base al vincolo temporale
-        const violazioniValide = recentViolazioni.filter(v => {
-
+        // Filtriamo le violazioni in base al vincolo temporale.
+        const violazioniValide = violazioniRecenti.filter(v => {
+            if(violazioniValide.length > 5){
+                // Se abbiamo 6 o più violazioni, non serve contare ancora.
+                return false;
+            }
+            // Controllo se la violazione corrente ricade nella finestra temporale.
             const t = new Date(v.created_at).getTime();
             return (t <= inizioFinestra && t >= fineFinestra);
         });
 
-        // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea.
+        // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea (se già non c'è).
         if (violazioniValide.length > 5) {
             // Se già c'è una segnalazione in corso, non serve ricrearla
             if (await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id)){
@@ -104,6 +118,7 @@ export class SegnalazioneService{
             await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
         }
     }
+    
     async checkRientroSegnalazione(geoarea_id: number){
         const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
             
@@ -111,11 +126,10 @@ export class SegnalazioneService{
                 // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
                 return;
             }
-            // Se c'è almeno una violazione (meno di 6), setta lo stato della segnalazione associata a quella geoarea a RIENTRATA.
+            // Se c'è almeno una violazione (ovviamente meno di 6), setta lo stato della segnalazione associata a quella geoarea a RIENTRATA.
             const t = await DatabaseConnection.getInstance().transaction();
             try {
-                const data: Partial<SegnalazioneCreationData> = {stato: "RIENTRATA"}
-                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, data, t);
+                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, {stato: "RIENTRATA"}, t);
                 await t.commit();
             } catch (err) {
                 await t.rollback();

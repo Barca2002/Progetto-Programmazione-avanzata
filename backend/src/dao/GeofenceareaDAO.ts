@@ -1,16 +1,8 @@
 import { Transaction } from 'sequelize';
 import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
+import { Violazione } from '../models/ViolazioneModel.js';
 
-/*
-export interface InterfacciaDAO<T>{
-    create(item: T, t: Transaction): Promise<T>;
-    get(id: number): Promise<T | null>;
-    getAll(): Promise<T[]>; 
-    update(item_id: number, new_data: Partial<T>, t: Transaction): Promise<T | null>;
-    delete(item_id: number, t: Transaction): Promise<T | null>;
-}
-*/
 
 export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
@@ -25,6 +17,10 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
     return await Geofencearea.findAll();
   }
   
+  async getUltimaViolazioneValida(geoarea_id: number): Promise<Violazione | null>{
+    const geoarea = await Geofencearea.findByPk(geoarea_id);
+    return await Violazione.findOne({where: {id:geoarea?.ultima_violazione_valida_id}})
+  }
 
   async findByName(name: string): Promise<Geofencearea | null> {
     // Stessa logica di findByEmail/findByUsername: serve poter restituire null senza lanciare errore

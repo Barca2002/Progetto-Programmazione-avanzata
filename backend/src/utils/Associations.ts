@@ -5,6 +5,7 @@ import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
 import { Segnalazione } from '../models/SegnalazioneModel.js';
 import { Violazione } from '../models/ViolazioneModel.js';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
+import { GeofenceAreaController } from '../controllers/GeofenceareaController.js';
 
 
 export function inizializzaAssociazioni(): void {
