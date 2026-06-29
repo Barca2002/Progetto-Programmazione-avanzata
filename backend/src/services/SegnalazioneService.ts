@@ -51,20 +51,19 @@ export class SegnalazioneService{
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
 
-        const allViolazioni = await this.violazioneDAO.findAllByGeoarea(current_geoarea.geoarea_id);
-
+        const recentViolazioni = await this.violazioneDAO.findByGeoareaLimit7(current_geoarea.geoarea_id);
         // Se non ci sono violazioni o sono < di 5 non bisogna generare una segnalazione
-        if(!allViolazioni || allViolazioni?.length <= 5){
+        if(!recentViolazioni || recentViolazioni?.length <= 5){
             return;
         }
-        const ultimaViolazione = allViolazioni[0]!;
-        const penultimaViolazione = allViolazioni[1]!;
+        const ultimaViolazione = recentViolazioni[0]!;
+        const penultimaViolazione = recentViolazioni[1]!;
         
         // Se l'ultima violazione è avvenuta al massimo 1 ora dopo la penultima, non deve essere contata.
         const includiUltimaViolazione = (ultimaViolazione.created_at.getTime() - penultimaViolazione.created_at.getTime()) > 60 * 60 * 1000;
 
         // Per definire la finestra temporale bisogna decidere qual'è la violazione di partenza (ultima o penultima).
-        const violazioneDiPartenza = includiUltimaViolazione ? penultimaViolazione : ultimaViolazione;
+        const violazioneDiPartenza = includiUltimaViolazione ? ultimaViolazione : penultimaViolazione;
 
         // Definizione della data iniziale in cui far partire la finestra temporale in base alla violazione di partenza (Linux epoch).
         const startTime = new Date(violazioneDiPartenza.created_at).getTime();
@@ -74,7 +73,7 @@ export class SegnalazioneService{
         const fineFinestra = startTime - 2 * 24 * 60 * 60 * 1000;
 
         // Filtriamo le violazioni in base al vincolo temporale
-        const violazioniValide = allViolazioni.filter(v => {
+        const violazioniValide = recentViolazioni.filter(v => {
 
             const t = new Date(v.created_at).getTime();
             return (t <= inizioFinestra && t >= fineFinestra);
@@ -100,7 +99,11 @@ export class SegnalazioneService{
                 throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
             } 
         } else {
-            const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id);
+            await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
+        }
+    }
+    async checkRientroSegnalazione(geoarea_id: number){
+        const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
             
             if (!lastSegnalazioneInCorso){
                 // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
@@ -119,6 +122,5 @@ export class SegnalazioneService{
                 }
                 throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
             }
-        }
     }
 }

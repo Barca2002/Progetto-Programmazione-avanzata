@@ -1,5 +1,5 @@
 import { DatiInviatiService } from "../services/DatiInviatiService.js";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
@@ -45,7 +45,7 @@ export class UserController {
 
   public async spendToken(user_id: number) {
     const user = await this.adminService.getUtenteById(user_id);
-    await this.adminService.updateTokenAmount(user.email, user.tokens - 1);
+    await this.adminService.updateTokenBalance(user.email, user.tokens - 0.025);
     return true;
   }
 }

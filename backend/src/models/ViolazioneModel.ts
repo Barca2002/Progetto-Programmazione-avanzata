@@ -5,6 +5,7 @@ export interface ViolazioneAllData {
     mmsi: number;
     geoarea_id: number;
     tipo: string;
+    contaInSegnalazione: boolean;
     created_at: Date;
 }
 
@@ -16,6 +17,7 @@ export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData>
     declare mmsi: number;
     declare geoarea_id: number;
     declare tipo: string;
+    declare contaInSegnalazione: boolean;
     declare created_at: Date;
 
 
@@ -38,6 +40,11 @@ export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData>
         tipo: {
             type: DataTypes.ENUM('ECCESSO VELOCITA', 'ACCESSO AREA NON AUTORIZZATA'),
             allowNull: false
+        },
+        contaInSegnalazione: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
         },
         created_at: {
         type: DataTypes.DATE,

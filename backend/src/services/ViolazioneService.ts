@@ -6,7 +6,6 @@ import { GeofenceareaService } from './GeofenceareaService.js';
 import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js';
 import { ViolazioneCreationData } from '../models/ViolazioneModel.js';
-import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { GeofenceImbarcazioniDAO } from '../dao/GeofenceImbarcazioniDAO.js';
 
@@ -15,7 +14,6 @@ export class ViolazioneService{
     private violazioneDAO = new ViolazioneDAO();
     private geofenceareaService = new GeofenceareaService();
     private imbarcazioneService = new ImbarcazioneService();
-    private datiinviatiDAO = new DatiinviatiDAO();
     private geofenceimbarcazioniDAO = new GeofenceImbarcazioniDAO();
 
     async createViolazione(data: ViolazioneCreationData){
@@ -76,18 +74,19 @@ export class ViolazioneService{
         if(!current_area){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
+        // Teniamo traccia se una violazione è già stata registrata per evitare di contarne due nel conteggio per generare uan segnalazione.
+        let violazioneGiaRegistrata = false;
         if(data.velocita_kmh > current_area.max_speed){
             // Creiamo la violazione per eccesso di velocità
-            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA'};
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA', contaInSegnalazione: true};
             await this.createViolazione(dataViolazione);
-            // AGGIUNGI ASSOCIAZIONE DELLA VIOLAZIONE ALLA BARCA
+            violazioneGiaRegistrata = true;
         }
         // .some() controlla se almeno un elemento soddisfa la condizione definita.
         if(!allowedGeoareas.some(g => g.geoarea_id === current_area!.geoarea_id)){
-            // Creiamo la violazione per accesso ad una area non autorizzata
-            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA'};
+            // Creiamo la violazione per accesso ad una area non autorizzata. Se è già stata registrata la violazione per eccesso di velocità, il campo contaInSegnalazione sarà false, altrimenti sarà true e quindi conterà.
+            const dataViolazione: ViolazioneCreationData = {mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA', contaInSegnalazione: !violazioneGiaRegistrata};
             await this.createViolazione(dataViolazione);
-            // AGGIUNGI ASSOCIAZIONE DELLA VIOLAZIONE ALLA BARCA
         }
         return;
     }

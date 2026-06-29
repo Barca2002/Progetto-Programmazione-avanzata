@@ -2,16 +2,6 @@ import { Transaction } from 'sequelize';
 import { Violazione, ViolazioneCreationData } from '../models/ViolazioneModel.js';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
 
-/*
-export interface InterfacciaDAO<T>{
-    create(item: T, t: Transaction): Promise<T>;
-    get(item_id1: number, item_id2?: number): Promise<T | null>;
-    getAll(): Promise<T[]>; 
-    update(item_id: number, item_id2?: number, new_data?: Partial<T>, t?: Transaction): Promise<T | null>;
-    delete(item_id1: number, item_id2?: number, t?: Transaction): Promise<T | null>;
-}
-*/
-
 export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
 
   async create(data: ViolazioneCreationData, t: Transaction): Promise<Violazione> {
@@ -28,6 +18,11 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
 
   async findAllByMmsi(mmsi: number): Promise<Violazione[] | null> {
     return await Violazione.findAll({ where: { mmsi } });
+  }
+
+  // Ne ritorna al massimo 7 perché per le violazioni non ce ne servono di più
+  async findByGeoareaLimit7(geoarea_id: number): Promise<Violazione[] | null> {
+    return await Violazione.findAll({ where: { geoarea_id }, order: [["created_at", "DESC"]], limit: 7 });
   }
 
   async findAllByGeoarea(geoarea_id: number): Promise<Violazione[] | null> {

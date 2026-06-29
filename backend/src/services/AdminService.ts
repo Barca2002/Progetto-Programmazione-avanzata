@@ -58,8 +58,9 @@ export class AdminService {
   };
 
   public async updateUtente(id: number, data: Partial<UserCreationData>) {
-    if (!data || Object.keys(data).length === 0)
+    if (!data || Object.keys(data).length === 0){
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+    }
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono
@@ -100,38 +101,25 @@ export class AdminService {
     }
   };
 
-  public async updateTokenBalance(email: string, tokenAmount: number, t: Transaction): Promise<User | null> {
-    const user = await User.findOne({
-      where: { email },
-      transaction: t
-    });
-
-    if (!user) {
-      return null;
-    }
-
-    await user.update({ tokens: tokenAmount }, { transaction: t });
-    return user;
-  }
-
-  public async updateTokenAmount(email: string, tokenAmount: number) {
+  public async updateTokenBalance(email: string, tokenAmount: number) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      if (!email || !await this.adminDAO.getByEmail(email))
+      if (!email){
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-
-      const user = await this.adminDAO.getByEmail(email);
-      if (user!.tokens <= 0)
+      }
+      const user = await this.findByEmail(email);
+      if (user!.tokens <= 0){
         throw ErrorFactory.getError(AppErrorEnum.TOKEN_SPEND_ERROR);
-
-      const result = await this.updateTokenBalance(email, tokenAmount, t);
+      }
+      // Aggiornamento del saldo dei token dell'utente
+      const result = await user.update({ tokens: tokenAmount }, { transaction: t });
       await t.commit();
       return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, result!.tokens);
     } catch (err) {
       await t.rollback();
       if (err instanceof AppError)
         throw err;
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
+      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   }
 }
