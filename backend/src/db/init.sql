@@ -341,7 +341,7 @@ INSERT INTO violazioni (tipo, mmsi, geoarea_id, created_at) VALUES
 --  geofence_areas
 -- ------------------------------------------------------------
 INSERT INTO geofence_areas (name, area, max_speed, ultima_violazione_valida_id) VALUES
-('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((13.4700 43.7000, 13.5500 43.7000, 13.5600 43.6700, 13.4900 43.6600, 13.4700 43.7000))', 4326), 20, 135),
+('Zona Marittima Nord Ancona', ST_GeomFromText('POLYGON((13.4700 43.7000, 13.5500 43.7000, 13.5600 43.6700, 13.4900 43.6600, 13.4700 43.7000))', 4326), 20, 134),
 ('Zona Marittima Est Porto', ST_GeomFromText('POLYGON((13.5600 43.6600, 13.6400 43.6600, 13.6500 43.6300, 13.5800 43.6200, 13.5600 43.6600))', 4326), 20, 74),
 ('Area Offshore Conero Nord', ST_GeomFromText('POLYGON((13.6200 43.6000, 13.7000 43.6000, 13.7100 43.5600, 13.6400 43.5500, 13.6200 43.6000))', 4326), 50, 51),
 ('Area Offshore Portonovo', ST_GeomFromText('POLYGON((13.6500 43.5600, 13.7300 43.5600, 13.7400 43.5200, 13.6700 43.5100, 13.6500 43.5600))', 4326), 50, 22),

@@ -24,7 +24,7 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
   // Ritorna al massimo le violazioni vecchia al massimo 2 giorni dall'ultima violazione valida della geoarea.
   async getRecentByGeoarea(geoarea_id: number): Promise<Violazione[] | null> {
     const geoarea = await Geofencearea.findByPk(geoarea_id);
-    const ultimaViolazione = await Violazione.findOne({where: {id:geoarea?.ultima_violazione_valida_id}});
+    const ultimaViolazione = await Violazione.findOne({where: {id:geoarea!.ultima_violazione_valida_id}});
 
     // Dopo aver preso la geoarea e l'ultima violazione valida associata, predo tutte le violazioni che partono da 2 giorni indietro l'ultima violazione valida in poi, quindi anche quelle nuove.
     return await Violazione.findAll({
