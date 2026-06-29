@@ -48,13 +48,13 @@ export class SegnalazioneService{
 
     // Funzione per controllare se generare o no una segnalazione per una geoarea.
     async checkIfSegnalazione(data: DatiinviatiCreationData){
-        const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+        const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         
         if(!current_geoarea){
             throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }
         // Prendo l'ultima violazione valida della geoarea corrente.
-        let ultimaViolazioneValida = await this.geofenceareaDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
+        let ultimaViolazioneValida = await this.violazioneDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
 
         if(!ultimaViolazioneValida){
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);

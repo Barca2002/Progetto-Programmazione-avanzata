@@ -5,9 +5,11 @@ import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { checkToken } from "../middlewares/JWTMiddleware.js";
+import { GeofenceareaService } from "../services/GeofenceareaService.js";
 
 export class ImbarcazioneController {
   public readonly imbarcazioneService = new ImbarcazioneService();
+  public readonly geofenceareaService = new GeofenceareaService();
 
   public async getImbarcazioneByMmsi(req: Request, res: Response ){
     try {
@@ -125,8 +127,9 @@ export class ImbarcazioneController {
 
   async getStatusPerGeoarea(req: Request, res: Response){
     try {
-        const result = await this.imbarcazioneService.getStatusPerGeoarea();
-        res.json(SuccessFactory.getSuccess(AppSuccessEnum.LOG_SPOSTAMENTI_FOUND, result));
+        const { mmsi, geoarea_id } = req.body;
+        const imbarcazione_status = await this.geofenceareaService.getGeoareaByLastDatoImbarcazione(mmsi, geoarea_id)
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

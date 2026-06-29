@@ -17,6 +17,11 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
     return await Violazione.findAll();
   }
 
+  async getUltimaViolazioneValida(geoarea_id: number): Promise<Violazione | null> {
+    const geoarea = await Geofencearea.findByPk(geoarea_id);
+    return await Violazione.findOne({ where: { id: geoarea?.ultima_violazione_valida_id } })
+  }
+
   async getAllByMmsi(mmsi: number): Promise<Violazione[] | null> {
     return await Violazione.findAll({ where: { mmsi } });
   }

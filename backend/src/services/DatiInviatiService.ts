@@ -16,14 +16,13 @@ export class DatiInviatiService {
   private readonly imbarcazioniService = new ImbarcazioneService();
   private readonly logspostamentoService = new LogSpostamentiService();
 
-  public async findLastDatoInviato(mmsi: number): Promise<Datiinviati | undefined> {
-    const dati = await this.datiinviatiDAO.findAllByMmsi(mmsi);
-
-    if (dati.length === 0 || !dati) {
+  //Torna l'ultimo dato inviato per quella imbarcazione
+  public async findLastDatoInviatoByMmsi(mmsi: number): Promise<Datiinviati> {
+    const dato = await this.datiinviatiDAO.getLastDatoByMmsi(mmsi);
+    if (!dato) {
       throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
     }
-
-    return dati.sort((a, b) => b.created_at - a.created_at)[0];
+    return dato;
   }
 
 
@@ -39,14 +38,14 @@ export class DatiInviatiService {
     const allowedGeoareas = await geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number }[];
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+      const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
       //Controllo se ha trovato una geoarea in cui risiede il punto
       if (!current_geoarea) {
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
       }
       const currentAreaIsAllowed: boolean = allowedGeoareas.some(g => g.geoarea_id === current_geoarea.geoarea_id);
       // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
-      const lastSpostamento = await this.findLastDatoInviato(data.mmsi);
+      const lastSpostamento = await this.findLastDatoInviatoByMmsi(data.mmsi);
       // Se non viene trova uno spostamento precedente, vuol dire che è il primo invio di dati.
       if (!lastSpostamento) {
         if (currentAreaIsAllowed) {
@@ -58,7 +57,7 @@ export class DatiInviatiService {
         }
       } else {
         // Dall'ultimo spostamento/dato inviato ricaviamo la sua geoarea.
-        const last_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, lastSpostamento.longitudine, lastSpostamento.latitudine);
+        const last_geoarea = await this.geofenceareaService.getGeoareaByPosition(lastSpostamento.longitudine, lastSpostamento.latitudine);
         if (!last_geoarea) {
           throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
         }

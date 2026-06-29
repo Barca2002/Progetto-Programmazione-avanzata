@@ -5,11 +5,9 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
-import { LogSpostamenti } from '../models/LogSpostamentiModel.js';
+import { ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
-import { LogSpostamentiDAO } from '../dao/LogSpostamentiDAO.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 
@@ -19,7 +17,6 @@ export class ImbarcazioneService {
   private readonly imbarcazioneDAO = new ImbarcazioneDAO();
   private readonly adminDAO = new AdminDAO();
   private readonly geofenceareaDAO = new GeofenceareaDAO();
-  private readonly logSpostamentiDAO = new LogSpostamentiDAO();
   private readonly segnalazioneDAO = new SegnalazioneDAO();
   //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo
   private get geofence_imbarcazioni() {
@@ -108,79 +105,6 @@ export class ImbarcazioneService {
       result.push({ imbarcazione: imbarcazione.toJSON(), Geofenceareas: geoareas });
     }
     return result;
-  }
-
-  async findAllLastSpostamento() {
-    const imbarcazioni: Imbarcazione[] = await this.imbarcazioneDAO.getAll();
-    const spostamenti: LogSpostamenti[] = await this.logSpostamentiDAO.getAll();
-    /*
-    spostamenti =
-    [
-      { "log_id": 1, "mmsi": 123, "geoarea_id": 3, "created_at": "08:00" },
-      { "log_id": 2, "mmsi": 456, "geoarea_id": 5, "created_at": "09:00" },
-      { "log_id": 3, "mmsi": 123, "geoarea_id": 3, "created_at": "10:00" },
-      { "log_id": 4, "mmsi": 123, "geoarea_id": 7, "created_at": "07:00" }
-    ]
-    */
-
-    return imbarcazioni.map(imbarcazione => {
-
-      //1) Prendo tutti gli spostamenti di quell'imbarcazione e li ordino per created_at decrescente
-      const spostamenti_imbarcazione: LogSpostamenti[] = spostamenti
-        .filter(s => s.mmsi === imbarcazione.mmsi)
-        .sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
-
-      /*
-      spostamenti_imbarcazione = 
-      [
-        { "log_id": 3, "mmsi": 123, "geoarea_id": 3, "created_at": "10:00" },
-        { "log_id": 1, "mmsi": 123, "geoarea_id": 3, "created_at": "08:00" },
-        { "log_id": 4, "mmsi": 123, "geoarea_id": 7, "created_at": "07:00" }
-      ]
-      */
-
-      //Vettore che contiene le geoaree associate a quell'imbarcazione
-      const geoaree_imbarcazione: number[] = [];
-
-      //2) Serve per prendere solo l'ultimo spostamento di ogni geoarea associata
-      const ultimi_spostamenti = spostamenti_imbarcazione.filter(s => {
-        if (geoaree_imbarcazione.includes(s.geoarea_id))
-          return false; //serve a dire a .filter di non usare un elemento (return false), quando è già nel vettore
-        geoaree_imbarcazione.push(s.geoarea_id);
-        return true;
-      });
-
-      /*
-      ultimi_spostamenti = 
-      [
-        { "log_id": 3, "mmsi": 123, "geoarea_id": 3, "created_at": "10:00" },
-        { "log_id": 4, "mmsi": 123, "geoarea_id": 7, "created_at": "07:00" }
-      ]
-      */
-
-      //Per ogni elemento di imbarcazioni, costruisco il json con le informazioni sull'imbarcazione con un vettore di LogSpostamenti contenente per ogni geoarea solo l'ultimo spostamento
-      return { Imbarcazione: imbarcazione.toJSON(), Spostamenti: ultimi_spostamenti };
-    });
-  }
-
-  async getStatusPerGeoarea(): Promise<object[]> {
-    const imbarcazioni = await this.findAllLastSpostamento();
-
-    return imbarcazioni.map(imb => {
-      const spostamenti = imb.Spostamenti;
-      return {
-        mmsi: imb.Imbarcazione.mmsi,
-        name: imb.Imbarcazione.name,
-        spostamenti: spostamenti.map(s => ({
-          geoarea_id: s.geoarea_id,
-          stato: s.spostamento === 'ENTRATA' ? 'DENTRO' : 'FUORI',
-          permanenza: s.spostamento === 'ENTRATA'
-            ? Math.floor((Date.now() - new Date(s.created_at).getTime()) / 60000)
-            : 0
-        }))
-      }; 
-    //Per non mostrare le imbarcazioni senza spostamenti si usa il filter
-    }).filter(imb => imb.spostamenti.length > 0);
   }
 
   async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
@@ -298,7 +222,7 @@ export class ImbarcazioneService {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_ASSOCIATION);
           }
           //Associo le geoaree
-          await this.geofence_imbarcazioni.create({ geoarea_id, mmsi }, {transaction: t});
+          await this.geofence_imbarcazioni.create({ geoarea_id, mmsi }, { transaction: t });
         }
       }
 

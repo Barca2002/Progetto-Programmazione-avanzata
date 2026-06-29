@@ -1,13 +1,11 @@
 import { Transaction } from 'sequelize';
 import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaModel.js';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
-import { Violazione } from '../models/ViolazioneModel.js';
-
 
 export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
-    return await Geofencearea.create(data, {transaction: t});
-}
+    return await Geofencearea.create(data, { transaction: t });
+  }
 
   async get(geoarea_id: number, _item_id2?: number): Promise<Geofencearea | null> {
     return await Geofencearea.findByPk(geoarea_id);
@@ -16,20 +14,15 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   async getAll(): Promise<Geofencearea[]> {
     return await Geofencearea.findAll();
   }
-  
-  async getUltimaViolazioneValida(geoarea_id: number): Promise<Violazione | null>{
-    const geoarea = await Geofencearea.findByPk(geoarea_id);
-    return await Violazione.findOne({where: {id:geoarea?.ultima_violazione_valida_id}})
-  }
 
   async findByName(name: string): Promise<Geofencearea | null> {
     // Stessa logica di findByEmail/findByUsername: serve poter restituire null senza lanciare errore
     return await Geofencearea.findOne({ where: { name } });
   }
 
-  async update(geoarea_id: number, new_data:Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea | null> {
-      const geoarea = await Geofencearea.findByPk(geoarea_id);
-      return await geoarea!.update(new_data, {transaction: t});
+  async update(geoarea_id: number, new_data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea | null> {
+    const geoarea = await Geofencearea.findByPk(geoarea_id);
+    return await geoarea!.update(new_data, { transaction: t });
   }
 
   async delete(geoarea_id: number, t: Transaction): Promise<Geofencearea | null> {

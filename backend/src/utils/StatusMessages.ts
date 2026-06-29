@@ -174,6 +174,8 @@ export const SUCCESS_LIST = {
         { statusCode: 201, message: "Log spostamenti trovati correttamente" },
     POSIZIONI_FOUND:
         { statusCode: 201, message: "Posizioni trovate correttamente" },
+    STATUS_FOUND:
+        { statusCode: 201, message: "Status dell'imbarcazione per la geoarea trovato" },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

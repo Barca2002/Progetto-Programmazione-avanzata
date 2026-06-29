@@ -50,7 +50,7 @@ export class ViolazioneService {
         }
         // Controllo che esiste l'imbarcazione
         await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
-        const violazioni = await this.violazioneDAO.findAllByMmsi(mmsi);
+        const violazioni = await this.violazioneDAO.getAllByMmsi(mmsi);
         if (!violazioni) {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
@@ -63,7 +63,7 @@ export class ViolazioneService {
         }
         // Controllo che esista la geoarea
         await this.geofenceareaService.getAreaById(geoarea_id);
-        const violazioni = await this.violazioneDAO.findAllByGeoarea(geoarea_id);
+        const violazioni = await this.violazioneDAO.getAllByGeoarea(geoarea_id);
         if (!violazioni) {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
@@ -71,7 +71,7 @@ export class ViolazioneService {
     }
     // Controlla se generare una violazione per eccesso di velocità o accesso ad una geoarea non autorizzata.
     async checkIfViolazione(data: DatiinviatiCreationData, ){
-        const current_area = await this.geofenceareaService.getGeoareaByPosition(data.mmsi, data.longitudine, data.latitudine);
+        const current_area = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];;
 
         if (!current_area) {

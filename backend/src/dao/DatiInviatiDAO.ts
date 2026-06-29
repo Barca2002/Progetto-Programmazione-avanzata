@@ -17,6 +17,13 @@ export class DatiinviatiDAO implements InterfacciaDAO<Datiinviati> {
   async get(user_id: number, _item_id2?: number): Promise<Datiinviati | null> {
     return await Datiinviati.findByPk(user_id);
   }
+
+  async getLastDatoByMmsi(mmsi: number): Promise<Datiinviati | null> {
+  return await Datiinviati.findOne({
+    where: { mmsi },
+    order: [['created_at', 'DESC']],
+  });
+}
   
   async getAll(): Promise<Datiinviati[]> {
     return await Datiinviati.findAll();
