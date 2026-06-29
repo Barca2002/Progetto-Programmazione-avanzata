@@ -20,6 +20,8 @@ export class AdminService {
       return result;
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
     }
   };
@@ -82,6 +84,8 @@ export class AdminService {
       return result;
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
     }
   };
@@ -96,6 +100,8 @@ export class AdminService {
       return SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null);
     } catch (err) {
       await t.rollback();
+      if (err instanceof AppError)
+        throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   };

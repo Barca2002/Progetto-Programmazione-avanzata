@@ -4,6 +4,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import jwt from 'jsonwebtoken';
 import { User, UserCreationData } from '../models/UserModel.js';
+import { AppError } from '../models/AppErrorModel.js';
 
 
 export class AuthService{
@@ -21,7 +22,9 @@ export class AuthService{
         try {
         // Decodifica della chiave da Base64 a formato PEM originale
         this.privateKey = Buffer.from(privateKeyBase64, 'base64').toString('utf8');
-        } catch (error) {
+        } catch (err) {
+        if (err instanceof AppError)
+            throw err;
         throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
         }
     }

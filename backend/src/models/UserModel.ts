@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, Optional, DecimalDataType } from 'sequelize';
+import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 
 // Definisce i campi che avrà ogni riga della tabella users
 export interface UserAllData {

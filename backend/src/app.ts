@@ -41,7 +41,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.send(`<h1>Servizio funzionante.
     Esegui l'accesso tramite la rotta "/auth/login".</h1>`);
 });
@@ -55,11 +55,11 @@ app.use("/user", UserRouter);
 
 
 // Error handler delle rotte inesistenti (404). Express prova tutte le rotte e se non trova niente, chiama questo middleware, il quale genera questa eccezione e poi la manda all'error handler generale. Va messo prima dell'error handler generale, altrimenti userebbe quello di default di express, il quale include l'HTML.
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(ErrorFactory.getError(AppErrorEnum.ROUTE_NOT_FOUND));
 });
 // Error handler generale (middleware di errore definito dai parametri nella firma), viene chiamato quando un next(err) gli viene passato un errore. Se il next() non contiene nulla, continua nella CoR con i middleware normali (senza parametro err).
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {
     return err.send(res);
   } else {

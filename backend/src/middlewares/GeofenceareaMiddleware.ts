@@ -26,20 +26,19 @@ const geofenceAreaSchema = z.object({
                 // Controlliamo anche che i numeri decimali non superino il massimo consentito
                 coordinates: z.array(
                     z.array(z.tuple([z.number().min(-180).max(180).refine(hasMaxDecimals),  // longitude
-                            z.number().min(-90).max(90).refine
-                    (hasMaxDecimals)// latitude
+                    z.number().min(-90).max(90).refine(hasMaxDecimals) // latitude
                     ]))
                 )
             }),
         })
     ),
-    
+
 }).strict();
 
 // Controllo del formato della richiesta tramite zod
-function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction){
+function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction) {
     const result = geofenceAreaSchema.safeParse(req.body);
-    if (!result.success){
+    if (!result.success) {
         throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOJSON_FORMAT);
     }
     console.log("Controllo formato geojson superato con successo.");
@@ -51,7 +50,7 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
     const coordinates: Position[][] = req.body?.features[0].geometry.coordinates;
     const punti = coordinates[0]; // Prendiamo l'array di punti
-    if (!coordinates || !punti){
+    if (!coordinates || !punti) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
     }
     // Bisogna controllare 3 cose principali:
@@ -66,10 +65,10 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     }
 
     // Ci devono essere minimo 4 punti e massimo MAX_POINTS punti per definire una geofence area.    
-    if (punti.length < 4 ) {
-        throw ErrorFactory.getError(AppErrorEnum.TOO_LITTLE_POINTS); 
+    if (punti.length < 4) {
+        throw ErrorFactory.getError(AppErrorEnum.TOO_LITTLE_POINTS);
     }
-    if (punti.length > MAX_POINTS){
+    if (punti.length > MAX_POINTS) {
         throw ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS);
     }
     // Controllo che il primo e l'ultimo punto coincidono per chiudere l'area
@@ -84,9 +83,9 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     const polygon = turf.polygon(coordinates);
     const kinks = turf.kinks(polygon);
     // kinks contiene il numero di punti di autointersezione, quindi se ce ne sta uno o più, allora il poligono ha dei tratti che s'intersecano
-    if (kinks.features.length > 0){
+    if (kinks.features.length > 0) {
         throw ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON);
-    }    
+    }
 
     // Ritorna il controllo al controller
     next();
