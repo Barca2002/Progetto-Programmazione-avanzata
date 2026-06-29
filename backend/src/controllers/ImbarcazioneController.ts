@@ -127,8 +127,8 @@ export class ImbarcazioneController {
 
   async getStatusPerGeoarea(req: Request, res: Response){
     try {
-        const { mmsi, geoarea_id } = req.body;
-        const imbarcazione_status = await this.geofenceareaService.getGeoareaByLastDatoImbarcazione(mmsi, geoarea_id)
+        const geoarea_id  = req.body.geoarea_id;
+        const imbarcazione_status = await this.geofenceareaService.getAllImbarcazioniStatus(geoarea_id)
         res.json(SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status));
     } catch (err) {
       if (err instanceof AppError) {

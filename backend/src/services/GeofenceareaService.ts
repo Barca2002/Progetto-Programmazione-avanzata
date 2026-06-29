@@ -25,12 +25,12 @@ export class GeofenceareaService {
   public async findByCoords(coords: Position[][]): Promise<Geofencearea | null> {
     const geoJson = {
       type: "Polygon",
-      coordinates: coords 
+      coordinates: coords
     };
     const db = DatabaseConnection.getInstance();
     const results = await db.query(`SELECT ga.* FROM geofence_areas ga WHERE ST_Covers(ga.area, ST_SetSRID(ST_GeomFromGeoJSON(:geojson), 4326)) LIMIT 1`,
       {
-        replacements: 
+        replacements:
         {
           geojson: JSON.stringify(geoJson)
         },
@@ -43,61 +43,46 @@ export class GeofenceareaService {
   }
 
   //FUNZIONE DELLA ROTTA ADMIN CHE TORNA LO STATUS DI UN IMBARCAZIONE PER UNA DETERMINATA GEOAREA (SE geo_id_body = last_dato_geo_id -> 'DENTRO', ANCHE LA PERMANENZA)
-  public async getGeoareaByLastDatoImbarcazione(mmsi: number, geoarea_id: number) {
+  public async getAllImbarcazioniStatus(geoarea_id: number) {
 
-    if (Number.isNaN(mmsi) || mmsi <= 0)
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI)
-
+    const imbarcazioni = await this.imbarcazioneDAO.getAll();
+    const results = [];
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
 
-    //Prendo l'imbarcazione
-    const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-
-    if (!imbarcazione)
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
-
-    //Prendo l'id della geoarea inserita nel body
-    const geoarea_body = await this.geofenceareaDAO.get(geoarea_id);
-
-    if (!geoarea_body)
-      throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND)
-
-    //Trovo l'ultimo dato inviato per l'imbarcazione
-    const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(mmsi);
-    if (!last_dato)
-      throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND)
-
-    //Trovo la geoarea associata a latitudine e longitudine dell'ultimo dato
-    const geoarea_last_dato = await this.getGeoareaByPosition(last_dato.longitudine, last_dato.latitudine);
-
-    if (!geoarea_last_dato)
-      throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND)
-
-    const diff = Date.now() - last_dato.created_at;
-    const giorni = Math.floor(diff / 86400000);
-    const ore = Math.floor((diff % 86400000) / 3600000);
-    const minuti = Math.floor((diff % 3600000) / 60000);
-
-    // console.log("last dato", geoarea_last_dato.geoarea_id)
-    // console.log("body", geoarea_body.geoarea_id)
-
-    // Se la geoarea associata all'ultimo dato inviato per quell'mmsi, corrisponde a quello inserito nel body, vuol dire che siamo dentro l'ultima geoarea associata, altrimenti siamo fuori
-    if (geoarea_last_dato.geoarea_id === geoarea_body.geoarea_id) {
-      return {
-        mmsi: imbarcazione.mmsi,
-        name: imbarcazione.name,
-        stato: 'DENTRO',
-        permanenza: `${giorni}g ${ore}h ${minuti}m`
+    //UGUALE A MYIMBARCAZIONISTATUS IN IMBARCAZIONISERVICE OTTIMIZZARE!!!
+    for (const imbarcazione of imbarcazioni) {
+      //Prendi l'ultimo dato inviato, associato all'imbarcazione
+      const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(imbarcazione.mmsi);
+      if (!last_dato) {
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
+        continue; //Se non c'è continuo comunque dicendo che è fuori
       }
-    } else {
-      return {
-        mmsi: imbarcazione.mmsi,
-        name: imbarcazione.name,
-        stato: 'FUORI'
+
+      //Prendo la geoarea associata all'ultimo dato
+      const geoarea_last_dato = await this.getGeoareaByPosition(last_dato.longitudine, last_dato.latitudine);
+
+      // Siccome l'utente può inviare posizioni anche che non siano di geoaree, dico comunque che è fuori
+      if(!geoarea_last_dato){
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
+        continue; //Se non c'è continuo comunque dicendo che è fuori
+      }
+     
+      //Se l'id della geoarea associato all'ultimo invio di dati per quell'imbarcazione è uguale a quello inserito nel body, vuol dire che è dentro quella geoarea
+      if (geoarea_last_dato.geoarea_id === geoarea_id) {
+        const diff = Date.now() - last_dato.created_at;
+        const giorni = Math.floor(diff / 86400000);
+        const ore = Math.floor((diff % 86400000) / 3600000);
+        const minuti = Math.floor((diff % 3600000) / 60000);
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'DENTRO', permanenza: `${giorni}g ${ore}h ${minuti}m` });
+      } else {
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
       }
     }
+
+    return results;
   }
+    
 
   public async getAreaByCoords(coords: Position[][]) {
     const area = await this.findByCoords(coords);

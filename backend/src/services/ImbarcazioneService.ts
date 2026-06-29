@@ -11,6 +11,7 @@ import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
+import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
@@ -20,6 +21,7 @@ export class ImbarcazioneService {
   private readonly geofenceareaDAO = new GeofenceareaDAO();
   private readonly segnalazioneDAO = new SegnalazioneDAO();
   private readonly geofenceareaService = new GeofenceareaService();
+  private readonly datiinviatiDAO = new DatiinviatiDAO();
 
 
   //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo
@@ -119,20 +121,36 @@ export class ImbarcazioneService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
     const results = [];
+
+    //Scorro tutte le imbarcazioni dell'utente
     for (const imbarcazione of my_imbarcazioni) {
-      try {
-        const status = await this.geofenceareaService.getGeoareaByLastDatoImbarcazione(imbarcazione.mmsi, geoarea_id);
-        results.push(status);
-      } catch (err) {
-        if (err instanceof AppError)
-          continue; // Per evitare che alla prima geoarea che non trova, anche se ne ha trovata una, non dia subito l'errore
-        throw err;
+      //Prendi l'ultimo dato inviato, associato all'imbarcazione
+      const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(imbarcazione.mmsi);
+      if (!last_dato) {
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
+        continue; //Se non c'è continuo comunque dicendo che è fuori
+      }
+
+      //Prendo la geoarea associata all'ultimo dato
+      const geoarea_last_dato = await this.geofenceareaService.getGeoareaByPosition(last_dato.longitudine, last_dato.latitudine);
+
+      // Siccome l'utente può inviare posizioni anche che non siano di geoaree, dico comunque che è fuori
+      if(!geoarea_last_dato){
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
+        continue; //Se non c'è continuo comunque dicendo che è fuori
+      }
+     
+      //Se l'id della geoarea associato all'ultimo invio di dati per quell'imbarcazione è uguale a quello inserito nel body, vuol dire che è dentro quella geoarea
+      if (geoarea_last_dato.geoarea_id === geoarea_id) {
+        const diff = Date.now() - last_dato.created_at;
+        const giorni = Math.floor(diff / 86400000);
+        const ore = Math.floor((diff % 86400000) / 3600000);
+        const minuti = Math.floor((diff % 3600000) / 60000);
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'DENTRO', permanenza: `${giorni}g ${ore}h ${minuti}m` });
+      } else {
+        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
       }
     }
-
-    //Mando l'errore solo se effettivamente non ne ha trovata nessuna
-    if (results.length === 0)
-      throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
 
     return results;
   }

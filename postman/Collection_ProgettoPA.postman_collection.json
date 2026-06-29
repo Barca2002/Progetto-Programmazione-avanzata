@@ -780,7 +780,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_id\": 1\r\n}",
+                  "raw": "{\r\n    \"geoarea_id\": 1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
