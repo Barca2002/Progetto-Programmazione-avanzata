@@ -14,7 +14,7 @@ export const ERROR_LIST = {
     INVALID_EMAIL:
         { statusCode: 400, message: "L'email fornita non è in un formato valido (esempio formato valido: mail@dominio.com)." },
     INVALID_PASSWORD:
-        { statusCode: 400, message: "La password fornita non è in un formato valido (Deve essere lunga tra 8 e 32 caratteri, comprendere almeno un numero e sono ammessi caratteri alfanumerici)." },
+        { statusCode: 400, message: "La password fornita non è in un formato valido (Deve essere lunga tra 8 e 32 caratteri, comprendere almeno un numero e sono ammessi caratteri speciali)." },
     INVALID_USERNAME:
         { statusCode: 400, message: "Lo username fornito non è in un formato valido." },
     INVALID_NAME:

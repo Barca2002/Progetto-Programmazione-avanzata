@@ -13,7 +13,7 @@ export class AdminController {
   private violazioneService = new ViolazioneService();
   
 
-  public async getUtenti(req: Request, res: Response) {
+  public async getUsers(req: Request, res: Response) {
     try {
       const utenti = await this.adminService.getUtenti();
       // Togliamo la password, il parametro plain: true rimuove tutti i metadati inutili di Sequelize.
@@ -31,7 +31,7 @@ export class AdminController {
     }
   }
 
-  public async getUtenteById(req: Request, res: Response ){
+  public async getUserById(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
       const responseData = await this.adminService.getUtenteById(id);
@@ -47,7 +47,7 @@ export class AdminController {
     }
   };
 
-  public async updateUtente(req: Request, res: Response ){
+  public async updateUser(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
       const utenteAggiornato = await this.adminService.updateUtente(id, req.body);
@@ -61,7 +61,7 @@ export class AdminController {
     }
   };
 
-  public async deleteUtente(req: Request, res: Response ){
+  public async deleteUser(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
       const result = await this.adminService.deleteUtente(id);
@@ -79,7 +79,8 @@ export class AdminController {
     try{
     const tokenAmount = req.body?.newTokenAmount;
     const email = req.body?.email;
-    res.json(await this.adminService.updateTokenAmount(email, tokenAmount));
+    const user = await this.adminService.findByEmail(email);
+    res.json(await this.adminService.updateTokenBalance(email, Number(user.tokens) + tokenAmount));
     } catch (err) {
       if (err instanceof AppError) {
         (err as AppError).send(res);

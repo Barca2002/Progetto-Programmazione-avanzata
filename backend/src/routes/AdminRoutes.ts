@@ -12,21 +12,21 @@ adminRouter.use(checkAdminRole);
 
 // GET tutti utenti
 adminRouter.get("/all", async function(req: Request, res: Response){
-    await adminController.getUtenti(req, res);
+    await adminController.getUsers(req, res);
 });
 
 // GET utente per ID
 adminRouter.get("/:id", async function(req: Request, res: Response){
-    await adminController.getUtenteById(req, res);
+    await adminController.getUserById(req, res);
 });
 // UPDATE utente
 adminRouter.patch("/update/:id", async function(req: Request, res: Response){
-    await adminController.updateUtente(req, res);
+    await adminController.updateUser(req, res);
 }); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perchè put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
 // DELETE utente
 adminRouter.delete("/delete/:id", async function(req: Request, res: Response){
-    await adminController.deleteUtente(req, res);
+    await adminController.deleteUser(req, res);
 });
 
 // Questa rotta permette di settare il saldo dei token di un utente.
