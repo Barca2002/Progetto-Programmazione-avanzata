@@ -48,7 +48,7 @@ export class Datiinviati extends Model<DatiinviatiAllData, DatiinviatiCreationDa
       created_at: {
         type: DataTypes.BIGINT,
         allowNull: false,
-        defaultValue: Date.now() //formato linux epoch
+        defaultValue: () => Date.now() //formato linux epoch, bisogna metterlo come funzione altrimenti il timestamp viene generato solo all'inizializzazione del Model e quindi ad ogni inserimento esso sarà sempre lo stesso
       },
       stato: {
         type: DataTypes.ENUM("IN NAVIGAZIONE", "IN PESCA", "STAZIONARIA"),

@@ -8,13 +8,15 @@ export const tokenValidation = [checkTokenAmount];
 export const tokenBalanceCheck = [checkTokenBalance];
 const adminService = new AdminService();
 
+const MIN_TOKEN_BALANCE = 0.025;
+
 // Controllo valore token nella ricarica del saldo (rotta admin). Usata solo internamente.
 function checkTokenAmount(req: Request, _res: Response, next: NextFunction){
     const tokenAmount = req.body.newTokenAmount;
     if(!tokenAmount || Number.isNaN(tokenAmount)){
       throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
     }
-    if(tokenAmount < 0.025 || tokenAmount > 100) {
+    if(tokenAmount < MIN_TOKEN_BALANCE || tokenAmount > 100) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_TOKEN_AMOUNT)
     }
     next();
@@ -29,7 +31,7 @@ async function checkTokenBalance(req: Request, res: Response, next: NextFunction
   if(!user){
     throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
   }
-  if(user.tokens < 0.025){
+  if(user.tokens < MIN_TOKEN_BALANCE){
     throw ErrorFactory.getError(AppErrorEnum.INSUFFICIENT_TOKEN_BALANCE);
   }
   next();

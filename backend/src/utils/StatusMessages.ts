@@ -166,8 +166,8 @@ export const SUCCESS_LIST = {
         { statusCode: 201, message: "L'imbarcazione è stata creata con successo." },
     GEOAREAS_LINKED:
         { statusCode: 200, message: "Geoaree associate alle imbarcazioni con successo." },
-    SEND_DATA:
-        { statusCode: 201, message: "Dati inviati con successo." },
+    SEND_STATUS_OK:
+        { statusCode: 201, message: "Dati sullo status inviati con successo." },
     TOKEN_BALANCE_UPDATED:
         { statusCode: 201, message: "Saldo token aggiornato correttamente." },
     LOG_SPOSTAMENTI_FOUND:

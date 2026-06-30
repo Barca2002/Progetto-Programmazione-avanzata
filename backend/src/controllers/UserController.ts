@@ -11,12 +11,13 @@ import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import AdminService from "../services/AdminService.js";
 
 export class UserController {
-  public readonly datiinviatiService = new DatiInviatiService();
-  public readonly imbarcazioneService = new ImbarcazioneService();
-  public readonly violazioneService = new ViolazioneService();
-  public readonly segnalazioneService = new SegnalazioneService();
-  public readonly adminService = new AdminService();
+  private readonly datiinviatiService = new DatiInviatiService();
+  private readonly imbarcazioneService = new ImbarcazioneService();
+  private readonly violazioneService = new ViolazioneService();
+  private readonly segnalazioneService = new SegnalazioneService();
+  private readonly adminService = new AdminService();
 
+  private readonly REQ_COST = 0.025;
 
   public async sendData(req: Request, res: Response) {
     try {
@@ -32,7 +33,7 @@ export class UserController {
       // Controllo se generare una violazione ed eventualmente una segnalazione
       await this.violazioneService.checkIfViolazione(data);
       await this.segnalazioneService.checkIfSegnalazione(data);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, data));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, data));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -44,7 +45,7 @@ export class UserController {
 
   public async spendToken(user_id: number) {
     const user = await this.adminService.getUtenteById(user_id);
-    await this.adminService.updateTokenBalance(user.email, user.tokens - 0.025);
+    await this.adminService.updateTokenBalance(user.email, user.tokens - this.REQ_COST);
     return true;
   }
 
@@ -56,7 +57,7 @@ export class UserController {
       const geoarea_id = Number(req.params.geoarea_id);
       //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, my_imbarcazioni_status));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, my_imbarcazioni_status));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

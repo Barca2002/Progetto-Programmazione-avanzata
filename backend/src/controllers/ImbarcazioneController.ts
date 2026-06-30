@@ -25,9 +25,10 @@ export class ImbarcazioneController {
     }
   };
 
-  public async getAllImbarcazioniWithGeofences(req: Request, res: Response ): Promise<void>{
+  // Funzione che ritorna all'admin tutte le imbarcazioni che sono in una geoarea.
+  public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response ): Promise<void>{
     try {
-      const imbarcazioni = await this.imbarcazioneService.getAllImbarcazioniWithGeofences();
+      const imbarcazioni = await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
     } catch (err) {
       if (err instanceof AppError) {
@@ -37,11 +38,11 @@ export class ImbarcazioneController {
       }
     }
   };
-
-  public async getMyImbarcazioniWithGeofences(req: Request, res: Response ): Promise<void>{
+    // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
+  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response ): Promise<void>{
     try {
       const user_id = checkToken(req).user_id;
-      const imbarcazioni = await this.imbarcazioneService.getMyImbarcazioniWithGeofences(user_id);
+      const imbarcazioni = await this.imbarcazioneService.getMyImbarcazioniWithGeofenceareas(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
     } catch (err) {
       if (err instanceof AppError) {
@@ -93,7 +94,7 @@ export class ImbarcazioneController {
     "geoarea_id": 1
   }
   */
-  public async deleteGeoarea(req: Request, res: Response ): Promise<void>{
+  public async unlinkGeoareasToImbarcazioni(req: Request, res: Response ): Promise<void>{
     try {
       const { mmsi, geoarea_id } = req.body;
 
@@ -101,7 +102,7 @@ export class ImbarcazioneController {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
 
-      await this.imbarcazioneService.deleteGeoarea(mmsi, geoarea_id);
+      await this.imbarcazioneService.deleteLinkGeoareaImbarcazione(mmsi, geoarea_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi, geoarea_id }));
     } catch (err) {
       if (err instanceof AppError) {

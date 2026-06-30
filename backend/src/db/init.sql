@@ -2,12 +2,12 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 DROP TABLE IF EXISTS log_spostamenti;
-DROP TABLE IF EXISTS violazioni;
+DROP TABLE IF EXISTS violazioni CASCADE; -- Bisogna megttere CASCADE a causa della dipendenza circolare.
 DROP TABLE IF EXISTS dati_inviati;
 DROP TABLE IF EXISTS imbarcazioni_segnalazioni;
 DROP TABLE IF EXISTS segnalazioni;
 DROP TABLE IF EXISTS geofence_imbarcazioni;
-DROP TABLE IF EXISTS geofence_areas;
+DROP TABLE IF EXISTS geofence_areas CASCADE;
 DROP TABLE IF EXISTS imbarcazioni;
 DROP TABLE IF EXISTS users;
 

@@ -6,7 +6,6 @@ import { AppError } from "../models/AppErrorModel.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
-import { GeofenceareaService } from "../services/GeofenceareaService.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 
 export class AdminController {
@@ -162,6 +161,7 @@ export class AdminController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
-
   }
+
+  
 }

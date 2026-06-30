@@ -7,9 +7,9 @@ const JWT_PUBLIC_KEY = process.env.JWT_PUBLIC_KEY;
   if (!JWT_PUBLIC_KEY){
       throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
   }
-
-const publicKeyBase64 = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
-  if(!publicKeyBase64){
+// Decodifica della chiave pubblica da base64 al formato normale (formato PEM).
+const publicKey = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
+  if(!publicKey){
     throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
   }
 
@@ -59,7 +59,7 @@ export function checkAdminRole (req: Request, res: Response, next: NextFunction)
 };
 
 export function decodeJwt(token: string){
-  const decodedToken = jwt.verify(token, publicKeyBase64, { algorithms: ['RS256'] }) as JwtPayload;
+  const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
   if(!decodedToken){
     throw ErrorFactory.getError(AppErrorEnum.JWT_VERIFY_ERROR);
   }

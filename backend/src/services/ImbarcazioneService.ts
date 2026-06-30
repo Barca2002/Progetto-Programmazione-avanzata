@@ -62,7 +62,7 @@ export class ImbarcazioneService {
     return imbarcazione;
   }
 
-  async getAllImbarcazioniWithGeofences() {
+  async getAllImbarcazioniWithGeofenceareas() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
     if (!imbarcazioni || imbarcazioni.length === 0)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
@@ -84,7 +84,7 @@ export class ImbarcazioneService {
     return result;
   }
 
-  async getMyImbarcazioniWithGeofences(user_id: number) {
+  async getMyImbarcazioniWithGeofenceareas(user_id: number) {
     if (Number.isNaN(user_id) || user_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
 
@@ -317,7 +317,7 @@ export class ImbarcazioneService {
   }
 
 
-  async deleteGeoarea(mmsi: number, geoarea_id: number): Promise<void> {
+  async deleteLinkGeoareaImbarcazione(mmsi: number, geoarea_id: number): Promise<void> {
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       //Controllo che l'imbarcazione esista

@@ -55,7 +55,7 @@ export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreatio
       created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW, // Qui va bene solo la data, perché DataTypes.NOW ritorna la data e l'ora, senza i millisecondi.
       }
     }, {
       sequelize,

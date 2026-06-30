@@ -19,7 +19,8 @@ export class SegnalazioneService{
     async createSegnalazione(data: SegnalazioneCreationData){
         const t = await DatabaseConnection.getInstance().transaction();
         try {
-            const geoarea = await this.geofenceareaService.getAreaById(data.geoarea_id);
+            const geoarea = await this.geofenceareaDAO.get(data.geoarea_id);
+            // Siccome possiamo avere posizioni che non sono in una geoarea, possiamo non controllare se effettuare la segnalazione visto che le geoaree non vengono toccate.
             if (!geoarea) {
                 throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
             }
@@ -51,13 +52,15 @@ export class SegnalazioneService{
         const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         
         if(!current_geoarea){
-            throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+            // Possono esserci posizioni fuori dalle geoaree, quindi in tal caso non si controlla neanche se generare una segnalazione perché non si entra in nessuna geoarea.
+            return;
         }
         // Prendo l'ultima violazione valida della geoarea corrente.
         let ultimaViolazioneValida = await this.violazioneDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
 
         if(!ultimaViolazioneValida){
-            throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
+            // C'è il caso in cui non è stat mai commessa una violazione per una geoarea, quindi in tal caso si ritorna e basta, non si controlla per niente se geneare la segnalazione.
+            return;
         }
         
         // Prendo le violazioni della geoarea che sono vecchie al massimo 2 giorni dall'ultima violazione valida perché le altre non servono. Potrebbe contenere nuove violazioni non valide (potrebbe avere n violazioni che sono arrivate prima di 1 ora dall'ultima violazioen valida).

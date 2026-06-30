@@ -70,12 +70,14 @@ export class ViolazioneService {
         return violazioni;
     }
     // Controlla se generare una violazione per eccesso di velocità o accesso ad una geoarea non autorizzata.
-    async checkIfViolazione(data: DatiinviatiCreationData, ){
+    async checkIfViolazione(data: DatiinviatiCreationData ){
         const current_area = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
-        const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];;
+        const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
 
+        // Siccome possiamo avere posizioni che non sono in una geoarea, non c'è nessuna violazione da creare
         if (!current_area) {
-            throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+            console.log("l'area è nulla");
+            return;
         }
         // Teniamo traccia se una violazione è già stata registrata per evitare di contarne due nel conteggio per generare uan segnalazione.
         let violazioneGiaRegistrata = false;
