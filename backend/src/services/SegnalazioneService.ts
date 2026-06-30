@@ -69,7 +69,7 @@ export class SegnalazioneService{
         }
 
         // Se l'ultima violazione è avvenuta al massimo 1 ora dopo l'ultima violazione valida, non deve essere contata. Di conseguenza anche tutte le violazioni avvenute prima di essa.
-        const ultimaViolazioneIsValid = (ultimaViolazione!.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 1 * 1 * 1000;
+        const ultimaViolazioneIsValid = (ultimaViolazione!.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 60 * 60 * 1000;
 
         // Se l'ultima violazione è valida, allora aggiorniamo quella nella geofence area.
         if(ultimaViolazioneIsValid){

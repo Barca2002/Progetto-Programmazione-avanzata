@@ -113,7 +113,7 @@ export class ImbarcazioneService {
     return result;
   }
 
-
+  // Funzione che ritorna tutte le imbarcazioni e se sono o no in una geoarea, con il relativo tempo di permanenza (UTENTE)
   async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
 
