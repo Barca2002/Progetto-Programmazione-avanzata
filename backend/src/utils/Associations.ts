@@ -17,7 +17,6 @@ export function inizializzaAssociazioni(): void {
         as: 'Geofenceareas'
     });
 
-
     Geofencearea.belongsToMany(Imbarcazione, {
         through: 'geofence_imbarcazioni',
         timestamps: false,

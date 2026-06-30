@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize, Model } from 'sequelize';
+import { DataTypes, Sequelize, Model, BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyAddAssociationsMixin } from 'sequelize';
+import { Imbarcazione } from './ImbarcazioneModel.js';
 
 export interface SegnalazioneAllData {
     id: number;
@@ -15,6 +16,10 @@ export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreatio
     declare geoarea_id: number;
     declare stato: string;
     declare created_at: Date;
+
+    declare addImbarcazione: BelongsToManyAddAssociationMixin<Imbarcazione, number>;
+    declare addImbarcazioni: BelongsToManyAddAssociationsMixin<Imbarcazione, number>;
+    declare removeImbarcazione: BelongsToManyRemoveAssociationMixin<Imbarcazione, number>;
 
 
   static inizializzaModel(sequelize: Sequelize): typeof Segnalazione {

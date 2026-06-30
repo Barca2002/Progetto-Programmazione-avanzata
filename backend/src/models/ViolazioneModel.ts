@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize, Model } from 'sequelize';
+import { DataTypes, Sequelize, Model, BelongsToGetAssociationMixin } from 'sequelize';
+import { Imbarcazione } from './ImbarcazioneModel.js';
 
 export interface ViolazioneAllData {
     id: number;
@@ -20,6 +21,8 @@ export class Violazione extends Model<ViolazioneAllData, ViolazioneCreationData>
     declare conta_in_segnalazione: boolean;
     declare created_at: Date;
 
+    // Per prendere l'imbarcazione associata ad una violazione
+    declare getImbarcazione: BelongsToGetAssociationMixin<Imbarcazione>;
 
   static inizializzaModel(sequelize: Sequelize): typeof Violazione {
     return Violazione.init({

@@ -9,6 +9,7 @@ import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { GeofenceareaDAO } from '../dao/GeofenceareaDAO.js';
 import { Violazione } from '../models/ViolazioneModel.js';
+import { Imbarcazione } from '../models/ImbarcazioneModel.js';
 
 export class SegnalazioneService{
     private readonly segnalazioneDao = new SegnalazioneDAO();
@@ -16,7 +17,7 @@ export class SegnalazioneService{
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaDAO = new GeofenceareaDAO();
 
-    async createSegnalazione(data: SegnalazioneCreationData){
+    async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]){
         const t = await DatabaseConnection.getInstance().transaction();
         try {
             const geoarea = await this.geofenceareaDAO.get(data.geoarea_id);
@@ -24,9 +25,20 @@ export class SegnalazioneService{
             if (!geoarea) {
                 throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
             }
-            const result = await this.segnalazioneDao.create(data, t);
+
+            const newSegnalazione = await this.segnalazioneDao.create(data, t);
+            // Vogliamo gli mmsi univoci, perché non possiamo inserire duplicati nella tabella imbarcazioni_segnalazioni.
+            const imbarcazioniMmsi = new Set<number>();
+
+            for (const violazione of violazioni) {
+                const imbarcazione = await violazione.getImbarcazione();
+                imbarcazioniMmsi.add(imbarcazione.mmsi);
+            }
+            // Sfruttiamo l'associazione con segnalazione e imbarcazione per aggiungere tutti le imbarcazioni tramite mmsi. ignoreDuplicates è sicurezza ridondante contro i duplicati.
+            await newSegnalazione.addImbarcazioni([...imbarcazioniMmsi], {ignoreDuplicates: true, transaction: t});
+
             await t.commit();
-            return result;
+
         } catch (err) {
             await t.rollback();
             if (err instanceof AppError) { 
@@ -94,15 +106,11 @@ export class SegnalazioneService{
         const fineFinestra = inizioFinestra - 2 * 24 * 60 * 60 * 1000;
 
         // Filtriamo le violazioni in base al vincolo temporale.
-        // Ottimizzazione: se troviamo più di 5 elementi che soddisfano il vincolo, ci fermiamo perché già bastano per creare la segnalazione.
         let violazioniValide: Violazione[] = [];
         for (const v of violazioniRecenti){
             const t = new Date(v.created_at).getTime();
             if (t <= inizioFinestra && t >= fineFinestra){
                 violazioniValide.push(v);
-            }
-            if(violazioniValide.length > 5){
-                break;
             }
         }
 
@@ -116,7 +124,7 @@ export class SegnalazioneService{
             const t = await DatabaseConnection.getInstance().transaction();
             try {
                 const newSegnalazione: SegnalazioneCreationData = {geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO"};
-                await this.createSegnalazione(newSegnalazione);
+                await this.createSegnalazione(newSegnalazione, violazioniValide);
                 await t.commit();
             } catch (err) {
                 await t.rollback();

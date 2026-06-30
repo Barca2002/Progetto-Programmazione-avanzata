@@ -142,7 +142,6 @@ CREATE TABLE imbarcazioni_segnalazioni (
     mmsi            INT NOT NULL,
 
     PRIMARY KEY (id_segnalazione, mmsi),
-    UNIQUE (id_segnalazione), -- Ogni segnalazione è associata a una sola imbarcazione --
     CONSTRAINT fk_si_segnalazione FOREIGN KEY (id_segnalazione) REFERENCES segnalazioni(id) ON DELETE CASCADE,
     CONSTRAINT fk_si_mmsi         FOREIGN KEY (mmsi)            REFERENCES imbarcazioni(mmsi) ON DELETE CASCADE
 );

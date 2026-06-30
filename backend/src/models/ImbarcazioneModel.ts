@@ -1,5 +1,6 @@
-import { DataTypes, Sequelize, Model, Optional, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin } from 'sequelize';
+import { DataTypes, Sequelize, Model, Optional, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyHasAssociationsMixin } from 'sequelize';
 import { Geofencearea } from './GeofenceareaModel.js';
+import { Segnalazione } from './SegnalazioneModel.js';
 
 export interface ImbarcazioneAllData {
   mmsi: number;
@@ -27,10 +28,16 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
   // Questi non aggiungono comportamento: dicono solo a TS che Sequelize popolerà questi metodi a runtime. Permettono di lavorare con le molti a molti/uno a molti.
   declare getGeofenceareas: BelongsToManyGetAssociationsMixin<Geofencearea>;
   declare hasGeofencearea: BelongsToManyHasAssociationMixin<Geofencearea, number>; // Ritorna se ha una singola area (booleano)
-  declare hasGeofenceareas: BelongsToManyHasAssociationMixin<Geofencearea, number>;
+  declare hasGeofenceareas: BelongsToManyHasAssociationsMixin<Geofencearea, number>;
   // Utili per aggiungere e rimuovere per linkare o unlinkare le geoaree.
   declare addGeofencearea: BelongsToManyAddAssociationMixin<Geofencearea, number>;
   declare removeGeofencearea: BelongsToManyRemoveAssociationMixin<Geofencearea, number>;
+
+  declare getSegnalazioni: BelongsToManyGetAssociationsMixin<Segnalazione>;
+  declare hasSegnalazione: BelongsToManyHasAssociationMixin<Segnalazione, number>;
+  declare hasSegnalazioni: BelongsToManyHasAssociationsMixin<Segnalazione, number>;
+  declare addSegnalazione: BelongsToManyAddAssociationMixin<Segnalazione, number>;
+  declare removeSegnalazione: BelongsToManyRemoveAssociationMixin<Segnalazione, number>;
 
   static inizializzaModel(sequelize: Sequelize): typeof Imbarcazione {
     return Imbarcazione.init({
