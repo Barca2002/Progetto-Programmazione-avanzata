@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
+import { DataTypes, Sequelize, Model, Optional, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin } from 'sequelize';
+import { Geofencearea } from './GeofenceareaModel.js';
 
 export interface ImbarcazioneAllData {
   mmsi: number;
@@ -22,6 +23,14 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
   declare user_id: number;
   declare created_at: Date;
 
+  // Mixin generati dall'associazione belongsToMany con Geofencearea. Mixin è una tecnica per aggiungere metodi ad una classe senza usare l'ereditarietà.
+  // Questi non aggiungono comportamento: dicono solo a TS che Sequelize popolerà questi metodi a runtime. Permettono di lavorare con le molti a molti/uno a molti.
+  declare getGeofenceareas: BelongsToManyGetAssociationsMixin<Geofencearea>;
+  declare hasGeofencearea: BelongsToManyHasAssociationMixin<Geofencearea, number>; // Ritorna se ha una singola area (booleano)
+  declare hasGeofenceareas: BelongsToManyHasAssociationMixin<Geofencearea, number>;
+  // Utili per aggiungere e rimuovere per linkare o unlinkare le geoaree.
+  declare addGeofencearea: BelongsToManyAddAssociationMixin<Geofencearea, number>;
+  declare removeGeofencearea: BelongsToManyRemoveAssociationMixin<Geofencearea, number>;
 
   static inizializzaModel(sequelize: Sequelize): typeof Imbarcazione {
     return Imbarcazione.init({

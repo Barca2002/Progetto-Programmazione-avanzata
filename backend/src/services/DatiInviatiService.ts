@@ -8,6 +8,7 @@ import { Datiinviati, DatiinviatiCreationData } from '../models/DatiInviatiModel
 import { ImbarcazioneService } from './ImbarcazioneService.js';
 import { LogSpostamentiService } from './LogSpostamentiService.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
+import { LogSpostamentiCreationData } from '../models/LogSpostamentiModel.js';
 
 export class DatiInviatiService {
   private readonly datiinviatiDAO = new DatiinviatiDAO();
@@ -25,7 +26,6 @@ export class DatiInviatiService {
     return last_dato;
   }
 
-
   public async sendData(data: DatiinviatiCreationData, user_id: number): Promise<void> {
 
     const imbarcazione = await this.imbarcazioneDAO.get(data.mmsi);
@@ -36,118 +36,51 @@ export class DatiInviatiService {
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
     // Prendiamo tutte le geoaree associate alle imbarcazioni dell'utente.
     const geofence_imbarcazioni = DatabaseConnection.getInstance().model('geofence_imbarcazioni');
-    const allowedGeoareas = await geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number }[];
+
+    // Prendiamo la geoarea corrispondente alla posizione inviata.
+    const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
+    const currentAreaIsAllowed: boolean = current_geoarea ? await imbarcazione.hasGeofencearea(current_geoarea!.geoarea_id) : false;
+
+    // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
+    const lastDatoInviato = await this.datiinviatiDAO.getLastDatoByMmsi(data.mmsi);
+
+    // Prendiamo la geoarea associata all'ultimo dato inviato (se esiste un dato precedente, altrimenti è nullo).
+    const geoarea_of_last_dato = lastDatoInviato
+      ? await this.geofenceareaService.getGeoareaByPosition(lastDatoInviato.longitudine, lastDatoInviato.latitudine)
+      : null;
+
+    // Se non c'è un'ultima geoarea (sia perché non c'è un dato precedente, sia perché il dato precedente non era in nessuna area), non può essere permessa.
+    const lastAreaIsAllowed = geoarea_of_last_dato
+      ? (await geofence_imbarcazioni.findOne({ where: { mmsi: data.mmsi, geoarea_id: geoarea_of_last_dato.geoarea_id } })) != null
+      : false;
+
+    // Se le due geoaree coincidono (stessa area, sia essa nulla o la stessa geoarea), non c'è nessun ingresso/uscita da registrare:
+    // è solo un movimento interno alla stessa area, oppure il dato è fuori da ogni area sia ora che prima. Il caso se entrambe le aree sono nulle, cioè siamo fuori dalle geoarea sia ora che prima, è gestito perché undefined === undefined è true.
+    const sameArea = current_geoarea?.geoarea_id === geoarea_of_last_dato?.geoarea_id;
+
+    const spostamentiDaLoggare:LogSpostamentiCreationData[] = [];
+
+    if (!sameArea) {
+      // Si esce dall'area precedente solo se esisteva un'area precedente ed era permessa per l'imbarcazione.
+      if (geoarea_of_last_dato && lastAreaIsAllowed) {
+        spostamentiDaLoggare.push({ mmsi: data.mmsi, geoarea_id: geoarea_of_last_dato.geoarea_id, spostamento: "USCITA" });
+      }
+      // Si entra nell'area corrente solo se esiste l'area corrente ed è permessa per l'imbarcazione.
+      if (current_geoarea && currentAreaIsAllowed) {
+        spostamentiDaLoggare.push({ mmsi: data.mmsi, geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA" });
+      }
+      // Se sono entrambi falsi, vuol dire che o sono sempre fuori o che non c'è il permesso per entrambe le geoaree e quindi non loggo nessuno spostamento.
+    }
 
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      // Prendiamo la geoarea corrispondente alla posizione inviata.
-      const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
-      console.log("--- CURRENT GEOAREA ----", current_geoarea?.geoarea_id)
-      const currentAreaIsAllowed: boolean = allowedGeoareas.some(g => g.geoarea_id === current_geoarea?.geoarea_id);
-      console.log(" ---- CURRENT GEOAREA IS ALLOWED -----", currentAreaIsAllowed);
-      // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
-      const lastDatoInviato = await this.datiinviatiDAO.getLastDatoByMmsi(data.mmsi);
-      console.log("---- LAST DATO -----", lastDatoInviato?.id)
-      // Se lastDatoInviato è nullo, vuol dire che è il primo invio di dati perché non ci sono dati precedenti.
-      // Inoltre, se non c'è un dato precedente, ma il dato attuale è in una geoarea, biosgna vedere se l'imbarcazione è associata ad essa. In caso positivo, si salva lo spostamento in entrata, altrimenti no.
-      if (!lastDatoInviato) {
-        if (current_geoarea && currentAreaIsAllowed) {
-          await this.logspostamentoService.create({
-            mmsi: data.mmsi,
-            geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA"
-          });
-        }
-        // Se l'area corrente è nulla o non è permessa o sono entrambi sono null e false, non salvo nessuno spostamento, ma solamente il dato.
-        await this.datiinviatiDAO.create(data, t);
-        await t.commit();
-        return;
+      // Salviamo gli spostamenti, se ci sono.
+      for (const spostamento of spostamentiDaLoggare) {
+        await this.logspostamentoService.create(spostamento, t);
       }
-
-      // Prendo la geoarea dell'ultimo dato inviato.
-      const geoarea_of_last_dato = await this.geofenceareaService.getGeoareaByPosition(lastDatoInviato.longitudine, lastDatoInviato.latitudine);
-      console.log("---- LAST GEOAREA ----", geoarea_of_last_dato?.geoarea_id);
-
-      let lastAreaIsAllowed: boolean;
-      // Se l'ultimo dato è nullo, ovviamnente l'ultima geoarea associata non può essere valida.
-      if(!geoarea_of_last_dato){
-        lastAreaIsAllowed = false;
-      } else {
-        lastAreaIsAllowed = allowedGeoareas.some(g => g.geoarea_id === geoarea_of_last_dato.geoarea_id);
-      }
-      console.log("---- LAST GEOAREA IS ALLOWED ----", lastAreaIsAllowed);
-
-      // Se la posizione corrente è fuori dalle geoaree, ma quella precedente era dentro un'area, sto uscendo dall'ultima geoarea. Ovviamente bisogna controllare se è permessa l'ultima geoarea per salvare l'uscita.
-      if (!current_geoarea) {
-
-        if (!geoarea_of_last_dato) {
-          // Se l'ultima posizione inviata è fuori da una geoarea, devo semplicemente salvare il dato.
-          await this.datiinviatiDAO.create(data, t);
-          await t.commit();
-          return;
-        }
-
-        // Invece, se l'ultima posizione inviata è in una geoarea, vediamo se è associata all'imbarcazione corrente.
-        if (lastAreaIsAllowed) {
-          // Se la geoarea dell'ultima posizione inviata è permessa, vuol dire che si esce da essa.
-          await this.logspostamentoService.create({ mmsi: data.mmsi, geoarea_id: geoarea_of_last_dato.geoarea_id, spostamento: "USCITA" });
-        }
-
-        // Inoltre, anche se l'ultima geoarea associata all'ultima posizione inviata non è permessa (cioè !lastAreaIsAllowed), non salvo nessuno spostamento, ma solo il dato. 
-        await this.datiinviatiDAO.create(data, t);
-        await t.commit();
-        return;
-      }
-      // Se ci sono entrambi i dati, cioè la geoarea corrente e il dato precedente, bisogna vedere se sono associate all'imbarcazione.
-      if (current_geoarea) {
-
-        if (!geoarea_of_last_dato) {
-          // Se l'ultima geoarea è nulla, devo vedere solo se quella corrente è associata e in caso positivo salvare lo spostamento in entrata
-          if (currentAreaIsAllowed) {
-            await this.logspostamentoService.create({
-              mmsi: data.mmsi,
-              geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA"
-            });
-          }
-          await this.datiinviatiDAO.create(data, t);
-          await t.commit();
-          return;
-        }
-
-        // Controlliamo se la geoarea precedente e corrente sono diverse, se lo sono c'è stata un'entrata ed un'uscita. Altrimenti, se sono uguali, non c'è stata nessuna uscita o entrata, ma solo un movimento interno alla geoarea precedente.
-        if (geoarea_of_last_dato.geoarea_id !== current_geoarea.geoarea_id) {
-
-          // CASO 1 : entrambe le zone sono autorizzate/associate. Quindi si deve loggare sia l'uscita che l'entrata.
-          if (lastAreaIsAllowed && currentAreaIsAllowed) {
-            // Si esce dall'ultima area di cui è stata inviata la posizione.
-            await this.logspostamentoService.create({ mmsi: data.mmsi, geoarea_id: geoarea_of_last_dato.geoarea_id, spostamento: "USCITA" });
-            // Si entra nella current_area, cioè la posizione che l'utente sta inviando.
-            await this.logspostamentoService.create({
-              mmsi: data.mmsi,
-              geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA"
-            });
-          }
-          // CASO 2: la posizione precedente non era autorizzata, ma la corrente si. Quindi si logga solo l'entrata nell'area corrente.
-          if (!lastAreaIsAllowed && currentAreaIsAllowed) {
-            await this.logspostamentoService.create({
-              mmsi: data.mmsi,
-              geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA"
-            });
-          }
-          // CASO 3: la posizione corrente non era autorizzata, ma la precedente si. Quindi si logga solo l'uscita dall'area precedente.
-          if (lastAreaIsAllowed && !currentAreaIsAllowed) {
-            await this.logspostamentoService.create({ mmsi: data.mmsi, geoarea_id: geoarea_of_last_dato.geoarea_id, spostamento: "USCITA" });
-          }
-          // CASO 4: nessuna delle due aree è autorizzata, quindi non salviamo nulla.
-        }
-        await this.datiinviatiDAO.create(data, t);
-        await t.commit();
-        return;
-      }
-
-      // Se l'ultimo dato (lastDatoInviato) e la current_geoarea sono nulli, vuol dire che siamo fuori da una geoarea e quindi va salvato solo il dato inviato, nessuno spostamento.
+      // Il dato va sempre salvato, indipendentemente dagli spostamenti generati.
       await this.datiinviatiDAO.create(data, t);
       await t.commit();
-      return;
     } catch (err) {
       await t.rollback();
       if (err instanceof AppError) {
