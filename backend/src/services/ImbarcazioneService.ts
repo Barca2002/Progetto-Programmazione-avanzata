@@ -113,8 +113,7 @@ export class ImbarcazioneService {
     return result;
   }
 
-
-  async buildImbarcazioniStatus(imbarcazioni: Imbarcazione[], geoarea_id: number) {
+  async generateImbarcazioniStatus(imbarcazioni: Imbarcazione[], geoarea_id: number) {
     const results = [];
 
     for (const imbarcazione of imbarcazioni) {
@@ -161,7 +160,7 @@ export class ImbarcazioneService {
     if (!my_imbarcazioni || my_imbarcazioni.length === 0)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-    return this.buildImbarcazioniStatus(my_imbarcazioni, geoarea_id);
+    return this.generateImbarcazioniStatus(my_imbarcazioni, geoarea_id);
   }
 
   //FUNZIONE USATA DA ADMINCONTROLLER PER TORNARE LO STATO DI TUTTE LE IMBARCAZIONI IN UNA GEOAREA
@@ -173,7 +172,7 @@ export class ImbarcazioneService {
 
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
 
-    return this.buildImbarcazioniStatus(imbarcazioni, geoarea_id);
+    return this.generateImbarcazioniStatus(imbarcazioni, geoarea_id);
   }
 
 
