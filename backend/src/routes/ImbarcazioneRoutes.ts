@@ -20,11 +20,6 @@ imbarcazioneRouter.get("/segnalazioni/all", checkUserRole,  async function(req: 
     await imbarcazione.getAllWithSegnalazioni(req, res);
 });
 
-// CAMBIARE NOMI ROTTE----------------
-// GET imbarcazioni che sono dentro o fuori dalle geoaree con tempo di permanenza (se dentro).
-imbarcazioneRouter.get("/location", checkAdminRole,  async function(req: Request, res: Response) {
-    await imbarcazione.getStatusPerGeoarea(req, res);
-});
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
 imbarcazioneRouter.get("/positions", checkAdminRole,  async function(req: Request, res: Response) {

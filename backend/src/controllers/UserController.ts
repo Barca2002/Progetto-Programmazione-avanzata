@@ -49,12 +49,13 @@ export class UserController {
     return true;
   }
 
-  public async myImbarcazioniStatus(req: Request, res: Response) {
+  public async getMyImbarcazioniStatus(req: Request, res: Response) {
     try {
       const authHeader = req.headers['authorization'];
       const token = authHeader!.split(' ')[1];
       const user_id = decodeJwt(token!).user_id;
-      const geoarea_id = req.body.geoarea_id;
+      const geoarea_id = Number(req.params.geoarea_id);
+      //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_DATA, my_imbarcazioni_status));
     } catch (err) {

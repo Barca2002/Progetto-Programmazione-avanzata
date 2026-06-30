@@ -125,20 +125,6 @@ export class ImbarcazioneController {
     }
   }
 
-  async getStatusPerGeoarea(req: Request, res: Response){
-    try {
-        const geoarea_id  = req.body.geoarea_id;
-        const imbarcazione_status = await this.geofenceareaService.getAllImbarcazioniStatus(geoarea_id)
-        res.json(SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
-
   public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {
     try {
         const { mmsi, start_date } = req.body;

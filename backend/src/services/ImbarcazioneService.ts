@@ -5,7 +5,7 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import { ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
+import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
@@ -114,16 +114,10 @@ export class ImbarcazioneService {
   }
 
 
-  async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
-    const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
-
-    if (!my_imbarcazioni || my_imbarcazioni.length === 0)
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-
+  async buildImbarcazioniStatus(imbarcazioni: Imbarcazione[], geoarea_id: number) {
     const results = [];
 
-    //Scorro tutte le imbarcazioni dell'utente
-    for (const imbarcazione of my_imbarcazioni) {
+    for (const imbarcazione of imbarcazioni) {
       //Prendi l'ultimo dato inviato, associato all'imbarcazione
       const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(imbarcazione.mmsi);
       if (!last_dato) {
@@ -135,11 +129,11 @@ export class ImbarcazioneService {
       const geoarea_last_dato = await this.geofenceareaService.getGeoareaByPosition(last_dato.longitudine, last_dato.latitudine);
 
       // Siccome l'utente può inviare posizioni anche che non siano di geoaree, dico comunque che è fuori
-      if(!geoarea_last_dato){
+      if (!geoarea_last_dato) {
         results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
         continue; //Se non c'è continuo comunque dicendo che è fuori
       }
-     
+
       //Se l'id della geoarea associato all'ultimo invio di dati per quell'imbarcazione è uguale a quello inserito nel body, vuol dire che è dentro quella geoarea
       if (geoarea_last_dato.geoarea_id === geoarea_id) {
         const diff = Date.now() - last_dato.created_at;
@@ -153,6 +147,33 @@ export class ImbarcazioneService {
     }
 
     return results;
+  }
+
+  //FUNZIONE USATA DA USERCONTROLLER PER TORNARE LO STATO DELLE PROPRIE IMBARCAZIONI
+  async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
+    if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
+
+    await this.geofenceareaService.getAreaById(geoarea_id);
+
+    const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
+
+    if (!my_imbarcazioni || my_imbarcazioni.length === 0)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+
+    return this.buildImbarcazioniStatus(my_imbarcazioni, geoarea_id);
+  }
+
+  //FUNZIONE USATA DA ADMINCONTROLLER PER TORNARE LO STATO DI TUTTE LE IMBARCAZIONI IN UNA GEOAREA
+  async getAllImbarcazioniStatus(geoarea_id: number) {
+    if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
+
+    await this.geofenceareaService.getAreaById(geoarea_id);
+
+    const imbarcazioni = await this.imbarcazioneDAO.getAll();
+
+    return this.buildImbarcazioniStatus(imbarcazioni, geoarea_id);
   }
 
 

@@ -54,3 +54,8 @@ adminRouter.get("/checkSegnalazioni/:geoarea_id", async function(req: Request, r
 adminRouter.post("/creaViolazione", async function(req: Request, res: Response){
     await adminController.createViolazione(req, res);
 });
+
+// GET imbarcazioni che sono dentro o fuori dalle geoaree con tempo di permanenza (se dentro).
+adminRouter.get("/location/:geoarea_id", checkAdminRole,  async function(req: Request, res: Response) {
+    await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
+});

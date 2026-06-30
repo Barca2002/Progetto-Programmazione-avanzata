@@ -6,11 +6,14 @@ import { AppError } from "../models/AppErrorModel.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
+import { GeofenceareaService } from "../services/GeofenceareaService.js";
+import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 
 export class AdminController {
   private readonly adminService = new AdminService();
   private readonly segnalazioneService = new SegnalazioneService();
   private readonly violazioneService = new ViolazioneService();
+  private readonly imbarcazioneService = new ImbarcazioneService();
   
 
   public async getUsers(_req: Request, res: Response) {
@@ -124,6 +127,20 @@ export class AdminController {
       const geoarea_id = Number(req.params.geoarea_id);
       const violazioni = await this.violazioneService.getViolazioniByGeoarea(geoarea_id);
       res.json(violazioni);
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async getAllImbarcazioniStatusPerGeoarea(req: Request, res: Response){
+    try {
+        const geoarea_id  = Number(req.params.geoarea_id);
+        const imbarcazione_status = await this.imbarcazioneService.getAllImbarcazioniStatus(geoarea_id)
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
