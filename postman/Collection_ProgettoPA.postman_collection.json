@@ -257,13 +257,14 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/geoarea/create",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/geoarea/create",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
                   "port": "{{PORT}}",
                   "path": [
+                    "admin",
                     "geoarea",
                     "create"
                   ]
@@ -422,7 +423,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/updateTokenBalance",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/update/tokenbalance",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -430,202 +431,8 @@
                   "port": "{{PORT}}",
                   "path": [
                     "admin",
-                    "updateTokenBalance"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "GetAllUtenti",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/all",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}}",
-                  "path": [
-                    "admin",
-                    "all"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "Segnalazioni",
-          "item": [
-            {
-              "name": "getSegnalazioniByGeoarea",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247901234,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 40,\r\n    \"velocita_kmh\": 65.34243,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /admin/checkSegnalazioni/5",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}} ",
-                  "path": [
-                    "admin",
-                    "checkSegnalazioni",
-                    "5"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "Violazioni",
-          "item": [
-            {
-              "name": "getViolazioniByMmsi",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247901234,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 40,\r\n    \"velocita_kmh\": 65.34243,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /admin/checkViolazioni/mmsi/247123456",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}} ",
-                  "path": [
-                    "admin",
-                    "checkViolazioni",
-                    "mmsi",
-                    "247123456"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "createViolazione",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247901234,\r\n    \"geoarea_id\": 1,\r\n    \"tipo\": \"ECCESSO VELOCITA\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /admin/creaViolazione",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}} ",
-                  "path": [
-                    "admin",
-                    "creaViolazione"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "getViolazioniByGeoarea",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247901234,\r\n    \"latitudine\": 43.680000,\r\n    \"longitudine\": 40,\r\n    \"velocita_kmh\": 65.34243,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}"
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /admin/checkViolazioni/geoarea/1",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}} ",
-                  "path": [
-                    "admin",
-                    "checkViolazioni",
-                    "geoarea",
-                    "1"
+                    "update",
+                    "tokenbalance"
                   ]
                 }
               },
@@ -661,12 +468,12 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/create",
+                  "raw": "http://{{HOST}}:{{PORT}} admin/imbarcazione/create",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
-                  "port": "{{PORT}} ",
+                  "port": "{{PORT}} admin",
                   "path": [
                     "imbarcazione",
                     "create"
@@ -676,7 +483,7 @@
               "response": []
             },
             {
-              "name": "getImbarcazioniInGeofencearea",
+              "name": "getAllImbarcazioniWithGeofenceareas",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               },
@@ -703,22 +510,24 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazioni/geofence",
+                  "raw": "http://{{HOST}}:{{PORT}} /admin/imbarcazioni/geoaree/all",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
                   "port": "{{PORT}} ",
                   "path": [
+                    "admin",
                     "imbarcazioni",
-                    "geofence"
+                    "geoaree",
+                    "all"
                   ]
                 }
               },
               "response": []
             },
             {
-              "name": "getImbarcazioniWithSegnalazioni",
+              "name": "getAllImbarcazioniWithSegnalazioni",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               },
@@ -761,7 +570,7 @@
               "response": []
             },
             {
-              "name": "getStatusPerGeoarea",
+              "name": "getAllImbarcazioniStatusByGeoarea",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               },
@@ -780,7 +589,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"geoarea_id\": 1\r\n}",
+                  "raw": "",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -788,15 +597,18 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/location",
+                  "raw": "http://{{HOST}}:{{PORT}} /admin/imbarcazioni/status/geoareaid/1",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
                   "port": "{{PORT}} ",
                   "path": [
-                    "imbarcazione",
-                    "location"
+                    "admin",
+                    "imbarcazioni",
+                    "status",
+                    "geoareaid",
+                    "1"
                   ]
                 }
               },
@@ -874,16 +686,17 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/geoareas/add",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/geoaree/link",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
-                  "port": "{{PORT}} ",
+                  "port": "{{PORT}}",
                   "path": [
-                    "imbarcazione",
-                    "geoareas",
-                    "add"
+                    "admin",
+                    "imbarcazioni",
+                    "geoaree",
+                    "link"
                   ]
                 }
               },
@@ -906,7 +719,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_id\": 1\r\n}",
+                  "raw": "{\r\n    \"mmsi\": 247123456,\r\n    \"geoarea_id\": 4\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -914,16 +727,17 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/geoareas/delete",
+                  "raw": "http://{{HOST}}:{{PORT}} /admin/imbarcazione/geoarea/unlink",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
                   ],
                   "port": "{{PORT}} ",
                   "path": [
+                    "admin",
                     "imbarcazione",
-                    "geoareas",
-                    "delete"
+                    "geoarea",
+                    "unlink"
                   ]
                 }
               },
@@ -937,7 +751,7 @@
       "name": "User",
       "item": [
         {
-          "name": "SendData",
+          "name": "sendStatus",
           "request": {
             "auth": {
               "type": "bearer",
@@ -961,7 +775,7 @@
               }
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /user/sendData",
+              "raw": "http://{{HOST}}:{{PORT}} /user/sendstatus",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
@@ -969,14 +783,14 @@
               "port": "{{PORT}} ",
               "path": [
                 "user",
-                "sendData"
+                "sendstatus"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "getMyImbarcazioni",
+          "name": "getMyImbarcazioniWithGeofenceareas",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -1003,14 +817,16 @@
               }
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /imbarcazione/my",
+              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/geoaree/my",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
               ],
               "port": "{{PORT}} ",
               "path": [
-                "imbarcazione",
+                "user",
+                "imbarcazioni",
+                "geoaree",
                 "my"
               ]
             }
@@ -1018,7 +834,51 @@
           "response": []
         },
         {
-          "name": "getImbarcazioniWithSegnalazioni Copy",
+          "name": "getMyImbarcazioniStatus",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT_TOKEN_USER}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/status/1",
+              "protocol": "http",
+              "host": [
+                "{{HOST}}"
+              ],
+              "port": "{{PORT}} ",
+              "path": [
+                "user",
+                "imbarcazioni",
+                "status",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllImbarcazioniWithSegnalazioni",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -1055,49 +915,6 @@
                 "imbarcazione",
                 "segnalazioni",
                 "all"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "myImbarcazioniStatus",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{JWT_TOKEN_USER}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"geoarea_id\": 3\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/status",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}} ",
-              "path": [
-                "user",
-                "imbarcazioni",
-                "status"
               ]
             }
           },

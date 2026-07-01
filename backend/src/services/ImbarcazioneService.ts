@@ -9,7 +9,6 @@ import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneMo
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
-import { Geofencearea } from '../models/GeofenceareaModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 
@@ -245,7 +244,7 @@ export class ImbarcazioneService {
   }
 
   async linkGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]): Promise<void> {
-    // La transazione è necessaria perché si può linakre un imbarcazione a più geoaree più volte. 
+    // La transazione è necessaria perché si può linkare un imbarcazione a più geoaree più volte. 
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       for (const { mmsi, geoarea_ids } of links) {
