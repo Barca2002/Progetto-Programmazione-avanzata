@@ -869,7 +869,7 @@
               "response": []
             },
             {
-              "name": "getAllImbarcazioniWithSegnalazioni",
+              "name": "getMyImbarcazioniWithSegnalazioni",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               },
