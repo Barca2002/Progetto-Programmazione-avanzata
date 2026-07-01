@@ -19,17 +19,17 @@ adminRouter.use(checkAdminRole);
 
 // ----- ROTTE PER IL TESTING, NON RISCHIESTE NELLA TRACCIA DEL PROGETTO ----
 // GET utente per id 
-adminRouter.get("/utente/get/:id", async function(req: Request, res: Response){
+adminRouter.get("/get/utente/:id", async function(req: Request, res: Response){
     await adminController.getUserById(req, res);
 });
 
 // UPDATE utente per id
-adminRouter.patch("/utente/update/:id", updateValidationPipeline, async function(req: Request, res: Response){
+adminRouter.patch("/update/utente/:id", updateValidationPipeline, async function(req: Request, res: Response){
     await adminController.updateUser(req, res);
 }); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perché put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
 // DELETE utente
-adminRouter.delete("/utente/delete/:id", async function(req: Request, res: Response){
+adminRouter.delete("/delete/utente/:id", async function(req: Request, res: Response){
     await adminController.deleteUser(req, res);
 });
 
@@ -55,6 +55,10 @@ adminRouter.get("/segnalazioni/geoarea_id/:geoarea_id", async function(req: Requ
 //  }
 adminRouter.patch("/update/tokenbalance", tokenValidation, async function(req: Request, res: Response){
     await adminController.updateTokenBalance(req, res);
+});
+
+adminRouter.get("/get/tokenbalance/:id", async function(req: Request, res: Response){
+    await adminController.getTokenBalance(req, res);
 });
 
 

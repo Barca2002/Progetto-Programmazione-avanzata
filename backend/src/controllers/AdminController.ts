@@ -93,6 +93,20 @@ export class AdminController {
     }
   }
 
+  public async getTokenBalance(req: Request, res: Response){
+    try{
+    const utente = await this.adminService.getUtenteById(Number(req.params.id));
+
+    res.json({id: utente.user_id, email: utente.email, tokens: utente.tokens});
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
   public async getSegnalazioniByGeoarea(req: Request, res: Response){
     try {
       const geoarea_id = Number(req.params.geoarea_id);
