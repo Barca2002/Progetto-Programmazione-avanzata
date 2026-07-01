@@ -32,11 +32,12 @@ export class ImbarcazioneController {
   public async getAllImbarcazioniWithGeofenceareas(){
     return await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
   }
+
+
   // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
   public async getUserImbarcazioniWithGeofenceareas(user_id: number) {
       const imbarcazioni = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
       return imbarcazioni;
-  
   }
 
   /*

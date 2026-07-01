@@ -4,15 +4,13 @@ import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 import { tokenValidation } from "../middlewares/TokenMiddleware.js";
 import { checkMmsi, imbarcazioneCreationValidation } from "../middlewares/ImbarcazioniMiddleware.js";
 import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
-import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
-import { checkGeoJson } from "../middlewares/GeofenceareaMiddleware.js";
+import { checkCreation } from "../middlewares/GeofenceareaMiddleware.js";
 import { userUpdateValidation } from "../middlewares/UpdateMiddleware.js";
 import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 
 export const adminRouter = Router();
 const adminController = new AdminController();
 const imbarcazioneController = new ImbarcazioneController();
-const geofenceareaController = new GeofenceAreaController();
 
 // Applichiamo i middleware definiti qui in tutte le rotte.
 adminRouter.use(checkAdminRole);
@@ -122,7 +120,7 @@ adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, 
 // --------- ROTTE GEOFENCE AREA ------------------
 // CREATE area (solo admin). Bisogna passare il contesto alla funzione altrimenti i this nella funzione createArea sono undefined
 
-adminRouter.post("/geoarea/create", checkGeoJson, async function(req: Request, res: Response) {
+adminRouter.post("/geoarea/create", checkCreation, async function(req: Request, res: Response) {
   await adminController.createGeofencearea(req, res);
 });
 

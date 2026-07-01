@@ -37,7 +37,6 @@ export class GeofenceAreaController {
   }
 
   public async createArea(data: GeofenceareaCreationData ){
-    
       return await this.geofenceareaService.createArea(data);
   }
 

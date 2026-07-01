@@ -79,9 +79,6 @@ export class GeofenceareaService {
   };
 
   public async updateArea(id: number, data: Partial<GeofenceareaCreationData>) {
-    if (!data || Object.keys(data).length === 0) {
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-    }
     await this.getAreaById(id); // controlla esistenza e validità id
     const t = await DatabaseConnection.getInstance().transaction();
     try {

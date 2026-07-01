@@ -6,9 +6,11 @@ import * as z from "zod";
 import * as turf from "@turf/turf";
 import { hasMaxDecimals } from "../utils/DecimalChecker.js";
 
-export const checkGeoJson = [checkGeoJsonFormat, checkCoordinates];
-export const checkGeoJsonUpdate = [checkGeoJsonUpdateFormat, checkCoordinatesUpdate];
+export const checkCreation = [checkGeoJsonFormat, checkCoordinates];
+export const checkUpdate = [checkGeoJsonUpdateFormat, checkCoordinatesUpdate];
 export const MAX_POINTS = 15;
+
+// ==================== CREAZIONE ====================
 
 // Definizione dello schema di validazione per il formato GeoJSON
 const geofenceAreaSchema = z.object({
@@ -32,7 +34,7 @@ const geofenceAreaSchema = z.object({
                 )
             }),
         })
-    ),
+    ).length(1), // ci aspettiamo esattamente 1 feature per la creazione
 
 }).strict();
 
@@ -89,6 +91,8 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
 
     next();
 }
+
+// ==================== UPDATE ====================
 
 // Definizione dello schema di validazione per il formato GeoJSON in fase di aggiornamento.
 // A differenza della creazione, tutti i campi sono opzionali, perché si può aggiornare anche un solo campo alla volta.
