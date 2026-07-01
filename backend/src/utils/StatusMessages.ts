@@ -191,6 +191,8 @@ export const SUCCESS_LIST = {
         { statusCode: 200, message: "Posizioni trovate correttamente" },
     STATUS_FOUND:
         { statusCode: 200, message: "Status dell'imbarcazione per la geoarea trovato" },
+    REQUEST_SUCCESS:
+        { statusCode: 200, message: "Richiesta completata con successo." },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;

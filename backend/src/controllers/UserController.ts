@@ -8,7 +8,8 @@ import { decodeJwt } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
-import AdminService from "../services/AdminService.js";
+import { AdminService} from "../services/AdminService.js";
+import { checkToken } from "../middlewares/JWTMiddleware.js";
 
 export class UserController {
   private readonly datiinviatiService = new DatiInviatiService();
@@ -65,6 +66,12 @@ export class UserController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
+  }
 
+  public async getMyTokenBalance(req: Request, res: Response) {
+      const token = await checkToken(req);
+      const user_id = token.user_id;
+      const user = await this.adminService.getUtenteById(user_id);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, {tokens: user.tokens}));
   }
 }

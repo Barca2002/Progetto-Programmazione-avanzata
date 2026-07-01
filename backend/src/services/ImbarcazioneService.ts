@@ -126,9 +126,10 @@ export class ImbarcazioneService {
 
   //FUNZIONE USATA DA USERCONTROLLER PER TORNARE LO STATO DELLE PROPRIE IMBARCAZIONI
   async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
-    if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
+    if (Number.isNaN(geoarea_id) || geoarea_id <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
-
+    }
+    // Controllo se la geoarea esiste, se non esiste viene lanciata un'eccezione.
     await this.geofenceareaService.getAreaById(geoarea_id);
 
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
