@@ -33,7 +33,7 @@ userRouter.get("/imbarcazioni/get/withgeoaree/my", checkUserRole,  async functio
 
 // GET tutte le imbarcazioni le relative segnalazioni associate
 userRouter.get("/imbarcazioni/get/segnalazioni/all",  async function(req: Request, res: Response) {
-    await imbarcazioneController.getAllWithSegnalazioni(req, res);
+    await userController.getMyImbarcazioniWithSegnalazioni(req, res);
 });
 
 //------------------------------------------

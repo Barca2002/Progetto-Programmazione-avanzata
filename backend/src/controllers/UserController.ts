@@ -10,6 +10,7 @@ import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { AdminService} from "../services/AdminService.js";
 import { checkToken } from "../middlewares/JWTMiddleware.js";
+import { ImbarcazioneController } from "./ImbarcazioneController.js";
 
 export class UserController {
   private readonly datiinviatiService = new DatiInviatiService();
@@ -17,6 +18,7 @@ export class UserController {
   private readonly violazioneService = new ViolazioneService();
   private readonly segnalazioneService = new SegnalazioneService();
   private readonly adminService = new AdminService();
+  private readonly imbarcazioneController = new ImbarcazioneController();
 
   private readonly REQ_COST = 0.025;
 
@@ -59,6 +61,20 @@ export class UserController {
       //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, my_imbarcazioni_status));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async getMyImbarcazioniWithSegnalazioni(req: Request, res: Response) {
+    try {
+      const user_id = checkToken(req).user_id;
+      const my_imbarcazioni_segnalazioni = await this.imbarcazioneController.getUserImbarcazioniWithSegnalazioni(user_id);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, my_imbarcazioni_segnalazioni));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

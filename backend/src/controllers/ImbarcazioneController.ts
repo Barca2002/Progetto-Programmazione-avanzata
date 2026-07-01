@@ -113,9 +113,9 @@ export class ImbarcazioneController {
     }
   };
 
-  public async getAllWithSegnalazioni(req: Request, res: Response) {
+  public async getAllImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
-      const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllWithSegnalazioni();
+      const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllImbarcazioniWithSegnalazioni();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
     } catch (err) {
       if (err instanceof AppError) {
@@ -124,6 +124,11 @@ export class ImbarcazioneController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
+  }
+
+  public async getUserImbarcazioniWithSegnalazioni(user_id: number) {
+    const my_imbarcazioni_segnalazioni = await this.imbarcazioneService.getUserImbarcazioniWithSegnalazioni(user_id);
+    return my_imbarcazioni_segnalazioni;
   }
 
   public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {

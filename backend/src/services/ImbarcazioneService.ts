@@ -264,11 +264,28 @@ export class ImbarcazioneService {
     }
   }
 
-  async getAllWithSegnalazioni() {
-    // Da imba
+  async getAllImbarcazioniWithSegnalazioni() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
-    const result = [];
 
+    if(!imbarcazioni){
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
+    }
+
+    return await this.getAllSegnalazioni(imbarcazioni);
+  }
+
+  async getUserImbarcazioniWithSegnalazioni(user_id: number) {
+    const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
+
+    if(!my_imbarcazioni){
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
+    }
+
+    return await this.getAllSegnalazioni(my_imbarcazioni);
+  }
+
+  async getAllSegnalazioni(imbarcazioni: Imbarcazione[]) {
+    const result = [];
     for (const imbarcazione of imbarcazioni) {
       const segnalazioniFiltered = (await imbarcazione.getSegnalazioni({
         // Togliamo gli attributi della tabella molti a molti.
