@@ -3,7 +3,7 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import * as z from "zod";
 
-export const updateValidationPipeline = [validateUpdateBody];
+export const userUpdateValidation = [validateUpdateBody];
 
 // A differenza di AuthMiddleware.ts, qui non c'è bisogno di validare la presenza dei campi, perché l'utente può decidere di aggiornare solo alcuni campi. Quindi se un campo non è presente, non viene validato. Se invece è presente, viene validato secondo gli schemi definiti.
 

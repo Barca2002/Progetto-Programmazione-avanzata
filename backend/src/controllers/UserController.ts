@@ -75,7 +75,7 @@ export class UserController {
     try {
       const user_id = checkToken(req).user_id;
       const my_imbarcazioni_segnalazioni = await this.imbarcazioneController.getUserImbarcazioniWithSegnalazioni(user_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, my_imbarcazioni_segnalazioni));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_segnalazioni));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

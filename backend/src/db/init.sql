@@ -34,9 +34,9 @@ CREATE TABLE users (
 -- ------------------------------------------------------------
 CREATE TABLE imbarcazioni (
     mmsi          INT          PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
+    name          VARCHAR(100) NOT NULL,
     type          VARCHAR(50)  NOT NULL,
-    descr         VARCHAR(255) NOT NULL,
+    descr         VARCHAR(500) NOT NULL,
     max_capacity  INT          NOT NULL,
     user_id       INT          NOT NULL,
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,

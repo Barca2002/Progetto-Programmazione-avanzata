@@ -4,8 +4,10 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
-import { checkToken } from "../middlewares/JWTMiddleware.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
+import { GeoAreaLinkRequest } from "./AdminController.js";
+import { ImbarcazioneCreationData } from "../models/ImbarcazioneModel.js";
+
 
 export class ImbarcazioneController {
   public readonly imbarcazioneService = new ImbarcazioneService();
@@ -60,23 +62,8 @@ export class ImbarcazioneController {
       }
   ]
   */
-  public async linkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
-    try {
-      const links = req.body;
-
-      if (!links || !Array.isArray(links)) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
-      await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
+  public async linkGeoareasToImbarcazioni(links: GeoAreaLinkRequest[]): Promise<void> {
+      return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
   };
 
   /*
@@ -105,19 +92,13 @@ export class ImbarcazioneController {
     }
   };
 
-  public async getAllImbarcazioniWithSegnalazioni(req: Request, res: Response) {
-    try {
+  // Funzione chiamata dall'adminController per ottenere tutte le imbarcazioni con le relative segnalazioni.
+  public async getAllImbarcazioniWithSegnalazioni() {
       const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllImbarcazioniWithSegnalazioni();
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
+      return imbarcazioni_segnalazioni;
   }
 
+   // Funzione chiamata dall'userController per ottenere tutte le proprie imbarcazioni con le relative segnalazioni.
   public async getUserImbarcazioniWithSegnalazioni(user_id: number) {
     const my_imbarcazioni_segnalazioni = await this.imbarcazioneService.getUserImbarcazioniWithSegnalazioni(user_id);
     return my_imbarcazioni_segnalazioni;
@@ -159,27 +140,8 @@ export class ImbarcazioneController {
     }
   }
 
-  public async createImbarcazione(req: Request, res: Response) {
-    try {
-      const { mmsi, name, type } = req.body;
-
-      if (!mmsi || !name || !type) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
-      if (String(mmsi).length !== 9) {
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-      }
-
-      const nuovaImbarcazione = await this.imbarcazioneService.createImbarcazione(req.body);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
+  public async createImbarcazione(data: ImbarcazioneCreationData) {
+      return await this.imbarcazioneService.createImbarcazione(data);
   };
 
   public async updateImbarcazione(req: Request, res: Response) {
