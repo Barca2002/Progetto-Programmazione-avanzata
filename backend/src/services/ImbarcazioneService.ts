@@ -10,6 +10,7 @@ import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
+import { Segnalazione } from '../models/SegnalazioneModel.js';
 
 
 export class ImbarcazioneService {
@@ -282,7 +283,7 @@ export class ImbarcazioneService {
   async getSegnalazioniOfImbarcazioni(imbarcazioni: Imbarcazione[]) {
     const result = [];
     for (const imbarcazione of imbarcazioni) {
-      const segnalazioniFiltered = (await imbarcazione.getSegnalazioni({
+      const segnalazioni = (await imbarcazione.getSegnalazioni({
         // Togliamo gli attributi della tabella molti a molti.
         joinTableAttributes: [],
         // Togliamo il campo created_at.
@@ -290,12 +291,12 @@ export class ImbarcazioneService {
         const { created_at, ...rest } = s.toJSON();
         return rest;
       });
-      if (segnalazioniFiltered.length === 0) {
+      if (segnalazioni.length === 0) {
         continue; // Se non ci sono segnalazioni per questa imbarcazione, saltiamo l'iterazione.
       }
       // Togliamo il campo created_at anche dall'imbarcazione.
       const { created_at, ...imbarcazioneFiltered } = imbarcazione.toJSON();
-      result.push({ imbarcazione: imbarcazioneFiltered, segnalazioniFiltered });
+      result.push({ imbarcazione: imbarcazioneFiltered, segnalazioni });
     }
     return result;
   }

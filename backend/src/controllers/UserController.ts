@@ -4,7 +4,6 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
-import { decodeJwt } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
@@ -25,10 +24,7 @@ export class UserController {
   public async sendData(req: Request, res: Response) {
     try {
       const data = req.body;
-      // Prendiamo l'user_id dal token JWT per controllare se è il proprietario della barca.
-      const authHeader = req.headers['authorization'];
-      const token = authHeader!.split(' ')[1];
-      const user_id = decodeJwt(token!).user_id;
+      const user_id = await checkToken(req).user_id;
       // Invio dei dati con i relativi controlli e logging dello spostamento
       await this.datiinviatiService.sendData(data, user_id);
       // Scaliamo i token per la richiesta.
@@ -54,9 +50,7 @@ export class UserController {
   
   public async getMyImbarcazioniStatus(req: Request, res: Response) {
     try {
-      const authHeader = req.headers['authorization'];
-      const token = authHeader!.split(' ')[1];
-      const user_id = decodeJwt(token!).user_id;
+      const user_id = await checkToken(req).user_id;
       const geoarea_id = Number(req.params.geoarea_id);
       //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
@@ -73,7 +67,7 @@ export class UserController {
 
   public async getMyImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
-      const user_id = checkToken(req).user_id;
+      const user_id = await checkToken(req).user_id;
       const my_imbarcazioni_segnalazioni = await this.imbarcazioneController.getUserImbarcazioniWithSegnalazioni(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_segnalazioni));
     } catch (err) {

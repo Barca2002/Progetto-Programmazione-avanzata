@@ -130,11 +130,6 @@ export class ImbarcazioneController {
   public async updateImbarcazione(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
-
-      if (Number.isNaN(mmsi) || mmsi <= 0) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
       await this.imbarcazioneService.updateImbarcazione(mmsi, req.body);
       const imbarcazioneAggiornata = await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
       res.json(imbarcazioneAggiornata);
@@ -150,11 +145,6 @@ export class ImbarcazioneController {
   public async deleteImbarcazione(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
-
-      if (Number.isNaN(mmsi) || mmsi <= 0) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
       await this.imbarcazioneService.deleteImbarcazione(mmsi);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_DELETED, null));
     } catch (err) {
