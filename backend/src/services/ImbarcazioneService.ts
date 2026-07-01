@@ -11,6 +11,7 @@ import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
+import { Segnalazione } from '../models/SegnalazioneModel.js';
 
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
@@ -251,10 +252,10 @@ export class ImbarcazioneService {
 
         //Controllo che l'imbarcazione esista
         const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-        if (!imbarcazione){
+        if (!imbarcazione) {
           throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
         }
-          
+
         //Controllo che tutte le geoareas esistano e che non siano già presenti
         for (const geoarea_id of geoarea_ids) {
           const geoarea = await this.geofenceareaDAO.get(geoarea_id);
@@ -268,7 +269,7 @@ export class ImbarcazioneService {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_ASSOCIATION);
           }
           //Associo le geoaree
-          await imbarcazione.addGeofencearea(geoarea_id, {transaction: t});
+          await imbarcazione.addGeofencearea(geoarea_id, { transaction: t });
         }
       }
 
@@ -282,17 +283,28 @@ export class ImbarcazioneService {
   }
 
   async getAllWithSegnalazioni() {
+    // Da imba
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
     const result = [];
 
     for (const imbarcazione of imbarcazioni) {
-      const segnalazioni = await this.segnalazioneDAO.findAllByMmsi(imbarcazione.mmsi);
-      result.push({ imbarcazione: imbarcazione.toJSON(), segnalazioni });
+      const segnalazioniFiltered = (await imbarcazione.getSegnalazioni({
+        // Togliamo gli attributi della tabella molti a molti.
+        joinTableAttributes: [],
+        // Togliamo il campo created_at.
+      })).map((s) => {
+        const { created_at, ...rest } = s.toJSON();
+        return rest;
+      });
+      if (segnalazioniFiltered.length === 0) {
+        continue; // Se non ci sono segnalazioni per questa imbarcazione, saltiamo l'iterazione.
+      }
+      // Togliamo il campo created_at anche dall'imbarcazione.
+      const { created_at, ...imbarcazioneFiltered } = imbarcazione.toJSON();
+      result.push({ imbarcazione: imbarcazioneFiltered, segnalazioniFiltered });
     }
-
     return result;
   }
-
 
   async deleteLinkGeoareaImbarcazione(mmsi: number, geoarea_id: number): Promise<void> {
     try {

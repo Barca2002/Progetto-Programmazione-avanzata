@@ -34,7 +34,7 @@ adminRouter.get("/violazioni/mmsi/:mmsi", checkMmsi, async function(req: Request
     await adminController.getViolazioniByMmsi(req, res);
 });
 
-adminRouter.get("/violazioni/geoareaid/:geoarea_id", checkAdminRole, async function(req: Request, res: Response){
+adminRouter.get("/violazioni/geoareaid/:geoarea_id", async function(req: Request, res: Response){
     await adminController.getViolazioniByGeoarea(req, res);
 });
 
@@ -54,10 +54,6 @@ adminRouter.patch("/update/tokenbalance", tokenValidation, async function(req: R
     await adminController.updateTokenBalance(req, res);
 });
 
-// GET status imbarcazioni, cioè se per ogni imarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
-adminRouter.get("/imbarcazioni/status/geoarea_id/:geoareaid", checkAdminRole,  async function(req: Request, res: Response) {
-    await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
-});
 
 // --------- ROTTE IMBARCAZIONI ----------------
 // CREATE imbarcazione (solo admin)
@@ -70,7 +66,7 @@ adminRouter.get("/imbarcazioni/status/geoarea_id/:geoareaid", checkAdminRole,  a
 //   "max_capacity": <numero>,
 //   "user_id": <numero>
 // }
-adminRouter.post("/imbarcazione/create", checkAdminRole,  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazione/create",  async function(req: Request, res: Response) {
     await imbarcazioneController.createImbarcazione(req, res);
 });
 
@@ -87,7 +83,7 @@ adminRouter.post("/imbarcazione/create", checkAdminRole,  async function(req: Re
 //   },
 //   ....
 // ]
-adminRouter.post("/imbarcazioni/geoaree/link", checkAdminRole,  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/geoaree/link",  async function(req: Request, res: Response) {
     await imbarcazioneController.linkGeoareasToImbarcazioni(req, res);
 });
 
@@ -97,8 +93,23 @@ adminRouter.post("/imbarcazioni/geoaree/link", checkAdminRole,  async function(r
 //     "mmsi": <numero>,
 //     "geoarea_id": <numero>
 // }
-adminRouter.delete("/imbarcazione/geoarea/unlink", checkAdminRole,  async function(req: Request, res: Response) {
+adminRouter.delete("/imbarcazione/geoarea/unlink",  async function(req: Request, res: Response) {
     await imbarcazioneController.unlinkGeoareasToImbarcazioni(req, res);
+});
+
+// GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
+adminRouter.get("/positions",  async function(req: Request, res: Response) {
+    await imbarcazioneController.getPointsAsGeoJson(req, res);
+});
+
+// GET status imbarcazioni, cioè se per ogni imarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
+adminRouter.get("/imbarcazioni/status/geoarea_id/:geoareaid",  async function(req: Request, res: Response) {
+    await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
+});
+
+
+adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, res: Response) {
+    await imbarcazioneController.getAllWithSegnalazioni(req, res);
 });
 
 // --------- ROTTE GEOFENCE AREA ------------------

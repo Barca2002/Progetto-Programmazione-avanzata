@@ -11,7 +11,7 @@ import { Imbarcazione } from './models/ImbarcazioneModel.js';
 import { imbarcazioneRouter } from './routes/ImbarcazioneRoutes.js';
 import { inizializzaAssociazioni } from './utils/Associations.js';
 import { Datiinviati } from './models/DatiInviatiModel.js';
-import { UserRouter } from './routes/UserRoutes.js';
+import { userRouter } from './routes/UserRoutes.js';
 import { Segnalazione } from './models/SegnalazioneModel.js';
 import { LogSpostamenti } from './models/LogSpostamentiModel.js';
 import { Violazione } from './models/ViolazioneModel.js';
@@ -48,9 +48,9 @@ app.get('/', (_req, res) => {
 // Rotte varie
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
-app.use("/geoarea", geofenceareaRouter);
-app.use("/imbarcazione", imbarcazioneRouter);
-app.use("/user", UserRouter);
+//app.use("/geoarea", geofenceareaRouter);
+//app.use("/imbarcazione", imbarcazioneRouter);
+app.use("/user", userRouter);
 
 
 // Error handler delle rotte inesistenti (404). Express prova tutte le rotte e se non trova niente, chiama questo middleware, il quale genera questa eccezione e poi la manda all'error handler generale. Va messo prima dell'error handler generale, altrimenti userebbe quello di default di express, il quale include l'HTML.

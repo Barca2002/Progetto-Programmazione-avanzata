@@ -5,7 +5,7 @@ import { tokenBalanceCheck } from "../middlewares/TokenMiddleware.js";
 import { checkDatiInviati } from "../middlewares/DatiInviatiMiddleware.js";
 import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
 
-export const UserRouter = Router();
+export const userRouter = Router();
 const userController = new UserController();
 const imbarcazioneController = new ImbarcazioneController(); 
 
@@ -17,16 +17,20 @@ const imbarcazioneController = new ImbarcazioneController();
 //     "velocita_kmh": 65.34,
 //     "stato": "IN NAVIGAZIONE"
 // }
-UserRouter.post("/sendstatus", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
+userRouter.post("/sendstatus", checkUserRole, tokenBalanceCheck, checkDatiInviati, async function(req: Request, res: Response) {
     await userController.sendData(req, res);
 });
 
-UserRouter.get("/imbarcazioni/status/:geoarea_id", checkUserRole, tokenBalanceCheck, checkUserRole, async function(req: Request, res: Response) {
+userRouter.get("/imbarcazioni/status/:geoarea_id", checkUserRole, tokenBalanceCheck, checkUserRole, async function(req: Request, res: Response) {
     await userController.getMyImbarcazioniStatus(req, res);
 });
 
 // GET imbarcazioni dell'utente loggato con geofence associate
-UserRouter.get("/imbarcazioni/geoaree/my", checkUserRole,  async function(req: Request, res: Response) {
+userRouter.get("/imbarcazioni/geoaree/my", checkUserRole,  async function(req: Request, res: Response) {
     await imbarcazioneController.getMyImbarcazioniWithGeofenceareas(req, res);
 });
 
+// GET tutte le imbarcazioni le relative segnalazioni associate
+userRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, res: Response) {
+    await imbarcazioneController.getAllWithSegnalazioni(req, res);
+});

@@ -9,7 +9,6 @@ import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { GeofenceareaDAO } from '../dao/GeofenceareaDAO.js';
 import { Violazione } from '../models/ViolazioneModel.js';
-import { Imbarcazione } from '../models/ImbarcazioneModel.js';
 
 export class SegnalazioneService{
     private readonly segnalazioneDao = new SegnalazioneDAO();
@@ -71,7 +70,7 @@ export class SegnalazioneService{
         let ultimaViolazioneValida = await this.violazioneDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
 
         if(!ultimaViolazioneValida){
-            // C'è il caso in cui non è stat mai commessa una violazione per una geoarea, quindi in tal caso si ritorna e basta, non si controlla per niente se geneare la segnalazione.
+            // C'è il caso in cui non è stata mai commessa una violazione per una geoarea, quindi in tal caso si ritorna e basta, non si controlla per niente se geneare la segnalazione.
             return;
         }
         
