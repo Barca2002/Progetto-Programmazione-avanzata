@@ -123,7 +123,7 @@ adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, 
 // CREATE area (solo admin). Bisogna passare il contesto alla funzione altrimenti i this nella funzione createArea sono undefined
 
 adminRouter.post("/geoarea/create", checkGeoJson, async function(req: Request, res: Response) {
-  await geofenceareaController.createArea(req, res);
+  await adminController.createGeofencearea(req, res);
 });
 
 // GET tutte le imbarcazioni con le geofence associate (solo admin)

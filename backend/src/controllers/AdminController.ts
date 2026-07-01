@@ -8,6 +8,9 @@ import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ImbarcazioneController } from "./ImbarcazioneController.js";
+import { Position } from "geojson";
+import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
+import { GeofenceAreaController } from "./GeofenceareaController.js";
 
 export interface GeoAreaLinkData {
   mmsi: number;
@@ -26,6 +29,7 @@ export class AdminController {
   private readonly violazioneService = new ViolazioneService();
   private readonly imbarcazioneService = new ImbarcazioneService();
   private readonly imbarcazioneController = new ImbarcazioneController();
+  private readonly geofenceareaController = new GeofenceAreaController();
   
 
   public async getUsers(_req: Request, res: Response) {
@@ -263,5 +267,42 @@ export class AdminController {
       }
     }
   }
+
+  public async createGeofencearea(req: Request, res: Response ){
+      try {
+        const name = req.body.features[0].properties.name;
+        const coordinates = req.body.features[0].geometry.coordinates;
+        const max_speed = req.body.features[0].properties.max_speed;
+        if (!name || !coordinates){
+          throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        }
+        /*
+        // Lo standard di geojson richiede prima la longituide e poi la latitudine, quindi coppie [long, lat], ...
+        
+        Inoltre, per definire un'area, richiede Position[][] (array di anelli, dove ogni anello è un array di punti):
+        "coordinates": [ [ [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] ] ]
+        */
+        const coordinatesGeoJson: Position[][] = coordinates;
+        // Creazione della nuova area.
+        const geoJsonArea: GeofenceareaCreationData = {
+          name: name,
+          area: {
+            type: 'Polygon',
+            coordinates: coordinatesGeoJson,
+          },
+          max_speed: max_speed ?? null, 
+        };
+
+        const nuovaArea = await this.geofenceareaController.createArea(geoJsonArea);
+        res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
+      } catch (err) {
+        if (err instanceof AppError) {
+          err.send(res);
+        } else {
+          console.log(err);
+          res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        }
+      }
+    };
   
 }

@@ -60,6 +60,7 @@ export class GeofenceareaService {
   };
 
   public async createArea(data: GeofenceareaCreationData) {
+    // Se l'area con le stesse coordinate o lo stesso nome esiste già, lanciamo un errore.
     if (await this.findByCoords(data.area.coordinates) || await this.geofenceareaDAO.findByName(data.name)) {
       throw ErrorFactory.getError(AppErrorEnum.GEOAREA_ALREADY_EXISTS)
     }
