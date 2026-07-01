@@ -39,18 +39,10 @@ export class ImbarcazioneController {
     }
   };
   // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
-  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
-    try {
-      const user_id = checkToken(req).user_id;
-      const imbarcazioni = await this.imbarcazioneService.getMyImbarcazioniWithGeofenceareas(user_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
+  public async getUserImbarcazioniWithGeofenceareas(user_id: number) {
+      const imbarcazioni = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
+      return imbarcazioni;
+  
   };
 
   /*

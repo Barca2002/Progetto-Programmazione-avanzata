@@ -10,6 +10,7 @@ import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { AdminService} from "../services/AdminService.js";
 import { checkToken } from "../middlewares/JWTMiddleware.js";
+import { ImbarcazioneController } from "./ImbarcazioneController.js";
 
 export class UserController {
   private readonly datiinviatiService = new DatiInviatiService();
@@ -17,6 +18,7 @@ export class UserController {
   private readonly violazioneService = new ViolazioneService();
   private readonly segnalazioneService = new SegnalazioneService();
   private readonly adminService = new AdminService();
+  private readonly imbarcazioneController = new ImbarcazioneController();
 
   private readonly REQ_COST = 0.025;
 
@@ -49,7 +51,7 @@ export class UserController {
     await this.adminService.updateTokenBalance(user.email, user.tokens - this.REQ_COST);
     return true;
   }
-
+  
   public async getMyImbarcazioniStatus(req: Request, res: Response) {
     try {
       const authHeader = req.headers['authorization'];
@@ -68,10 +70,26 @@ export class UserController {
     }
   }
 
+  // Funzione usata dalla rotta utente per ritornare il saldo dei token dell'utente loggato.
   public async getMyTokenBalance(req: Request, res: Response) {
       const token = await checkToken(req);
       const user_id = token.user_id;
       const user = await this.adminService.getUtenteById(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, {tokens: user.tokens}));
+  }
+
+  // Funzione usata dalla rotta utente per ritornare se tutte le imbarcazioni dell'utente loggato sono nella geoarea inserita nella richiesta.
+  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response){
+    try{
+    const user_id = checkToken(req).user_id;
+    const imbarcazioni = await this.imbarcazioneController.getUserImbarcazioniWithGeofenceareas(user_id);
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
   }
 }

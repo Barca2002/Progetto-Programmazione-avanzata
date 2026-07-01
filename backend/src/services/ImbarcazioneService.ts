@@ -70,7 +70,7 @@ export class ImbarcazioneService {
     return result;
   }
 
-  async getMyImbarcazioniWithGeofenceareas(user_id: number) {
+  async getUserImbarcazioniWithGeofenceareas(user_id: number) {
     if (Number.isNaN(user_id) || user_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
 
