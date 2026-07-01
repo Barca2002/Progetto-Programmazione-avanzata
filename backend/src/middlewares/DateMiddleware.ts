@@ -15,8 +15,19 @@ export function validateDateFormat(req: Request, res: Response, next: NextFuncti
   const result = dateSchema.safeParse(req.body);
 
   if (!result.success) {
-    res.send(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
-    return;
+    // Prendiamo il primo errore riscontrato da Zod
+        const firstIssue = result.error.issues[0]!;
+        const fieldName = firstIssue.path[0];
+
+        // Mappiamo il nome del campo fallito sul rispettivo errore
+        switch (fieldName) {
+            case "start_date":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE));
+            case "end_date":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE));
+            default:
+                return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
+        }
   }
 
   next();

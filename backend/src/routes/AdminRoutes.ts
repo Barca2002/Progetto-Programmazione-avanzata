@@ -106,7 +106,7 @@ adminRouter.post("/imbarcazione/geoarea/unlink",  async function(req: Request, r
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
 adminRouter.post("/imbarcazioni/positions", checkMmsi, validateDateFormat, async function(req: Request, res: Response) {
-    await imbarcazioneController.getPointsAsGeoJson(req, res);
+    await adminController.getPointsAsGeoJson(req, res);
 });
 
 // GET status imbarcazioni, cioè se per ogni imbarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).

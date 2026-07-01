@@ -9,9 +9,15 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ImbarcazioneController } from "./ImbarcazioneController.js";
 
-export interface GeoAreaLinkRequest {
+export interface GeoAreaLinkData {
   mmsi: number;
   geoarea_ids: number[];
+}
+
+export interface PointsAsGeoJsonData {
+  mmsi: number;
+  start_date: string;
+  end_date: string;
 }
 
 export class AdminController {
@@ -219,13 +225,36 @@ export class AdminController {
 
   public async linkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void>{
     try {
-      const links: GeoAreaLinkRequest[] = req.body;
+      const links: GeoAreaLinkData[] = req.body;
 
       if (!links || !Array.isArray(links)) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
       await this.imbarcazioneController.linkGeoareasToImbarcazioni(links);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {
+    try {
+      const { mmsi, start_date } = req.body;
+      if (!mmsi || !start_date) {
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
+      // Se si inserisce la data di fine si usa quella, altrimenti prendo la data al momento della richiesta
+      const end_date = req.body.end_date ? req.body.end_date : new Date().toLocaleDateString('it-IT');
+
+      const data: PointsAsGeoJsonData = {mmsi, start_date, end_date};
+
+      const posizioni = await this.imbarcazioneController.getPointsAsGeoJson(data);
+
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

@@ -8,13 +8,10 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
-import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
-import { Segnalazione } from '../models/SegnalazioneModel.js';
 
 
-//Quì c'è tutta la logica di business, come devono essere gestiti i dati.
 export class ImbarcazioneService {
   private readonly imbarcazioneDAO = new ImbarcazioneDAO();
   private readonly adminDAO = new AdminDAO();

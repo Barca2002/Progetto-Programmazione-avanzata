@@ -5,8 +5,9 @@ import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
-import { GeoAreaLinkRequest } from "./AdminController.js";
+import { GeoAreaLinkData, PointsAsGeoJsonData } from "./AdminController.js";
 import { ImbarcazioneCreationData } from "../models/ImbarcazioneModel.js";
+import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 
 export class ImbarcazioneController {
@@ -62,7 +63,7 @@ export class ImbarcazioneController {
       }
   ]
   */
-  public async linkGeoareasToImbarcazioni(links: GeoAreaLinkRequest[]): Promise<void> {
+  public async linkGeoareasToImbarcazioni(links: GeoAreaLinkData[]): Promise<void> {
       return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
   };
 
@@ -104,27 +105,9 @@ export class ImbarcazioneController {
     return my_imbarcazioni_segnalazioni;
   }
 
-  public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {
-    try {
-      const { mmsi, start_date } = req.body;
-
-      if (!mmsi || !start_date) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
-      // Se si inserisce la data di fine si usa quella, altrimenti prendo la data al momento della richiesta
-      const end_date = req.body.end_date ?  req.body.end_date: new Date().toLocaleDateString('it-IT');
-
-      const posizioni = await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(mmsi, start_date, end_date);
-
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
+  // Funzione chiamata dall'adminController per ottenere tutte le posizioni in formato GeoJson di un'imbarcazione.
+  public async getPointsAsGeoJson(data: PointsAsGeoJsonData): Promise<FeatureCollection<Geometry, GeoJsonProperties>> {
+     return await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(data.mmsi, data.start_date, data.end_date);
   }
 
   public async getSegnalazioniByMmsi(req: Request, res: Response) {
