@@ -6,6 +6,7 @@ import { checkMmsi } from "../middlewares/ImbarcazioniMiddleware.js";
 import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
 import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
 import { checkGeoJson } from "../middlewares/GeofenceareaMiddleware.js";
+import { registerValidationPipeline } from "../middlewares/AuthMiddleware.js";
 
 export const adminRouter = Router();
 const adminController = new AdminController();
@@ -17,16 +18,17 @@ adminRouter.use(checkAdminRole);
 
 // ----- ROTTE PER IL TESTING, NON RISCHIESTE NELLA TRACCIA DEL PROGETTO ----
 // GET utente per id 
-adminRouter.get("/:id", async function(req: Request, res: Response){
+adminRouter.get("/utente/get/:id", async function(req: Request, res: Response){
     await adminController.getUserById(req, res);
 });
-// UPDATE utente
-adminRouter.patch("/update/:id", async function(req: Request, res: Response){
+
+// UPDATE utente per id
+adminRouter.patch("/utente/update/:id", registerValidationPipeline, async function(req: Request, res: Response){
     await adminController.updateUser(req, res);
 }); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perché put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
 // DELETE utente
-adminRouter.delete("/delete/:id", async function(req: Request, res: Response){
+adminRouter.delete("/utente/delete/:id", async function(req: Request, res: Response){
     await adminController.deleteUser(req, res);
 });
 
@@ -87,18 +89,18 @@ adminRouter.post("/imbarcazioni/geoaree/link",  async function(req: Request, res
     await imbarcazioneController.linkGeoareasToImbarcazioni(req, res);
 });
 
-// Disassocia una geoarea ad un'imbarcazione (solo admin).
+// Disassocia una geoarea ad un'imbarcazione (solo admin). Usiamo una POST, perché passiamo un body con i dati della richiesta, invece nella DELETE, come nella GET, si dovrebbe passare i dati tramite i query params.
 // Il format della richiesta deve essere:
 // {
 //     "mmsi": <numero>,
 //     "geoarea_id": <numero>
 // }
-adminRouter.delete("/imbarcazione/geoarea/unlink",  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazione/geoarea/unlink",  async function(req: Request, res: Response) {
     await imbarcazioneController.unlinkGeoareasToImbarcazioni(req, res);
 });
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
-adminRouter.get("/positions",  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/positions",  async function(req: Request, res: Response) {
     await imbarcazioneController.getPointsAsGeoJson(req, res);
 });
 
