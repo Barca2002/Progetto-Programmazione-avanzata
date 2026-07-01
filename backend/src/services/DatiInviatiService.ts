@@ -27,7 +27,6 @@ export class DatiInviatiService {
   }
 
   public async sendData(data: DatiinviatiCreationData, user_id: number): Promise<void> {
-
     const imbarcazione = await this.imbarcazioneDAO.get(data.mmsi);
     if (!imbarcazione) {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);

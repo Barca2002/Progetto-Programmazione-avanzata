@@ -17,7 +17,6 @@ export class AuthController {
     public async login(req: Request, res: Response){
         try {
             const { email, password } = req.body;
-            // Controlliamo se l'email esiste
             
             // Generazione del token
             const jwtToken = await this.authService.login(email, password);

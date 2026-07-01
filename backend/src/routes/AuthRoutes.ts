@@ -1,6 +1,6 @@
 import { Router, Response, Request } from "express";
 import { AuthController } from "../controllers/AuthController.js";
-import { loginValidationPipeline, registerValidationPipeline } from "../middlewares/AuthMiddleware.js";
+import { validateLoginBody, validateRegisterBody } from "../middlewares/AuthMiddleware.js";
 
 
 // Istanziamo il router e il controller per gestire le rotte di autenticazione.
@@ -13,11 +13,11 @@ const authController = new AuthController();
  * 2. Esse vengono validate tramite la pipeline definita in validateLogin(checkEmail e checkPassword) da AuthMiddleware.
  * 3. Genera il token JWT di autenticazione
  */
-authRouter.post('/login', loginValidationPipeline, async function (req: Request, res: Response) {
+authRouter.post('/login', validateLoginBody, async function (req: Request, res: Response) {
     await authController.login(req, res);
 });
 
-authRouter.post('/register', registerValidationPipeline, async function(req: Request, res: Response) {
+authRouter.post('/register', validateRegisterBody, async function(req: Request, res: Response) {
     await authController.register(req, res);
 });
 

@@ -74,7 +74,7 @@ adminRouter.post("/imbarcazioni/positions", checkMmsi, validateDateFormat, async
 });
 
 // GET status imbarcazioni, cioè se per ogni imbarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
-adminRouter.get("/imbarcazioni/status/geoarea_id/:geoareaid",  async function(req: Request, res: Response) {
+adminRouter.get("/imbarcazioni/status/geoareaid/:geoareaid",  async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
 });
 
@@ -85,7 +85,7 @@ adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, 
 
 // --------- ROTTE GEOFENCE AREA ------------------
 
-// CREATE area (solo admin). Bisogna passare il contesto alla funzione altrimenti i this nella funzione createArea sono undefined
+// CREATE area (solo admin).
 adminRouter.post("/geoarea/create", checkCreation, async function(req: Request, res: Response) {
   await adminController.createGeofencearea(req, res);
 });

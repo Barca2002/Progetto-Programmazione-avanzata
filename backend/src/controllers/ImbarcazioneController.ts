@@ -24,7 +24,7 @@ export class ImbarcazioneController {
       return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
   }
 
-  public async unlinkGeoareaToImbarcazioni(mmsi: number, geoarea_id: number): Promise<void> {
+  public async unlinkGeoareaToImbarcazioni(mmsi: number, geoarea_id: number){
       return await this.imbarcazioneService.unlinkGeoareaImbarcazione(mmsi, geoarea_id);
   }
 

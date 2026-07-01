@@ -41,8 +41,9 @@ export class ImbarcazioneService {
   }
 
   async getImbarcazioneByMmsi(mmsi: number) {
-    if (Number.isNaN(mmsi) || mmsi <= 0)
+    if (Number.isNaN(mmsi) || mmsi <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
+    }
     const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
     if (!imbarcazione) {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
@@ -52,34 +53,35 @@ export class ImbarcazioneService {
 
   async getAllImbarcazioniWithGeofenceareas() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
-    if (!imbarcazioni || imbarcazioni.length === 0)
+    if (!imbarcazioni || imbarcazioni.length === 0){
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-
-    const result = [];
-
-    for (const imbarcazione of imbarcazioni) {
-      const associazioni = await imbarcazione.getGeofenceareas();
-
-      result.push({ imbarcazione: imbarcazione.toJSON(), Geoareas: associazioni });
     }
-    return result;
+    return await this.generateImbarcazioniWithGeofenceareas(imbarcazioni);
   }
 
   async getUserImbarcazioniWithGeofenceareas(user_id: number) {
-    if (Number.isNaN(user_id) || user_id <= 0)
+    if (Number.isNaN(user_id) || user_id <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
-
+    }
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
 
-    if (!my_imbarcazioni || my_imbarcazioni.length === 0)
+    if (!my_imbarcazioni || my_imbarcazioni.length === 0){
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    }
+    return await this.generateImbarcazioniWithGeofenceareas(my_imbarcazioni);
+  }
 
+  // Usata dalle funzioni precedenti (sia user che admin) per generare il json con le imbarcazioni e le corrispondenti geoaree associate.
+  async generateImbarcazioniWithGeofenceareas(imbarcazioni: Imbarcazione[]){
     const result = [];
 
-    for (const imbarcazione of my_imbarcazioni) {
-      const associazioni = await imbarcazione.getGeofenceareas();
-
-      result.push({ imbarcazione: imbarcazione.toJSON(), Geofenceareas: associazioni });
+    for (const imbarcazione of imbarcazioni) {
+      const associazioni = await imbarcazione.getGeofenceareas({joinTableAttributes: []}); // Togliamo gli attributi della molti a molti dalle associazioni.
+      const associazioniFiltered = []; // Togliamo gli attributi non necessari.
+      for (const associazione of associazioni){
+        associazioniFiltered.push({ geoarea_id: associazione.geoarea_id, name: associazione.name, coordinates: associazione.area.coordinates, max_speed: associazione.max_speed ?? "Nessun limite di velocità", ultima_violazione_valida_id: associazione.ultima_violazione_valida_id, created_at: associazione.created_at });
+      }
+      result.push({ imbarcazione: imbarcazione.toJSON(), geofenceareas: associazioniFiltered });
     }
     return result;
   }
@@ -185,43 +187,70 @@ export class ImbarcazioneService {
     };
   }
 
-  async updateImbarcazione(mmsi: number, data: Partial<ImbarcazioneCreationData>) {
-    if (!data || Object.keys(data).length === 0)
-      throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-    const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-    if (!imbarcazione)
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-    const t = await DatabaseConnection.getInstance().transaction();
-    try {
-      await this.imbarcazioneDAO.update(mmsi, data, t);
-      await t.commit();
-      return await this.imbarcazioneDAO.get(mmsi);
-    } catch (err) {
-      await t.rollback();
-      if (err instanceof AppError)
-        throw err;
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
+  async getAllImbarcazioniWithSegnalazioni() {
+    const imbarcazioni = await this.imbarcazioneDAO.getAll();
+
+    if(!imbarcazioni || imbarcazioni.length === 0){
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONI_NOT_FOUND)
     }
+
+    return await this.getImbarcazioniWithSegnalazioni(imbarcazioni);
   }
 
-  async deleteImbarcazione(mmsi: number) {
-    const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-    if (!imbarcazione)
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-    const t = await DatabaseConnection.getInstance().transaction();
+  async getUserImbarcazioniWithSegnalazioni(user_id: number) {
+    const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
+
+    if(!my_imbarcazioni || my_imbarcazioni.length === 0){
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
+    }
+
+    return await this.getImbarcazioniWithSegnalazioni(my_imbarcazioni);
+  }
+
+  // Ritorna una lista di imbarcazioni con le relative segnalazioni. Se un'imbarcazione non ha segnalazioni, non viene inclusa nel risultato.
+  async getImbarcazioniWithSegnalazioni(imbarcazioni: Imbarcazione[]) {
+    const result = [];
+    for (const imbarcazione of imbarcazioni) {
+      const segnalazioni = await imbarcazione.getSegnalazioni({joinTableAttributes: []
+      }); // Togliamo gli attributi della tabella molti a molti.
+      if (segnalazioni.length === 0) {
+        continue; // Se non ci sono segnalazioni per questa imbarcazione, saltiamo l'iterazione.
+      }
+      // Togliamo il campo created_at anche dall'imbarcazione.
+      result.push({ imbarcazione: imbarcazione, segnalazioni });
+    }
+    return result;
+  }
+
+  async unlinkGeoareaImbarcazione(mmsi: number, geoarea_id: number) {
     try {
-      const result = await this.imbarcazioneDAO.delete(mmsi, t);
-      await t.commit();
-      return result;
+      //Controllo che l'imbarcazione esista
+      const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
+      if (!imbarcazione){
+        throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+      }
+
+      //Controllo che la geoarea esista
+      const geoarea = await this.geofenceareaDAO.get(geoarea_id);
+      if (!geoarea){
+        throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
+      }
+        
+      //Controllo che l'associazione esista
+      const associazione = await imbarcazione.hasGeofencearea(geoarea_id);
+      if (!associazione){
+        throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
+      }
+        
+      await imbarcazione.removeGeofencearea(geoarea_id);
     } catch (err) {
-      await t.rollback();
       if (err instanceof AppError)
         throw err;
       throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   }
 
-  async linkGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]): Promise<void> {
+  async linkGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]){
     // La transazione è necessaria perché si può linkare un imbarcazione a più geoaree più volte. 
     const t = await DatabaseConnection.getInstance().transaction();
     try {
@@ -256,76 +285,6 @@ export class ImbarcazioneService {
       if (err instanceof AppError)
         throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
-  }
-
-  async getAllImbarcazioniWithSegnalazioni() {
-    const imbarcazioni = await this.imbarcazioneDAO.getAll();
-
-    if(!imbarcazioni){
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONI_NOT_FOUND)
-    }
-
-    return await this.getSegnalazioniOfImbarcazioni(imbarcazioni);
-  }
-
-  async getUserImbarcazioniWithSegnalazioni(user_id: number) {
-    const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
-
-    if(!my_imbarcazioni){
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
-    }
-
-    return await this.getSegnalazioniOfImbarcazioni(my_imbarcazioni);
-  }
-
-  // Ritorna una lista di imbarcazioni con le relative segnalazioni. Se un'imbarcazione non ha segnalazioni, non viene inclusa nel risultato.
-  async getSegnalazioniOfImbarcazioni(imbarcazioni: Imbarcazione[]) {
-    const result = [];
-    for (const imbarcazione of imbarcazioni) {
-      const segnalazioni = (await imbarcazione.getSegnalazioni({
-        // Togliamo gli attributi della tabella molti a molti.
-        joinTableAttributes: [],
-        // Togliamo il campo created_at.
-      })).map((s) => {
-        const { created_at, ...rest } = s.toJSON();
-        return rest;
-      });
-      if (segnalazioni.length === 0) {
-        continue; // Se non ci sono segnalazioni per questa imbarcazione, saltiamo l'iterazione.
-      }
-      // Togliamo il campo created_at anche dall'imbarcazione.
-      const { created_at, ...imbarcazioneFiltered } = imbarcazione.toJSON();
-      result.push({ imbarcazione: imbarcazioneFiltered, segnalazioni });
-    }
-    return result;
-  }
-
-  async unlinkGeoareaImbarcazione(mmsi: number, geoarea_id: number) {
-    try {
-      //Controllo che l'imbarcazione esista
-      const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-      if (!imbarcazione){
-        throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-      }
-
-      //Controllo che la geoarea esista
-      const geoarea = await this.geofenceareaDAO.get(geoarea_id);
-      if (!geoarea){
-        throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
-      }
-        
-      //Controllo che l'associazione esista
-      const associazione = await imbarcazione.hasGeofencearea(geoarea_id);
-      if (!associazione){
-        throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
-      }
-        
-      await imbarcazione.removeGeofencearea(geoarea_id);
-    } catch (err) {
-      if (err instanceof AppError)
-        throw err;
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   }
 

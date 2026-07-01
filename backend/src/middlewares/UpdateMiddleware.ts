@@ -22,16 +22,13 @@ export function validateUpdateBody(req: Request, _res: Response, next: NextFunct
     const result = updateBodySchema.safeParse(req.body);
     
     if (!result.success) {
-        // Prendiamo il primo errore riscontrato da Zod
         const firstIssue = result.error.issues[0]!;
-        const fieldName = firstIssue.path[0]; // Es: "username", "email", "password"
+        const fieldName = firstIssue.path[0];
 
-        // Se l'errore è dovuto a chiavi non permesse (es. inviate a causa di .strict())
         if (firstIssue.code === "unrecognized_keys") {
             return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
         }
 
-        // Mappiamo il nome del campo fallito sul rispettivo errore
         switch (fieldName) {
             case "username":
                 return next(ErrorFactory.getError(AppErrorEnum.INVALID_USERNAME));
