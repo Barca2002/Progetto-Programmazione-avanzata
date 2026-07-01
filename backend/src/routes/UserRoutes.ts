@@ -3,11 +3,9 @@ import { UserController } from "../controllers/UserController.js";
 import { checkUserRole } from "../middlewares/JWTMiddleware.js";
 import { tokenBalanceCheck } from "../middlewares/TokenMiddleware.js";
 import { checkDatiInviati } from "../middlewares/DatiInviatiMiddleware.js";
-import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
 
 export const userRouter = Router();
 const userController = new UserController();
-const imbarcazioneController = new ImbarcazioneController(); 
 
 // Invio dati istantanei (user)
 // {

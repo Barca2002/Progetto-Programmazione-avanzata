@@ -39,7 +39,7 @@ const geofenceAreaSchema = z.object({
 }).strict();
 
 // Controllo del formato della richiesta tramite zod
-function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction) {
+function checkGeoJsonFormat(req: Request, _res: Response, next: NextFunction) {
     const result = geofenceAreaSchema.safeParse(req.body);
     if (!result.success) {
         throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOJSON_FORMAT);
@@ -49,7 +49,7 @@ function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
-function checkCoordinates(req: Request, res: Response, next: NextFunction) {
+function checkCoordinates(req: Request, _res: Response, next: NextFunction) {
     // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
     const coordinates: Position[][] = req.body?.features[0].geometry.coordinates;
     const punti = coordinates[0]; // Prendiamo l'array di punti
@@ -113,7 +113,7 @@ const geofenceAreaUpdateSchema = z.object({
 }).strict();
 
 // Controllo del formato della richiesta tramite zod
-function checkGeoJsonUpdateFormat(req: Request, res: Response, next: NextFunction) {
+function checkGeoJsonUpdateFormat(req: Request, _res: Response, next: NextFunction) {
     const result = geofenceAreaUpdateSchema.safeParse(req.body);
     if (!result.success) {
         throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOJSON_FORMAT);
@@ -123,7 +123,7 @@ function checkGeoJsonUpdateFormat(req: Request, res: Response, next: NextFunctio
     next();
 }
 
-function checkCoordinatesUpdate(req: Request, res: Response, next: NextFunction) {
+function checkCoordinatesUpdate(req: Request, _res: Response, next: NextFunction) {
     // Se la geometria non è stata fornita nell'update, non c'è nulla da validare qui: si passa oltre
     if (!req.body?.geometry) {
         next();
