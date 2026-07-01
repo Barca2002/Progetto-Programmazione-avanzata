@@ -122,6 +122,6 @@ export class GeofenceareaService {
       });
     // Per estrarre un solo oggetto, vediamo la lunghezza del risultato della query.
     // Se è > 0, prendiamo la prima geofencearea (può estrarre al massimo una sola geofencearea), altrimenti restituiamo null.
-    return results.length > 0 ? results[0]! : null;
+    return results.length > 0 ? results[0] : null;
   }
 }

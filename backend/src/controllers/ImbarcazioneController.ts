@@ -11,7 +11,7 @@ export class ImbarcazioneController {
   public readonly imbarcazioneService = new ImbarcazioneService();
   public readonly geofenceareaService = new GeofenceareaService();
 
-  public async getImbarcazioneByMmsi(req: Request, res: Response ){
+  public async getImbarcazioneByMmsi(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
       const imbarcazione = await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
@@ -26,7 +26,7 @@ export class ImbarcazioneController {
   };
 
   // Funzione che ritorna all'admin tutte le imbarcazioni che sono in una geoarea.
-  public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response ): Promise<void>{
+  public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
     try {
       const imbarcazioni = await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
@@ -38,8 +38,8 @@ export class ImbarcazioneController {
       }
     }
   };
-    // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
-  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response ): Promise<void>{
+  // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
+  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
     try {
       const user_id = checkToken(req).user_id;
       const imbarcazioni = await this.imbarcazioneService.getMyImbarcazioniWithGeofenceareas(user_id);
@@ -68,7 +68,7 @@ export class ImbarcazioneController {
       }
   ]
   */
-  public async linkGeoareasToImbarcazioni(req: Request, res: Response ): Promise<void>{
+  public async linkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
     try {
       const links = req.body;
 
@@ -94,7 +94,7 @@ export class ImbarcazioneController {
     "geoarea_id": 1
   }
   */
-  public async unlinkGeoareasToImbarcazioni(req: Request, res: Response ): Promise<void>{
+  public async unlinkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
     try {
       const { mmsi, geoarea_id } = req.body;
 
@@ -113,7 +113,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public async getAllWithSegnalazioni(req: Request, res: Response){
+  public async getAllWithSegnalazioni(req: Request, res: Response) {
     try {
       const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllWithSegnalazioni();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
@@ -128,40 +128,28 @@ export class ImbarcazioneController {
 
   public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {
     try {
-        const { mmsi, start_date } = req.body;
+      const { mmsi, start_date } = req.body;
 
-        if (!mmsi || !start_date) {
-            throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-        }
+      if (!mmsi || !start_date) {
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
 
-        const end_date = req.body.end_date ? new Date(req.body.end_date) : new Date();
+      // Se si inserisce la data di fine si usa quella, altrimenti prendo la data al momento della richiesta
+      const end_date = req.body.end_date ?  req.body.end_date: new Date().toLocaleDateString('it-IT');
 
-        const startDate = new Date(start_date);
-        const endDate = new Date(end_date);
+      const posizioni = await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(mmsi, start_date, end_date);
 
-        if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-            throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-        }
-
-        const posizioni = await this.imbarcazioneService.getPosizioniImbarcazione(mmsi,startDate, endDate);
-
-        res.json(
-            SuccessFactory.getSuccess(
-                AppSuccessEnum.POSIZIONI_FOUND,
-                posizioni
-            )
-        );
-
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni));
     } catch (err) {
-        if (err instanceof AppError) {
-            err.send(res);
-        } else {
-            res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-        }
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
     }
-}
+  }
 
-  public async getSegnalazioniByMmsi(req: Request, res: Response){
+  public async getSegnalazioniByMmsi(req: Request, res: Response) {
     try {
       const imbarcazione = await this.imbarcazioneService.getImbarcazioneByMmsi(req.body.mmsi);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazione));
@@ -174,7 +162,7 @@ export class ImbarcazioneController {
     }
   }
 
-  public async createImbarcazione(req: Request, res: Response ){
+  public async createImbarcazione(req: Request, res: Response) {
     try {
       const { mmsi, name, type } = req.body;
 
@@ -197,7 +185,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public async updateImbarcazione(req: Request, res: Response ){
+  public async updateImbarcazione(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
 
@@ -217,7 +205,7 @@ export class ImbarcazioneController {
     }
   };
 
-  public async deleteImbarcazione(req: Request, res: Response ){
+  public async deleteImbarcazione(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
 

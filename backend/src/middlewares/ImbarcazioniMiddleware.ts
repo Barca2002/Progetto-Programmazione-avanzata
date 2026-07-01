@@ -6,7 +6,8 @@ import * as z from 'zod';
 const mmsiSchema = z.string().length(9).regex(/^\d+$/);
 
 export async function checkMmsi(req: Request, _res: Response, next: NextFunction){
-    const mmsi = req.params.mmsi;
+    const mmsi = req.params.mmsi ? req.params.mmsi : String(req.body.mmsi); //l'mmsi può arrivare come string dai params o come number dal body, cosi includo entrambi i casi
+    console.log(mmsi, typeof mmsi)
     const result = mmsiSchema.safeParse(mmsi);
     if(!result.success){
         throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);

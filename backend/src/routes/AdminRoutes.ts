@@ -7,6 +7,7 @@ import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js
 import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
 import { checkGeoJson } from "../middlewares/GeofenceareaMiddleware.js";
 import { registerValidationPipeline } from "../middlewares/AuthMiddleware.js";
+import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 
 export const adminRouter = Router();
 const adminController = new AdminController();
@@ -100,11 +101,11 @@ adminRouter.post("/imbarcazione/geoarea/unlink",  async function(req: Request, r
 });
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
-adminRouter.post("/imbarcazioni/positions",  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/positions", checkMmsi, validateDateFormat, async function(req: Request, res: Response) {
     await imbarcazioneController.getPointsAsGeoJson(req, res);
 });
 
-// GET status imbarcazioni, cioè se per ogni imarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
+// GET status imbarcazioni, cioè se per ogni imbarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
 adminRouter.get("/imbarcazioni/status/geoarea_id/:geoareaid",  async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
 });

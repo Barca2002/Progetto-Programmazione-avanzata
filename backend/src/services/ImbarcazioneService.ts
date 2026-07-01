@@ -152,24 +152,29 @@ export class ImbarcazioneService {
   }
 
 
-  async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
-    if (!Number.isFinite(mmsi) || mmsi <= 0)
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-
+  async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string, end_date: string): Promise<FeatureCollection> {
     const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
 
-    if (!(start_date instanceof Date) || Number.isNaN(start_date.getTime()))
+    //Converto la data di inizio nel tipo Date
+    const parsed_start_date = new Date(start_date.split(/[-/]/).reverse().join('-'));
+
+    //Controlla il contenuto: se quei numeri, una volta interpretati come giorno-mese-anno, formano una data che esiste davvero. Nel caso formassero una data sbagliata il getTime() tornerebbe NaN
+    if (Number.isNaN(parsed_start_date.getTime()))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE);
 
-    if (!(end_date instanceof Date) || Number.isNaN(end_date.getTime()))
+    //Converto la data di fine nel tipo Date
+    const parsed_end_date = new Date(end_date.split(/[-/]/).reverse().join('-'));
+
+    //Controlla il contenuto: se quei numeri, una volta interpretati come giorno-mese-anno, formano una data che esiste davvero. Nel caso formassero una data sbagliata il getTime() tornerebbe NaN
+    if (Number.isNaN(parsed_end_date.getTime()))
       throw ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE);
 
-    if (start_date >= end_date)
+    if (parsed_start_date > parsed_end_date)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_DATE_RANGE);
 
-    const dati = await this.imbarcazioneDAO.getPositionsByMmsiAndDateRange(mmsi, start_date, end_date);
+    const dati = await this.imbarcazioneDAO.getPositionsByMmsiAndDateRange(mmsi, parsed_start_date, parsed_end_date);
 
     return {
       type: 'FeatureCollection',
@@ -182,30 +187,6 @@ export class ImbarcazioneService {
         properties: {}
       }))
     };
-  }
-
-  async getPosizioniImbarcazione(mmsi: number, start_date: Date, end_date: Date): Promise<FeatureCollection> {
-    if (!Number.isFinite(mmsi) || mmsi <= 0) {
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-    }
-
-    const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-    if (!imbarcazione) {
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-    }
-
-    if (!(start_date instanceof Date) || Number.isNaN(start_date.getTime())) {
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE);
-    }
-
-    if (!(end_date instanceof Date) || Number.isNaN(end_date.getTime())) {
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE);
-    }
-
-    if (start_date >= end_date) {
-      throw ErrorFactory.getError(AppErrorEnum.INVALID_DATE_RANGE);
-    }
-    return await this.getPosizioniImbarcazioneAsGeoJson(mmsi, start_date, end_date);
   }
 
   async updateImbarcazione(mmsi: number, data: Partial<ImbarcazioneCreationData>) {
