@@ -164,7 +164,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"user3@mail.com\",\r\n    \"password\": \"User3456\"\r\n}",
+              "raw": "{\r\n    \"email\": \"user1@mail.com\",\r\n    \"password\": \"User1234\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -318,7 +318,7 @@
           "name": "Utenti",
           "item": [
             {
-              "name": "GetUtenteById",
+              "name": "getUtenteById",
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -333,7 +333,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/utente/get/3",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/get/utente/3",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -341,8 +341,8 @@
                   "port": "{{PORT}}",
                   "path": [
                     "admin",
-                    "utente",
                     "get",
+                    "utente",
                     "3"
                   ]
                 }
@@ -350,7 +350,7 @@
               "response": []
             },
             {
-              "name": "EditUtenteById",
+              "name": "editUtenteById",
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -391,7 +391,7 @@
               "response": []
             },
             {
-              "name": "UpdateTokens",
+              "name": "updateTokenBalance",
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -425,6 +425,38 @@
                     "admin",
                     "update",
                     "tokenbalance"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getTokenBalance",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/get/tokenbalance/1",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "get",
+                    "tokenbalance",
+                    "1"
                   ]
                 }
               },
@@ -743,6 +775,147 @@
       "name": "User",
       "item": [
         {
+          "name": "Imbarcazioni",
+          "item": [
+            {
+              "name": "getMyImbarcazioniWithGeofenceareas",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_USER}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/get/withgeoaree/my",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}} ",
+                  "path": [
+                    "user",
+                    "imbarcazioni",
+                    "get",
+                    "withgeoaree",
+                    "my"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getMyImbarcazioniStatus",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_USER}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/get/status/geoarea_id/1",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}} ",
+                  "path": [
+                    "user",
+                    "imbarcazioni",
+                    "get",
+                    "status",
+                    "geoarea_id",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getAllImbarcazioniWithSegnalazioni",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_USER}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/get/segnalazioni/all",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}} ",
+                  "path": [
+                    "user",
+                    "imbarcazioni",
+                    "get",
+                    "segnalazioni",
+                    "all"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "sendStatus",
           "request": {
             "auth": {
@@ -767,7 +940,7 @@
               }
             },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /user/sendstatus",
+              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazione/send/status",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
@@ -775,17 +948,16 @@
               "port": "{{PORT}} ",
               "path": [
                 "user",
-                "sendstatus"
+                "imbarcazione",
+                "send",
+                "status"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "getMyImbarcazioniWithGeofenceareas",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          "name": "getMyTokenBalance",
           "request": {
             "auth": {
               "type": "bearer",
@@ -799,115 +971,17 @@
             },
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/geoaree/my",
+              "raw": "http://{{HOST}}:{{PORT}}/user/get/tokenbalance",
               "protocol": "http",
               "host": [
                 "{{HOST}}"
               ],
-              "port": "{{PORT}} ",
+              "port": "{{PORT}}",
               "path": [
                 "user",
-                "imbarcazioni",
-                "geoaree",
-                "my"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getMyImbarcazioniStatus",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{JWT_TOKEN_USER}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/status/1",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}} ",
-              "path": [
-                "user",
-                "imbarcazioni",
-                "status",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getAllImbarcazioniWithSegnalazioni",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{JWT_TOKEN_USER}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/segnalazioni/all",
-              "protocol": "http",
-              "host": [
-                "{{HOST}}"
-              ],
-              "port": "{{PORT}} ",
-              "path": [
-                "user",
-                "imbarcazioni",
-                "segnalazioni",
-                "all"
+                "get",
+                "tokenbalance"
               ]
             }
           },
