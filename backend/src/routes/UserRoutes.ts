@@ -28,7 +28,7 @@ userRouter.get("/imbarcazioni/get/status/geoarea_id/:geoarea_id", checkUserRole,
 
 // GET imbarcazioni dell'utente loggato con geofence associate
 userRouter.get("/imbarcazioni/get/withgeoaree/my", checkUserRole,  async function(req: Request, res: Response) {
-    await imbarcazioneController.getMyImbarcazioniWithGeofenceareas(req, res);
+    await userController.getMyImbarcazioniWithGeofenceareas(req, res);
 });
 
 // GET tutte le imbarcazioni le relative segnalazioni associate
