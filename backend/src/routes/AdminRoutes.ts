@@ -126,7 +126,7 @@ adminRouter.post("/geoarea/create", checkGeoJson, async function(req: Request, r
   await adminController.createGeofencearea(req, res);
 });
 
-// GET tutte le imbarcazioni con le geofence associate (solo admin)
+// GET tutte le imbarcazioni con le geofence associate
 adminRouter.get("/imbarcazioni/geoaree/all", checkAdminRole, async function(req: Request, res: Response) {
-    await imbarcazioneController.getAllImbarcazioniWithGeofenceareas(req, res);
+    await adminController.getAllImbarcazioniWithGeofenceareas(req, res);
 });

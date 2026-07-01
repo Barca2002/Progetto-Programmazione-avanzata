@@ -26,30 +26,21 @@ export class ImbarcazioneController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
-  };
+  }
 
-  // Funzione che ritorna all'admin tutte le imbarcazioni che sono in una geoarea.
-  public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
-    try {
-      const imbarcazioni = await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  };
+  // Funzione che ritorna all'adminController tutte le imbarcazioni che sono in una geoarea.
+  public async getAllImbarcazioniWithGeofenceareas(){
+    return await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
+  }
   // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
   public async getUserImbarcazioniWithGeofenceareas(user_id: number) {
       const imbarcazioni = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
       return imbarcazioni;
   
-  };
+  }
 
   /*
-  Body del link (vettore di associazioni):
+  Body della rotta di link (vettore di associazioni):
   [
       {
           "mmsi": 247112233,
@@ -65,10 +56,10 @@ export class ImbarcazioneController {
   */
   public async linkGeoareasToImbarcazioni(links: GeoAreaLinkData[]): Promise<void> {
       return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
-  };
+  }
 
   /*
-  Body della delete:
+  Body della unlink:
   {
     "mmsi": 247123456,
     "geoarea_id": 1
@@ -91,7 +82,7 @@ export class ImbarcazioneController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
-  };
+  }
 
   // Funzione chiamata dall'adminController per ottenere tutte le imbarcazioni con le relative segnalazioni.
   public async getAllImbarcazioniWithSegnalazioni() {
@@ -125,7 +116,7 @@ export class ImbarcazioneController {
 
   public async createImbarcazione(data: ImbarcazioneCreationData) {
       return await this.imbarcazioneService.createImbarcazione(data);
-  };
+  }
 
   public async updateImbarcazione(req: Request, res: Response) {
     try {
@@ -140,7 +131,7 @@ export class ImbarcazioneController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
-  };
+  }
 
   public async deleteImbarcazione(req: Request, res: Response) {
     try {
@@ -154,5 +145,5 @@ export class ImbarcazioneController {
         res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
       }
     }
-  };
+  }
 }

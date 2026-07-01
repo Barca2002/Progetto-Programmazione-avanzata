@@ -303,6 +303,19 @@ export class AdminController {
           res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
         }
       }
-    };
+  };
   
+  public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
+    try {
+      const imbarcazioni = await this.imbarcazioneController.getAllImbarcazioniWithGeofenceareas();
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
 }
