@@ -19,13 +19,17 @@ export const ERROR_LIST = {
     INVALID_USERNAME:
         { statusCode: 400, message: "Lo username fornito non è in un formato valido." },
     INVALID_NAME:
-        { statusCode: 400, message: "Il nome non è in un formato valido." },
+        { statusCode: 400, message: "Il nome non è in un formato valido. Sono ammessi massimo 100 caratteri." },
     INVALID_TYPE:
         { statusCode: 400, message: "Il tipo non è in un formato valido." },
-    INVALID_ASSOCIATION:
-        { statusCode: 400, message: "Un associazione è già presente" },
+    INVALID_DESCR:
+        { statusCode: 400, message: "La descrizione non è in un formato valido. Sono ammessi massimo 500 caratteri." },
+    INVALID_MAX_CAPACITY:
+        { statusCode: 400, message: "La capacità massima non è in un formato valido. Deve essere un numero intero positivo e non superiore a 1000." },
     INVALID_USERID:
         { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
+    INVALID_ASSOCIATION:
+        { statusCode: 400, message: "Un associazione è già presente" },
     INCORRECT_DATA:
         { statusCode: 400, message: "I dati forniti non sono corretti." },
     TOKEN_EDIT_NOT_ALLOWED:
@@ -56,11 +60,23 @@ export const ERROR_LIST = {
     USERNAME_NOT_FOUND:
         { statusCode: 404, message: "Username non trovato." },
     MISSING_USERNAME:
-        { statusCode: 400, message: "Parametro username mancante nella richiesta." },
+        { statusCode: 400, message: "Parametro 'username' mancante nella richiesta." },
     MISSING_EMAIL: 
-        { statusCode: 400, message: "Parametro email mancante nella richiesta." },
+        { statusCode: 400, message: "Parametro 'email' mancante nella richiesta." },
     MISSING_PASSWORD:
-        { statusCode: 400, message: "Parametro password mancante nella richiesta." },
+        { statusCode: 400, message: "Parametro 'password' mancante nella richiesta." },
+    MISSING_MMSI:
+        { statusCode: 400, message: "Parametro 'mmsi' mancante nella richiesta." },
+    MISSING_TYPE:
+        { statusCode: 400, message: "Parametro 'type' mancante nella richiesta." },
+    MISSING_NAME:
+        { statusCode: 400, message: "Parametro 'name' mancante nella richiesta." },
+    MISSING_DESCR:
+        { statusCode: 400, message: "Parametro 'descr' mancante nella richiesta." },
+    MISSING_MAX_CAPACITY:
+        { statusCode: 400, message: "Parametro 'max_capacity' mancante nella richiesta." },
+    MISSING_USER_ID:
+        { statusCode: 400, message: "Parametro 'user_id' mancante nella richiesta." },
     MISSING_DATA:
         {statusCode: 400, message: "Dati mancanti nella richiesta."},
     DATO_NOT_FOUND:
@@ -73,6 +89,8 @@ export const ERROR_LIST = {
         { statusCode: 409, message: "L'imbarcazione è già associata ad un utente, ricontrolla i dati inseriti" },
     IMBARCAZIONE_NOT_FOUND:
         { statusCode: 404, message: "Imbarcazione non trovata." },
+    IMBARCAZIONI_NOT_FOUND:
+        { statusCode: 404, message: "Imbarcazioni non trovate." },
     INVALID_MMSI:
         { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:

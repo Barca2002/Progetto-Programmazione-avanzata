@@ -20,15 +20,13 @@ export class ImbarcazioneService {
   private readonly datiinviatiDAO = new DatiinviatiDAO();
 
   async createImbarcazione(data: ImbarcazioneCreationData) {
-    const t = await DatabaseConnection.getInstance().transaction();
-    try {
-      const utenteEsistente = await this.adminDAO.get(data.user_id);
+    const utenteEsistente = await this.adminDAO.get(data.user_id);
       if (!utenteEsistente) {
         throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
       }
-
+    const t = await DatabaseConnection.getInstance().transaction();
+    try {
       const result = await this.imbarcazioneDAO.create(data, t);
-
       await t.commit();
       return result;
 
@@ -264,10 +262,10 @@ export class ImbarcazioneService {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
 
     if(!imbarcazioni){
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONI_NOT_FOUND)
     }
 
-    return await this.getAllSegnalazioni(imbarcazioni);
+    return await this.getSegnalazioniOfImbarcazioni(imbarcazioni);
   }
 
   async getUserImbarcazioniWithSegnalazioni(user_id: number) {
@@ -277,10 +275,11 @@ export class ImbarcazioneService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
     }
 
-    return await this.getAllSegnalazioni(my_imbarcazioni);
+    return await this.getSegnalazioniOfImbarcazioni(my_imbarcazioni);
   }
 
-  async getAllSegnalazioni(imbarcazioni: Imbarcazione[]) {
+  // Ritorna una lista di imbarcazioni con le relative segnalazioni. Se un'imbarcazione non ha segnalazioni, non viene inclusa nel risultato.
+  async getSegnalazioniOfImbarcazioni(imbarcazioni: Imbarcazione[]) {
     const result = [];
     for (const imbarcazione of imbarcazioni) {
       const segnalazioni = (await imbarcazione.getSegnalazioni({

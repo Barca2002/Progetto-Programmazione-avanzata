@@ -2,11 +2,11 @@ import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 import { tokenValidation } from "../middlewares/TokenMiddleware.js";
-import { checkMmsi } from "../middlewares/ImbarcazioniMiddleware.js";
+import { checkMmsi, imbarcazioneCreationValidation } from "../middlewares/ImbarcazioniMiddleware.js";
 import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
 import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
 import { checkGeoJson } from "../middlewares/GeofenceareaMiddleware.js";
-import { updateValidationPipeline } from "../middlewares/UpdateMiddleware.js";
+import { userUpdateValidation } from "../middlewares/UpdateMiddleware.js";
 import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 
 export const adminRouter = Router();
@@ -17,14 +17,14 @@ const geofenceareaController = new GeofenceAreaController();
 // Applichiamo i middleware definiti qui in tutte le rotte.
 adminRouter.use(checkAdminRole);
 
-// ----- ROTTE PER IL TESTING, NON RISCHIESTE NELLA TRACCIA DEL PROGETTO ----
+// ----- ROTTE PER IL TESTING, NON RICHIESTE NELLA TRACCIA DEL PROGETTO ----
 // GET utente per id 
 adminRouter.get("/get/utente/:id", async function(req: Request, res: Response){
     await adminController.getUserById(req, res);
 });
 
 // UPDATE utente per id
-adminRouter.patch("/update/utente/:id", updateValidationPipeline, async function(req: Request, res: Response){
+adminRouter.patch("/update/utente/:id", userUpdateValidation, async function(req: Request, res: Response){
     await adminController.updateUser(req, res);
 }); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perché put sostituisce l'intera istanza con i dati nuovi che inserisco.
 
@@ -73,8 +73,8 @@ adminRouter.get("/get/tokenbalance/:id", async function(req: Request, res: Respo
 //   "max_capacity": <numero>,
 //   "user_id": <numero>
 // }
-adminRouter.post("/imbarcazione/create",  async function(req: Request, res: Response) {
-    await imbarcazioneController.createImbarcazione(req, res);
+adminRouter.post("/imbarcazione/create", imbarcazioneCreationValidation, async function(req: Request, res: Response) {
+    await adminController.createImbarcazione(req, res);
 });
 
 // Associa più geoareae a più imbarcazioni (solo admin). Si possono passare più dati e un mmsi può ricevere più geoaree.
@@ -91,7 +91,7 @@ adminRouter.post("/imbarcazione/create",  async function(req: Request, res: Resp
 //   ....
 // ]
 adminRouter.post("/imbarcazioni/geoaree/link",  async function(req: Request, res: Response) {
-    await imbarcazioneController.linkGeoareasToImbarcazioni(req, res);
+    await adminController.linkGeoareasToImbarcazioni(req, res);
 });
 
 // Disassocia una geoarea ad un'imbarcazione (solo admin). Usiamo una POST, perché passiamo un body con i dati della richiesta, invece nella DELETE, come nella GET, si dovrebbe passare i dati tramite i query params.
@@ -116,7 +116,7 @@ adminRouter.get("/imbarcazioni/status/geoarea_id/:geoareaid",  async function(re
 
 
 adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, res: Response) {
-    await imbarcazioneController.getAllWithSegnalazioni(req, res);
+    await adminController.getAllImbarcazioniWithSegnalazioni(req, res);
 });
 
 // --------- ROTTE GEOFENCE AREA ------------------

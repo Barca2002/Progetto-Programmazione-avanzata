@@ -7,12 +7,19 @@ import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
+import { ImbarcazioneController } from "./ImbarcazioneController.js";
+
+export interface GeoAreaLinkRequest {
+  mmsi: number;
+  geoarea_ids: number[];
+}
 
 export class AdminController {
   private readonly adminService = new AdminService();
   private readonly segnalazioneService = new SegnalazioneService();
   private readonly violazioneService = new ViolazioneService();
   private readonly imbarcazioneService = new ImbarcazioneService();
+  private readonly imbarcazioneController = new ImbarcazioneController();
   
 
   public async getUsers(_req: Request, res: Response) {
@@ -178,5 +185,54 @@ export class AdminController {
     }
   }
 
+  public async createImbarcazione(req: Request, res: Response) {
+    try {
+      const {user_id, mmsi, name, type } = req.body;
+
+      if (!user_id || !mmsi || !name || !type) {
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
+
+      const nuovaImbarcazione = await this.imbarcazioneController.createImbarcazione(req.body);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  };
+
+  public async getAllImbarcazioniWithSegnalazioni(req: Request, res: Response){
+    try{
+    const imbarcazioni_segnalazioni = await this.imbarcazioneController.getAllImbarcazioniWithSegnalazioni();
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async linkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void>{
+    try {
+      const links: GeoAreaLinkRequest[] = req.body;
+
+      if (!links || !Array.isArray(links)) {
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
+      await this.imbarcazioneController.linkGeoareasToImbarcazioni(links);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
   
 }
