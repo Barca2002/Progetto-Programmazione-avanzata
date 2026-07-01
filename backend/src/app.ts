@@ -48,8 +48,6 @@ app.get('/', (_req, res) => {
 // Rotte varie
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
-//app.use("/geoarea", geofenceareaRouter);
-//app.use("/imbarcazione", imbarcazioneRouter);
 app.use("/user", userRouter);
 
 

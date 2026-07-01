@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
-import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
-import { SuccessFactory } from "../factory/SuccessFactory.js";
+import { AppErrorEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
 import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
@@ -40,32 +39,4 @@ export class GeofenceAreaController {
       return await this.geofenceareaService.createArea(data);
   }
 
-  public async updateArea(req: Request, res: Response ){
-    try {
-      const id = Number(req.params.id);
-      const areaAggiornata = await this.geofenceareaService.updateArea(id, req.body);
-      res.json(areaAggiornata);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
-
-  public async deleteArea(req: Request, res: Response ){
-    try {
-      const id = Number(req.params.id);
-      await this.geofenceareaService.deleteArea(id);
-      const success = SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, null);
-      res.json(success);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
 }

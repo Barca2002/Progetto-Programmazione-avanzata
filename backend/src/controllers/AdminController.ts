@@ -25,75 +25,11 @@ export interface PointsAsGeoJsonData {
 
 export class AdminController {
   private readonly adminService = new AdminService();
-  private readonly segnalazioneService = new SegnalazioneService();
   private readonly violazioneService = new ViolazioneService();
   private readonly imbarcazioneService = new ImbarcazioneService();
   private readonly imbarcazioneController = new ImbarcazioneController();
   private readonly geofenceareaController = new GeofenceAreaController();
-  
 
-  public async getUsers(_req: Request, res: Response) {
-    try {
-      const utenti = await this.adminService.getUtenti();
-      // Togliamo la password, il parametro plain: true rimuove tutti i metadati inutili di Sequelize.
-      const sanitizedUser = utenti.map(user => {
-        const { password: _password, ...rest } = user.get({ plain: true });
-        return rest;
-    });
-    res.json(sanitizedUser);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
-
-  public async getUserById(req: Request, res: Response ){
-    try {
-      const id = Number(req.params.id);
-      const responseData = await this.adminService.getUtenteById(id);
-      // Ritorno le informazioni dell'utente togliendo info sensibili come la password
-      const { username, email, is_admin, tokens } = responseData;
-      res.json({username, email, is_admin, tokens});
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  };
-
-  public async updateUser(req: Request, res: Response ){
-    try {
-      const id = Number(req.params.id);
-      const utenteAggiornato = (await this.adminService.updateUtente(id, req.body)).get({ plain: true });
-      const { password, ...utenteAggiornatoFiltered } = utenteAggiornato;
-      res.json(utenteAggiornatoFiltered);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  };
-
-  public async deleteUser(req: Request, res: Response ){
-    try {
-      const id = Number(req.params.id);
-      const result = await this.adminService.deleteUtente(id);
-      res.json(result);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  };
 
   public async updateTokenBalance(req: Request, res: Response){
     try{
@@ -115,49 +51,6 @@ export class AdminController {
     const utente = await this.adminService.getUtenteById(Number(req.params.id));
 
     res.json({id: utente.user_id, email: utente.email, tokens: utente.tokens});
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
-
-  public async getSegnalazioniByGeoarea(req: Request, res: Response){
-    try {
-      const geoarea_id = Number(req.params.geoarea_id);
-      const segnalazioni = await this.segnalazioneService.getSegnalazioniByGeoarea(geoarea_id);
-      res.json(segnalazioni);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
-
-  public async getViolazioniByMmsi(req: Request, res: Response){
-    // L'mmsi va castato in number per lavorarci con le altre funzioni
-    try {
-      const mmsi = Number(req.params.mmsi);
-      const violazioni = await this.violazioneService.getViolazioniByMmsi(mmsi);
-      res.json(violazioni);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
-      }
-    }
-  }
-
-  public async getViolazioniByGeoarea(req: Request, res: Response){
-    try {
-      const geoarea_id = Number(req.params.geoarea_id);
-      const violazioni = await this.violazioneService.getViolazioniByGeoarea(geoarea_id);
-      res.json(violazioni);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -236,6 +129,25 @@ export class AdminController {
       }
       await this.imbarcazioneController.linkGeoareasToImbarcazioni(links);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
+    } catch (err) {
+      if (err instanceof AppError) {
+        err.send(res);
+      } else {
+        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+      }
+    }
+  }
+
+  public async unlinkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
+    try {
+      const { mmsi, geoarea_id } = req.body;
+
+      if (!mmsi || !geoarea_id) {
+        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+      }
+
+      await this.imbarcazioneController.unlinkGeoareaToImbarcazioni(mmsi, geoarea_id);
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi: mmsi, geoarea_id: geoarea_id }));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

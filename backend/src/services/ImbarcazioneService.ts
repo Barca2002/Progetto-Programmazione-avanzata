@@ -10,7 +10,6 @@ import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
-import { Segnalazione } from '../models/SegnalazioneModel.js';
 
 
 export class ImbarcazioneService {
@@ -20,6 +19,7 @@ export class ImbarcazioneService {
   private readonly geofenceareaService = new GeofenceareaService();
   private readonly datiinviatiDAO = new DatiinviatiDAO();
 
+  // Usata dall'adminController tramite imbarcazioneController.
   async createImbarcazione(data: ImbarcazioneCreationData) {
     const utenteEsistente = await this.adminDAO.get(data.user_id);
       if (!utenteEsistente) {
@@ -301,23 +301,26 @@ export class ImbarcazioneService {
     return result;
   }
 
-  async deleteLinkGeoareaImbarcazione(mmsi: number, geoarea_id: number): Promise<void> {
+  async unlinkGeoareaImbarcazione(mmsi: number, geoarea_id: number) {
     try {
       //Controllo che l'imbarcazione esista
       const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-      if (!imbarcazione)
+      if (!imbarcazione){
         throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+      }
 
       //Controllo che la geoarea esista
       const geoarea = await this.geofenceareaDAO.get(geoarea_id);
-      if (!geoarea)
+      if (!geoarea){
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
-
+      }
+        
       //Controllo che l'associazione esista
       const associazione = await imbarcazione.hasGeofencearea(geoarea_id);
-      if (!associazione)
+      if (!associazione){
         throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
-
+      }
+        
       await imbarcazione.removeGeofencearea(geoarea_id);
     } catch (err) {
       if (err instanceof AppError)

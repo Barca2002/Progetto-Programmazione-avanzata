@@ -38,8 +38,6 @@ export class GeofenceareaService {
     return results.length > 0 ? results[0]! : null;
   }
 
-    
-
   public async getAreaByCoords(coords: Position[][]) {
     const area = await this.findByCoords(coords);
     if (!area) {
@@ -75,36 +73,6 @@ export class GeofenceareaService {
       if (err instanceof AppError)
         throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-    }
-  };
-
-  public async updateArea(id: number, data: Partial<GeofenceareaCreationData>) {
-    await this.getAreaById(id); // controlla esistenza e validità id
-    const t = await DatabaseConnection.getInstance().transaction();
-    try {
-      await this.geofenceareaDAO.update(id, data, t);
-      await t.commit();
-      return await this.geofenceareaDAO.get(id);
-    } catch (err) {
-      await t.rollback();
-      if (err instanceof AppError)
-        throw err;
-      throw ErrorFactory.getError(AppErrorEnum.UPDATE_ERROR);
-    }
-  };
-
-  public async deleteArea(id: number) {
-    await this.getAreaById(id); // controlla esistenza e validità id
-    const t = await DatabaseConnection.getInstance().transaction();
-    try {
-      const result = await this.geofenceareaDAO.delete(id, t);
-      await t.commit();
-      return result;
-    } catch (err) {
-      await t.rollback();
-      if (err instanceof AppError)
-        throw err;
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
     }
   };
 

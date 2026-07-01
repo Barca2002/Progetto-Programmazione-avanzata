@@ -44,31 +44,6 @@ export class ViolazioneService {
         }
     }
 
-    async getViolazioniByMmsi(mmsi: number) {
-        if (!mmsi || Number.isNaN(mmsi) || mmsi <= 0) {
-            throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
-        }
-        // Controllo che esiste l'imbarcazione
-        await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
-        const violazioni = await this.violazioneDAO.getAllByMmsi(mmsi);
-        if (!violazioni) {
-            throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
-        }
-        return violazioni;
-    }
-
-    async getViolazioniByGeoarea(geoarea_id: number) {
-        if (!geoarea_id || Number.isNaN(geoarea_id) || geoarea_id <= 0) {
-            throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
-        }
-        // Controllo che esista la geoarea
-        await this.geofenceareaService.getAreaById(geoarea_id);
-        const violazioni = await this.violazioneDAO.getAllByGeoarea(geoarea_id);
-        if (!violazioni) {
-            throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
-        }
-        return violazioni;
-    }
     // Controlla se generare una violazione per eccesso di velocità o accesso ad una geoarea non autorizzata.
     async checkIfViolazione(data: DatiinviatiCreationData ){
         const current_area = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);

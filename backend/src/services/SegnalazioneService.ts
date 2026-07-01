@@ -47,17 +47,6 @@ export class SegnalazioneService{
         }
     }
 
-    async getSegnalazioniByGeoarea(geoarea_id: number){
-        if(!geoarea_id || Number.isNaN(geoarea_id) || geoarea_id <= 0){
-            throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);
-        }
-        const segnalazioni = await this.segnalazioneDao.findAllByGeoarea(geoarea_id);
-        if(!segnalazioni){
-            throw ErrorFactory.getError(AppErrorEnum.SEGNALAZIONE_NOT_FOUND);
-        }
-        return segnalazioni;
-    }
-
     // Funzione per controllare se generare o no una segnalazione per una geoarea.
     async checkIfSegnalazione(data: DatiinviatiCreationData){
         const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
@@ -136,7 +125,7 @@ export class SegnalazioneService{
             await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
         }
     }
-    
+    // Funzione chiamata da checkIfSegnalazione per controllare se impostare lo stato della segnalazione a RIENTRATA.
     async checkRientroSegnalazione(geoarea_id: number){
         const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
             
