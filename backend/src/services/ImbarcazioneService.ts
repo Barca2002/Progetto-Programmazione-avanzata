@@ -8,18 +8,14 @@ import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
-import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
-import { Segnalazione } from '../models/SegnalazioneModel.js';
-
 
 //Quì c'è tutta la logica di business, come devono essere gestiti i dati.
 export class ImbarcazioneService {
   private readonly imbarcazioneDAO = new ImbarcazioneDAO();
   private readonly adminDAO = new AdminDAO();
   private readonly geofenceareaDAO = new GeofenceareaDAO();
-  private readonly segnalazioneDAO = new SegnalazioneDAO();
   private readonly geofenceareaService = new GeofenceareaService();
   private readonly datiinviatiDAO = new DatiinviatiDAO();
 
@@ -287,7 +283,7 @@ export class ImbarcazioneService {
   async getAllSegnalazioni(imbarcazioni: Imbarcazione[]) {
     const result = [];
     for (const imbarcazione of imbarcazioni) {
-      const segnalazioniFiltered = (await imbarcazione.getSegnalazioni({
+      const segnalazioni = (await imbarcazione.getSegnalazioni({
         // Togliamo gli attributi della tabella molti a molti.
         joinTableAttributes: [],
         // Togliamo il campo created_at.
@@ -295,12 +291,12 @@ export class ImbarcazioneService {
         const { created_at, ...rest } = s.toJSON();
         return rest;
       });
-      if (segnalazioniFiltered.length === 0) {
+      if (segnalazioni.length === 0) {
         continue; // Se non ci sono segnalazioni per questa imbarcazione, saltiamo l'iterazione.
       }
       // Togliamo il campo created_at anche dall'imbarcazione.
       const { created_at, ...imbarcazioneFiltered } = imbarcazione.toJSON();
-      result.push({ imbarcazione: imbarcazioneFiltered, segnalazioniFiltered });
+      result.push({ imbarcazione: imbarcazioneFiltered, segnalazioni });
     }
     return result;
   }

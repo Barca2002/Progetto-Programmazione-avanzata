@@ -4,7 +4,6 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { AppError } from "../models/AppErrorModel.js";
-import { checkToken } from "../middlewares/JWTMiddleware.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
 
 export class ImbarcazioneController {
@@ -161,16 +160,6 @@ export class ImbarcazioneController {
 
   public async createImbarcazione(req: Request, res: Response) {
     try {
-      const { mmsi, name, type } = req.body;
-
-      if (!mmsi || !name || !type) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
-      if (String(mmsi).length !== 9) {
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-      }
-
       const nuovaImbarcazione = await this.imbarcazioneService.createImbarcazione(req.body);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione));
     } catch (err) {
@@ -185,11 +174,6 @@ export class ImbarcazioneController {
   public async updateImbarcazione(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
-
-      if (Number.isNaN(mmsi) || mmsi <= 0) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
       await this.imbarcazioneService.updateImbarcazione(mmsi, req.body);
       const imbarcazioneAggiornata = await this.imbarcazioneService.getImbarcazioneByMmsi(mmsi);
       res.json(imbarcazioneAggiornata);
@@ -205,11 +189,6 @@ export class ImbarcazioneController {
   public async deleteImbarcazione(req: Request, res: Response) {
     try {
       const mmsi = Number(req.params.mmsi);
-
-      if (Number.isNaN(mmsi) || mmsi <= 0) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-      }
-
       await this.imbarcazioneService.deleteImbarcazione(mmsi);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_DELETED, null));
     } catch (err) {
