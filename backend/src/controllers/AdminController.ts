@@ -52,8 +52,9 @@ export class AdminController {
   public async updateUser(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
-      const utenteAggiornato = await this.adminService.updateUtente(id, req.body);
-      res.json(utenteAggiornato);
+      const utenteAggiornato = (await this.adminService.updateUtente(id, req.body)).get({ plain: true });
+      const { password, ...utenteAggiornatoFiltered } = utenteAggiornato;
+      res.json(utenteAggiornatoFiltered);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 
 import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
-import { checkAdminRole, checkUserRole } from "../middlewares/JWTMiddleware.js";
+import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 
 export const imbarcazioneRouter = Router();
 const imbarcazioneController = new ImbarcazioneController();

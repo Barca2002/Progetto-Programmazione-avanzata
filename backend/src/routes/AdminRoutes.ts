@@ -6,7 +6,7 @@ import { checkMmsi } from "../middlewares/ImbarcazioniMiddleware.js";
 import { ImbarcazioneController } from "../controllers/ImbarcazioneController.js";
 import { GeofenceAreaController } from "../controllers/GeofenceareaController.js";
 import { checkGeoJson } from "../middlewares/GeofenceareaMiddleware.js";
-import { registerValidationPipeline } from "../middlewares/AuthMiddleware.js";
+import { updateValidationPipeline } from "../middlewares/UpdateMiddleware.js";
 
 export const adminRouter = Router();
 const adminController = new AdminController();
@@ -23,7 +23,7 @@ adminRouter.get("/utente/get/:id", async function(req: Request, res: Response){
 });
 
 // UPDATE utente per id
-adminRouter.patch("/utente/update/:id", registerValidationPipeline, async function(req: Request, res: Response){
+adminRouter.patch("/utente/update/:id", updateValidationPipeline, async function(req: Request, res: Response){
     await adminController.updateUser(req, res);
 }); //con patch posso non mandare tutti i dati necessari per fare l'update, è meglio rispetto a put, perché put sostituisce l'intera istanza con i dati nuovi che inserisco.
 

@@ -9,10 +9,16 @@ export async function checkDatiInviati(req: Request, _res: Response, next: NextF
 
     if (!result.success) {
         // Prendiamo il primo campo che ha fallito la validazione (path contiene il nome del campo/proprietà).
-        const firstError = result.error.issues[0]!.path[0];
+        const firstIssue = result.error.issues[0]!;
+        const fieldName = firstIssue.path[0]; // Es: "username", "email", "password"
 
-        // Mappiamo l'errore 
-        switch (firstError) {
+        // Se l'errore è dovuto a chiavi non permesse (es. inviate a causa di .strict())
+        if (firstIssue.code === "unrecognized_keys") {
+            return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
+        }
+
+        // Mappiamo gli errori 
+        switch (fieldName) {
             case 'mmsi':
                 throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
             case 'latitudine':
@@ -45,10 +51,10 @@ export const datiInviatiSchema = z.object({
         .min(-180)
         .max(180)
         .refine(hasMaxDecimals),
-    // Il limite massimo di velocità è di 200 km/h
-    velocita_kmh: z.number()
-        .min(0)
-        .max(200)
-        .refine(hasMaxDecimals),
+    // Il limite massimo di velocità registrabile è di 200 km/h. Deve essere un numero intero positivo. Siccome javascript non distingue tra, per esempio, 10 e 10.0, tecnicamente si possono mettere tanti 0 dopo la virgola, ma il numero sarà comunque considerato intero.
+    velocita_kmh: z.number().
+        int()
+        .positive()
+        .max(200),
     stato: z.enum(['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'])
 }).strict(); // Modalità strict, altrimenti si possono aggiungere campi a piacere

@@ -34,8 +34,6 @@ export class DatiInviatiService {
     }
     // Passiamo l'user_id estratto dal token JWT per controllare se è il proprietario della barca.
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
-    // Prendiamo tutte le geoaree associate alle imbarcazioni dell'utente.
-    const geofence_imbarcazioni = DatabaseConnection.getInstance().model('geofence_imbarcazioni');
 
     // Prendiamo la geoarea corrispondente alla posizione inviata.
     const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
@@ -51,7 +49,7 @@ export class DatiInviatiService {
 
     // Se non c'è un'ultima geoarea (sia perché non c'è un dato precedente, sia perché il dato precedente non era in nessuna area), non può essere permessa.
     const lastAreaIsAllowed = geoarea_of_last_dato
-      ? (await geofence_imbarcazioni.findOne({ where: { mmsi: data.mmsi, geoarea_id: geoarea_of_last_dato.geoarea_id } })) != null
+      ? (await imbarcazione.hasGeofencearea(geoarea_of_last_dato.geoarea_id))
       : false;
 
     // Se le due geoaree coincidono (stessa area, sia essa nulla o la stessa geoarea), non c'è nessun ingresso/uscita da registrare:
