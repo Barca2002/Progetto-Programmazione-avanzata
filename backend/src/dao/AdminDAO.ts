@@ -20,14 +20,20 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return await User.findAll();
   }
 
-  async update(user_id: number,new_data: Partial<UserCreationData>, t: Transaction): Promise<User | null> {
+  async update(user_id: number, new_data: Partial<UserCreationData>, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
-    return await user!.update(new_data, { transaction: t });
+    if (!user) {
+      return null;
+    }
+    return await user.update(new_data, { transaction: t });
   }
 
   async delete(user_id: number, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
-    await user!.destroy({ transaction: t });
+    if (!user) {
+      return null;
+    }
+    await user.destroy({ transaction: t });
     return user;
   }
 

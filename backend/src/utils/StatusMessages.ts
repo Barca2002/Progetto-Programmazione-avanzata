@@ -1,4 +1,5 @@
 import { MAX_POINTS } from "../middlewares/GeofenceareaMiddleware.js";
+import { MAX_DECIMALS } from "./DecimalChecker.js";
 // Enumerativi degli errori e dei messaggi di successo dell'applicazione. Questi enum forniscono una struttura centralizzata per gestire i messaggi di errore e successo.
 export const ERROR_LIST = {
     DB_CONNECTION_ERROR:
@@ -12,7 +13,7 @@ export const ERROR_LIST = {
     INCORRECT_PASSWORD:
         { statusCode: 401, message: "La password inserita non è corretta." },
     INVALID_EMAIL:
-        { statusCode: 400, message: "L'email fornita non è in un formato valido (esempio formato valido: mail@dominio.com)." },
+        { statusCode: 400, message: "L'email fornita non è in un formato valido (esempio formato valido: mail@dominio.com). Sono ammessi massimo 255 caratteri." },
     INVALID_PASSWORD:
         { statusCode: 400, message: "La password fornita non è in un formato valido (Deve essere lunga tra 8 e 32 caratteri, comprendere almeno un numero e sono ammessi caratteri speciali)." },
     INVALID_USERNAME:
@@ -26,7 +27,11 @@ export const ERROR_LIST = {
     INVALID_USERID:
         { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
     INCORRECT_DATA:
-        { statusCode: 400, message: "I dati forniti non sono corretti o sono già stati usati." },
+        { statusCode: 400, message: "I dati forniti non sono corretti." },
+    TOKEN_EDIT_NOT_ALLOWED:
+        { statusCode: 400, message: "Non è possibile modificare il saldo dei token con questa rotta." },
+    CREATEDAT_EDIT_NOT_ALLOWED:
+    { statusCode: 400, message: "Non è possibile modificare il campo created_at." },
     EMAIL_ALREADY_EXISTS:
         { statusCode: 409, message: "L'email fornita è già esistente." },
     USERNAME_ALREADY_EXISTS: { statusCode: 409, message: "Lo username fornito è già esistente e associato ad un altro utente." },
@@ -50,6 +55,14 @@ export const ERROR_LIST = {
         { statusCode: 404, message: "Utente non trovato." },
     USERNAME_NOT_FOUND:
         { statusCode: 404, message: "Username non trovato." },
+    MISSING_USERNAME:
+        { statusCode: 400, message: "Parametro username mancante nella richiesta." },
+    MISSING_EMAIL: 
+        { statusCode: 400, message: "Parametro email mancante nella richiesta." },
+    MISSING_PASSWORD:
+        { statusCode: 400, message: "Parametro password mancante nella richiesta." },
+    MISSING_DATA:
+        {statusCode: 400, message: "Dati mancanti nella richiesta."},
     DATO_NOT_FOUND:
         { statusCode: 404, message: "Dato non trovato" },
     GEOAREA_NOT_FOUND:
@@ -65,13 +78,13 @@ export const ERROR_LIST = {
     NOT_ADMIN:
         { statusCode: 403, message: "Accesso riservato agli amministratori." },
     INVALID_LATITUDINE:
-        { statusCode: 400, message: "La latitudine deve essere un numero compreso tra -90 e 90." },
+        { statusCode: 400, message: `La latitudine deve essere un numero compreso tra -90 e 90.  Sono ammesse ${MAX_DECIMALS} cifre dopo la virgola` },
     INVALID_LONGITUDINE:
-        { statusCode: 400, message: "La longitudine deve essere un numero compreso tra -180 e 180." },
+        { statusCode: 400, message: `La longitudine deve essere un numero compreso tra -180 e 180. Sono ammesse ${MAX_DECIMALS} cifre dopo la virgola` },
     INVALID_STATO:
         { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIA." },
     INVALID_VELOCITA:
-        { statusCode: 400, message: "La velocità deve essere un numero positivo e non superiore a 200 km/h." },
+        { statusCode: 400, message: "La velocità deve essere un numero intero positivo e non superiore a 200 km/h." },
     MAX_SPEED_LIMIT:
         { statusCode: 400, message: "La velocità deve essere inferiore a quella max oppure la geoarea non ha una velocità massima" },
     DELETE_ERROR:
@@ -113,11 +126,11 @@ export const ERROR_LIST = {
     INVALID_STATO_VIOLAZIONE:
         { statusCode: 400, message: "Stato della violazione non ammesso." },
     INVALID_DATE_RANGE:
-        { statusCode: 400, message: "Le date inserite non sono nel formato adeguato" },
+        { statusCode: 400, message: "Le date inserite non sono nel formato adeguato." },
     INVALID_START_DATE:
-        { statusCode: 400, message: "Le data di inizio non è nel formato adeguato" },
+        { statusCode: 400, message: "Le data di inizio non è nel formato adeguato." },
     INVALID_END_DATE:
-        { statusCode: 400, message: "Le data di fine non è nel formato adeguato" },
+        { statusCode: 400, message: "Le data di fine non è nel formato adeguato." },
     IMBARCAZIONE_OWNERSHIP_ERROR:
         { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." },
     TOKEN_SPEND_ERROR:
@@ -126,6 +139,8 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Ultima posizione non trovata." },
     ROUTE_NOT_FOUND:
         { statusCode: 404, message: "Rotta non trovata." },
+    INVALID_PARAMS:
+        { statusCode: 400, message: "I parametri forniti non sono corretti." },
 
 } as const;
 
@@ -167,15 +182,15 @@ export const SUCCESS_LIST = {
     GEOAREAS_LINKED:
         { statusCode: 200, message: "Geoaree associate alle imbarcazioni con successo." },
     SEND_STATUS_OK:
-        { statusCode: 201, message: "Dati sullo status inviati con successo." },
+        { statusCode: 200, message: "Dati sullo status inviati con successo." },
     TOKEN_BALANCE_UPDATED:
-        { statusCode: 201, message: "Saldo token aggiornato correttamente." },
+        { statusCode: 200, message: "Saldo token aggiornato correttamente." },
     LOG_SPOSTAMENTI_FOUND:
-        { statusCode: 201, message: "Log spostamenti trovati correttamente" },
+        { statusCode: 200, message: "Log spostamenti trovati correttamente" },
     POSIZIONI_FOUND:
-        { statusCode: 201, message: "Posizioni trovate correttamente" },
+        { statusCode: 200, message: "Posizioni trovate correttamente" },
     STATUS_FOUND:
-        { statusCode: 201, message: "Status dell'imbarcazione per la geoarea trovato" },
+        { statusCode: 200, message: "Status dell'imbarcazione per la geoarea trovato" },
 } as const;
 
 export type AppSuccessName = keyof typeof SUCCESS_LIST;
