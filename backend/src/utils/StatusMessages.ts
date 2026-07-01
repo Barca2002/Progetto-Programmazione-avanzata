@@ -159,6 +159,8 @@ export const ERROR_LIST = {
         { statusCode: 404, message: "Rotta non trovata." },
     INVALID_PARAMS:
         { statusCode: 400, message: "I parametri forniti non sono corretti." },
+    IMBARCAZIONE_ALREADY_EXISTS:
+        { statusCode: 400, message: "L'imbarcazione già esiste." },
 
 } as const;
 

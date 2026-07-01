@@ -21,10 +21,17 @@ export class ImbarcazioneService {
 
   // Usata dall'adminController tramite imbarcazioneController.
   async createImbarcazione(data: ImbarcazioneCreationData) {
+    if (!data.mmsi){
+      throw ErrorFactory.getError(AppErrorEnum.MISSING_DATA);
+    }
     const utenteEsistente = await this.adminDAO.get(data.user_id);
       if (!utenteEsistente) {
         throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
       }
+
+    if(await this.imbarcazioneDAO.get(data.mmsi) || await this.imbarcazioneDAO.getByName(data.name)){
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_ALREADY_EXISTS);
+    }
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.imbarcazioneDAO.create(data, t);

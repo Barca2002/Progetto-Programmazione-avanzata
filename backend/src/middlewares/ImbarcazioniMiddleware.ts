@@ -3,16 +3,73 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum } from "../utils/StatusMessages.js";
 import * as z from 'zod';
 
-export const imbarcazioneCreationValidation = [checkMmsi, checkName, checkType, checkDescr, checkMaxCapacity, checkUserId];
-
-const mmsiSchema = z.string().length(9).regex(/^\d+$/);
+// Per controllare che l'mmsi sia un numero a 9 cifre, imponiamo che deve essere in questo intervallo.
+const mmsiSchema = z.number().min(100000000).max(999999999);
 const nameSchema = z.string().max(100);
 const typeSchema = z.string().max(50);
 const descrSchema = z.string().max(500);
 const maxCapacitySchema = z.number().int().max(1000);
 const userIdSchema = z.number().int().positive();
 
-// ---------------- CREATION (campi obbligatori) ----------------
+const imbarcazioneCreationSchema = z.object({
+    mmsi: mmsiSchema,
+    name: nameSchema,
+    type: typeSchema,
+    descr: descrSchema,
+    max_capacity: maxCapacitySchema,
+    user_id: userIdSchema
+}).strict();
+
+export function validateImbarcazioneCreationBody(req: Request, _res: Response, next: NextFunction) {
+    const result = imbarcazioneCreationSchema.safeParse(req.body);
+    
+    if (!result.success) {
+        const firstIssue = result.error.issues[0]!;
+        const fieldName = firstIssue.path[0];
+
+        if (firstIssue.code === "unrecognized_keys") {
+            return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
+        }
+
+         // Se mancano i parametri, zod riceve come tipo undefined, quindi l'errore sarà invalid:type.
+        if (firstIssue.code === "invalid_type") {
+            switch (fieldName) {
+                case "mmsi":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_MMSI));
+                case "name":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_NAME));
+                case "type":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_TYPE));
+                case "descr":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DESCR));
+                case "max_capacity":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_MAX_CAPACITY));
+                case "user_id":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_USER_ID));
+                default:
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
+            }
+        }
+
+        switch (fieldName) {
+            case "mmsi":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_MMSI));
+            case "name":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_NAME));
+            case "type":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_TYPE));
+            case "descr":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_DESCR));
+            case "max_capacity":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_MAX_CAPACITY));
+            case "user_id":
+                return next(ErrorFactory.getError(AppErrorEnum.INVALID_USERID));
+            default:
+                return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
+        }
+    }
+    next();
+}
 
 export async function checkMmsi(req: Request, _res: Response, next: NextFunction){
     const mmsi = req.params.mmsi ? req.params.mmsi : String(req.body.mmsi);
@@ -22,66 +79,6 @@ export async function checkMmsi(req: Request, _res: Response, next: NextFunction
     const result = mmsiSchema.safeParse(mmsi);
     if(!result.success){
         throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-    }
-    next();
-}
-
-export async function checkName(req: Request, _res: Response, next: NextFunction){
-    const name = req.body.name;
-    if(!name){
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_NAME);
-    }
-    const result = nameSchema.safeParse(name);
-    if(!result.success){
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_NAME);
-    }
-    next();
-}
-
-export async function checkType(req: Request, _res: Response, next: NextFunction){
-    const type = req.body.type;
-    if(!type){
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_TYPE);
-    }
-    const result = typeSchema.safeParse(type);
-    if(!result.success){
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_TYPE);
-    }
-    next();
-}
-
-export async function checkDescr(req: Request, _res: Response, next: NextFunction){
-    const descr = req.body.descr;
-    if(!descr){
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_DESCR);
-    }
-    const result = descrSchema.safeParse(descr);
-    if(!result.success){
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_DESCR);
-    }
-    next();
-}
-
-export async function checkMaxCapacity(req: Request, _res: Response, next: NextFunction){
-    const max_capacity = req.body.max_capacity;
-    if(!max_capacity){
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_MAX_CAPACITY);
-    }
-    const result = maxCapacitySchema.safeParse(max_capacity);
-    if(!result.success){
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_MAX_CAPACITY);
-    }
-    next();
-}
-
-export async function checkUserId(req: Request, _res: Response, next: NextFunction){
-    const user_id = req.body.user_id;
-    if(!user_id){
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_USER_ID);
-    }
-    const result = userIdSchema.safeParse(user_id);
-    if(!result.success){
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
     }
     next();
 }

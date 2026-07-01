@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 import { tokenValidation } from "../middlewares/TokenMiddleware.js";
-import { checkMmsi, imbarcazioneCreationValidation } from "../middlewares/ImbarcazioniMiddleware.js";
+import { checkMmsi, validateImbarcazioneCreationBody } from "../middlewares/ImbarcazioniMiddleware.js";
 import { checkCreation } from "../middlewares/GeofenceareaMiddleware.js";
 import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 
@@ -37,7 +37,7 @@ adminRouter.get("/get/tokenbalance/:id", async function(req: Request, res: Respo
 //   "max_capacity": <numero>,
 //   "user_id": <numero>
 // }
-adminRouter.post("/imbarcazione/create", imbarcazioneCreationValidation, async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazione/create", validateImbarcazioneCreationBody, async function(req: Request, res: Response) {
     await adminController.createImbarcazione(req, res);
 });
 

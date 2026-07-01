@@ -22,6 +22,12 @@ export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
     });
   }
 
+  async getByName(name: string): Promise<Imbarcazione | null> {
+    return await Imbarcazione.findOne({
+      where: { name: name }
+    });
+  }
+
   async getAllByUserId(user_id: number): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll({
       where: { user_id: user_id }
