@@ -12,16 +12,7 @@ export interface ImbarcazioneAllData {
   created_at: Date;
 }
 
-export interface ImbarcazioneCreationData extends Omit<Optional<ImbarcazioneAllData, 'mmsi'>, 'created_at'> {}
-
-export interface ImbarcazioneCreationDataBody {
-  mmsi: number;
-  name: string;
-  type: string;
-  descr: string;
-  max_capacity: number;
-  user_id: number;
-}
+export interface ImbarcazioneCreationData extends Omit<ImbarcazioneAllData, 'created_at'> {}
 
 export interface LinkDataBody {
   mmsi: number;

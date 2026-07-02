@@ -12,7 +12,7 @@ import { CreateGeofenceAreaBody, GeofenceareaCreationData } from "../models/Geof
 import { GeofenceAreaController } from "./GeofenceareaController.js";
 import { ViolazioneCreationData } from "../models/ViolazioneModel.js";
 import { UpdateTokenBody } from "../models/UserModel.js";
-import { GetPointsAsGeoJsonBody, ImbarcazioneCreationDataBody, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
+import { GetPointsAsGeoJsonBody, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
 
 export class AdminController {
   private readonly adminService = new AdminService();
@@ -80,7 +80,7 @@ export class AdminController {
 
   public async createImbarcazione(req: Request, res: Response) {
     try {
-      const { mmsi, name, type, descr, max_capacity, user_id } = req.body as ImbarcazioneCreationDataBody;
+      const { mmsi, name, type, descr, max_capacity, user_id } = req.body as ImbarcazioneCreationData;
 
       if (!user_id || !mmsi || !name || !type || !descr || !max_capacity) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
