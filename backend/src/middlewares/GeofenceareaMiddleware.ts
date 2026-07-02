@@ -160,10 +160,10 @@ export function checkGeoJsonFormat(req: Request, _res: Response, next: NextFunct
 
 function checkCoordinates(req: Request, _res: Response, next: NextFunction) {
     // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
-    const coordinates: Position[][] = req.body?.features[0].geometry.coordinates;
-    const punti = coordinates[0]; // Prendiamo l'array di punti
+    const coordinates: Position[][] = req.body?.features?.[0]?.geometry?.coordinates;
+    const punti = coordinates?.[0]; // Prendiamo l'array di punti
     if (!coordinates || !punti) {
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_COORDINATES);
+        return next(ErrorFactory.getError(AppErrorEnum.MISSING_COORDINATES));
     }
     // Bisogna controllare 3 cose principali:
     // - Le coordinate devono contenere almeno 4 punti (per creare un triangolo
@@ -173,21 +173,21 @@ function checkCoordinates(req: Request, _res: Response, next: NextFunction) {
 
     // Controllo che coordinates sia un array e che i punti siano un array (cioè coordinates[0])
     if (!Array.isArray(coordinates) || !Array.isArray(coordinates[0])) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
     }
 
     // Ci devono essere minimo 4 punti e massimo MAX_POINTS punti per definire una geofence area.    
     if (punti.length < 4) {
-        throw ErrorFactory.getError(AppErrorEnum.TOO_LITTLE_POINTS);
+        return next(ErrorFactory.getError(AppErrorEnum.TOO_LITTLE_POINTS));
     }
     if (punti.length > MAX_POINTS) {
-        throw ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS);
+        return next(ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS));
     }
     // Controllo che il primo e l'ultimo punto coincidono per chiudere l'area. la posizione 0 indica la longitudine, la posizione 1 indica la latitudine.
     const primoPunto = punti[0];
     const ultimoPunto = punti.at(-1);
     if (!primoPunto || !ultimoPunto || primoPunto[0] !== ultimoPunto[0] || primoPunto[1] !== ultimoPunto[1]) {
-        throw ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS);
+        return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS));
     }
     // Con turf controlliamo se ci sono punti di sovrapposizione nel poligono
     // Definito dalle coordinare.
@@ -195,7 +195,7 @@ function checkCoordinates(req: Request, _res: Response, next: NextFunction) {
     const kinks = turf.kinks(polygon);
     // kinks contiene il numero di punti di autointersezione, quindi se ce ne sta uno o più, allora il poligono ha dei tratti che s'intersecano
     if (kinks.features.length > 0) {
-        throw ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON);
+        return next(ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON));
     }
 
     next();

@@ -40,7 +40,7 @@ function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: a
             invalid: AppErrorEnum.INVALID_LONGITUDINE,
         },
         latitudine: {
-            missing: AppErrorEnum.MISSING_TYPE_IMBARCAZIONE,
+            missing: AppErrorEnum.MISSING_LATITUDINE,
             invalid: AppErrorEnum.INVALID_LATITUDINE,
         },
         velocita_kmh: {

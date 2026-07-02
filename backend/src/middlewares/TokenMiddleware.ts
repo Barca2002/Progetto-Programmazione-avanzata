@@ -52,17 +52,21 @@ export function validateTokenAmount(req: Request, _res: Response, next: NextFunc
   next();
 }
 
-export async function checkTokenBalance(req: Request, res: Response, next: NextFunction) {
-  const jwtDecoded = checkToken(req);
-  if (!jwtDecoded) {
-    throw ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_INVALID);
+export async function checkTokenBalance(req: Request, _res: Response, next: NextFunction) {
+  try {
+    const jwtDecoded = checkToken(req);
+    if (!jwtDecoded) {
+      return next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_INVALID));
+    }
+    const user = await adminService.getUtenteById(jwtDecoded.user_id);
+    if (!user) {
+      return next(ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND));
+    }
+    if (user.tokens < MIN_TOKEN_BALANCE) {
+      return next(ErrorFactory.getError(AppErrorEnum.INSUFFICIENT_TOKEN_BALANCE));
+    }
+    next();
+  } catch (err) {
+    next(err);
   }
-  const user = await adminService.getUtenteById(jwtDecoded.user_id);
-  if (!user) {
-    throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
-  }
-  if (user.tokens < MIN_TOKEN_BALANCE) {
-    throw ErrorFactory.getError(AppErrorEnum.INSUFFICIENT_TOKEN_BALANCE);
-  }
-  next();
 }

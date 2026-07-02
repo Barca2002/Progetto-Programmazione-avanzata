@@ -63,7 +63,7 @@ function mapErroriRegister(campo: string, issue: z.core.$ZodIssue, reqBody: any)
     return missing ? entry.missing : entry.invalid;
 }
 /**
- * È uguale alla funzione precedente, soltano che non bisogna validare il campo username, quindi ha un campo in meno.
+ * È uguale alla funzione precedente, soltanto che non bisogna validare il campo username, quindi ha un campo in meno.
  * @param campo stringa che rappresenta il campo del body della richiesta da validare. Si controlla se è mancante o di tipo errato/invalido.
  * @param issue oggetto di Zod che rappresenta il problema del campo. Permette di distinguere se è missing o di tipo errato/invalido.
  * @param reqBody oggetto che rappresenta il body della richiesta. Serve per vedere se il campo è mancante o di tipo errato.
@@ -93,7 +93,7 @@ function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
 }
 
 /**
- * Sfruttiamo l'helper function per effetuare la validazione di uno schema con 
+ * Sfruttiamo l'helper function per effettuare la validazione di uno schema con 
  * una certa mappa di errori. 
  */
 
