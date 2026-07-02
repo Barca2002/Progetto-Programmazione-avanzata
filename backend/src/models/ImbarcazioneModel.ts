@@ -14,6 +14,30 @@ export interface ImbarcazioneAllData {
 
 export interface ImbarcazioneCreationData extends Omit<Optional<ImbarcazioneAllData, 'mmsi'>, 'created_at'> {}
 
+export interface ImbarcazioneCreationDataBody {
+  mmsi: number;
+  name: string;
+  type: string;
+  descr: string;
+  max_capacity: number;
+  user_id: number;
+}
+
+export interface LinkDataBody {
+  mmsi: number;
+  geoarea_ids: number[];
+}
+
+export interface UnlinkDataBody {
+  mmsi: number;
+  geoarea_id: number;
+}
+
+export interface GetPointsAsGeoJsonBody {
+  mmsi: number;
+  start_date: string;
+  end_date?: string;
+}
 
 export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreationData> implements ImbarcazioneAllData {
   declare mmsi: number;

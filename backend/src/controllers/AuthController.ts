@@ -6,6 +6,17 @@ import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AdminService } from "../services/AdminService.js";
 
+interface LoginBody {
+  email: string;
+  password: string;
+}
+
+interface RegisterBody {
+  username: string;
+  email: string;
+  password: string;
+}
+
 export class AuthController {
     public readonly authService = new AuthService();
     public readonly adminService = new AdminService();
@@ -16,7 +27,7 @@ export class AuthController {
      */
     public async login(req: Request, res: Response){
         try {
-            const { email, password } = req.body;
+            const { email, password } = req.body as LoginBody;
             
             // Generazione del token
             const jwtToken = await this.authService.login(email, password);
@@ -34,7 +45,7 @@ export class AuthController {
 
     public async register(req: Request, res: Response){
         try {
-            const { username, email, password } = req.body;
+            const { username, email, password } = req.body as RegisterBody;
             
             const newUser = await this.authService.register(email, username, password);
             await this.adminService.createUtente(newUser);

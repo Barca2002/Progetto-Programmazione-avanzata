@@ -11,12 +11,26 @@ export interface GeofenceareaAllData {
   geoarea_id: number;
   name: string;
   area: GeoJsonPolygon;
-  max_speed: number;
+  max_speed: number | null;
   ultima_violazione_valida_id: number;
   created_at: Date;
 }
 
 export interface GeofenceareaCreationData extends Omit<Optional<GeofenceareaAllData, 'max_speed' | 'ultima_violazione_valida_id'>, 'geoarea_id' | 'created_at'> {}
+
+export interface CreateGeofenceAreaBody {
+  features: [
+    {
+      properties: {
+        name: string;
+        max_speed?: number;
+      };
+      geometry: {
+        coordinates: Position[][];
+      };
+    }
+  ];
+}
 
 export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreationData> implements GeofenceareaAllData {
   declare geoarea_id: number;

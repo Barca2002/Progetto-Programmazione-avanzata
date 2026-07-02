@@ -1,3 +1,4 @@
+import { Position } from 'geojson';
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 
 // Definisce i campi che avrà ogni riga della tabella users
@@ -14,6 +15,11 @@ export interface UserAllData {
 export interface UserCreationData extends Omit<Optional<UserAllData, 'is_admin'>, 'user_id' | 'created_at' | 'tokens' > {}
 
 export interface UserUpdateData extends Omit<Optional<UserAllData, 'is_admin' | 'tokens' | 'created_at'>, 'user_id' > {}
+
+export interface UpdateTokenBody {
+  email: string;
+  newTokenAmount: number;
+}
 
 // Model<UserAllData, UserCreationData>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
 //Voglio ottenere un User definito come Model<UserAllData, UserCreation> perché mi servono entrambi: il primo per leggere una qualsiasi row del db e l'altro quando verrà creato nel db.

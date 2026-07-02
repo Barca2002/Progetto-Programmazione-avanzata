@@ -70,7 +70,7 @@ export class AdminService {
     if (data.created_at) {
       throw ErrorFactory.getError(AppErrorEnum.CREATEDAT_EDIT_NOT_ALLOWED);
     }
-    
+
     // Controllo se l'id è corretto
     await this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono

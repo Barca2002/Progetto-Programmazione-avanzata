@@ -1,7 +1,6 @@
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
-import { GeoAreaLinkData, PointsAsGeoJsonData } from "./AdminController.js";
-import { ImbarcazioneCreationData } from "../models/ImbarcazioneModel.js";
+import { GetPointsAsGeoJsonBody, ImbarcazioneCreationData, LinkDataBody } from "../models/ImbarcazioneModel.js";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 export class ImbarcazioneController {
@@ -20,7 +19,7 @@ export class ImbarcazioneController {
   }
 
   // Si possono linkare più imbarcazioni a più geoaree in una sola richiesta.
-  public async linkGeoareasToImbarcazioni(links: GeoAreaLinkData[]): Promise<void> {
+  public async linkGeoareasToImbarcazioni(links: LinkDataBody[]): Promise<void> {
       return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
   }
 
@@ -41,8 +40,9 @@ export class ImbarcazioneController {
   }
 
   // Funzione chiamata dall'adminController per ottenere tutte le posizioni in formato GeoJson di un'imbarcazione.
-  public async getPointsAsGeoJson(data: PointsAsGeoJsonData): Promise<FeatureCollection<Geometry, GeoJsonProperties>> {
-     return await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(data.mmsi, data.start_date, data.end_date);
+  public async getPointsAsGeoJson(data: GetPointsAsGeoJsonBody): Promise<FeatureCollection<Geometry, GeoJsonProperties>> {
+    const end_date = data.end_date ?? new Date().toLocaleDateString('it-IT');
+    return await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(data.mmsi, data.start_date, end_date);
   }
 
   public async createImbarcazione(data: ImbarcazioneCreationData) {

@@ -62,7 +62,7 @@ export const ERROR_LIST = {
     MISSING_USERNAME:
         { statusCode: 400, message: "Parametro 'username' mancante nella richiesta." },
     MISSING_EMAIL: 
-        { statusCode: 400, message: "Parametro 'email' mancante nella richiesta." },
+        { statusCode: 400, message: "Parametro 'email' mancante nella richiesta o il valore inserito non è una stringa." },
     MISSING_PASSWORD:
         { statusCode: 400, message: "Parametro 'password' mancante nella richiesta." },
     MISSING_MMSI:
@@ -77,6 +77,8 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Parametro 'max_capacity' mancante nella richiesta." },
     MISSING_USER_ID:
         { statusCode: 400, message: "Parametro 'user_id' mancante nella richiesta." },
+    MISSING_TOKEN_AMOUNT:
+        { statusCode: 400, message: "Parametro 'newTokenAmount' mancante nella richiesta o il valore inserito non è un numero." },
     MISSING_DATA:
         {statusCode: 400, message: "Dati mancanti nella richiesta."},
     DATO_NOT_FOUND:
