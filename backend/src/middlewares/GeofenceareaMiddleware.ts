@@ -10,8 +10,6 @@ import { MIN_NAME_LENGTH, MAX_NAME_LENGTH, MAX_SPEED_ALLOWED, MAX_POINTS } from 
 
 export const checkCreation = [checkGeoJsonFormat, checkCoordinates];
 
-// ==================== CREAZIONE ====================
-
 // Per controllare la longitudine e latitudine delle posizioni, usiamo questo schema. ctx è il contesto e value è il dato che stiamo validando. superRefine(), a differenza di refine() che restituisce solo un booleano, permette di creare errori custom e fare validazione avanzata.
 const PositionSchema = z.array(z.number()).superRefine((value, ctx) => {
     const [lon, lat] = value;
@@ -102,8 +100,7 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
    
     const missing = isMissingIssueGeoJSON(issue, reqBody);
     const pathString = issue.path.join(".");
-    console.log("missing: ", missing)
-    console.log("pathstring: ", pathString);
+
     if (issue.code === "unrecognized_keys") {
         return AppErrorEnum.INVALID_PARAMS;
     }
@@ -150,7 +147,6 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
         default: return AppErrorEnum.INCORRECT_DATA;
     }
 }
-
 
 export function checkGeoJsonFormat(req: Request, _res: Response, next: NextFunction) {
     validateBody(req.body, geofenceAreaSchema, mapGeofenceAreaErrors, next);

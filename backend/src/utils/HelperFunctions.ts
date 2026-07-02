@@ -66,6 +66,7 @@ export function validateBody(body: any, schema: z.ZodSchema, errorMapper: ErrorM
         return;
     }
 
+    // Mi prendo la prima issue che poi verrà passata all'ErrorMap per vedere se è missing e quale errore prendere.
     const issue = result.error.issues[0];
     // Se per qualche errore interno di zod esso restituisce un vettore di issues vuoto, l'app crasherebbe all'assegnazione della variabile campo.
     if (!issue) {
@@ -79,7 +80,7 @@ export function validateBody(body: any, schema: z.ZodSchema, errorMapper: ErrorM
         next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
         return;
     }
-    // Chiama la mappa di errori per prendere l'errore giusto.
+    // Chiama/inietta la mappa di errori per prendere l'errore giusto.
     const errorEnum = errorMapper(campo, issue, body);
     next(ErrorFactory.getError(errorEnum));
 }
