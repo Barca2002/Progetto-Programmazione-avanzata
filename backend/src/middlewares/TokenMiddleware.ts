@@ -6,7 +6,6 @@ import { AdminService } from "../services/AdminService.js"
 import { emailSchema } from "./AuthMiddleware.js";
 import * as z from "zod";
 
-export const tokenBalanceCheck = [checkTokenBalance];
 const adminService = new AdminService();
 
 const MIN_TOKEN_BALANCE = 0.025;
