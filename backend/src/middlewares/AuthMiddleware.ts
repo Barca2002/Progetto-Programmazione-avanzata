@@ -72,7 +72,7 @@ function mapErroriRegister(campo: string, issue: z.core.$ZodIssue, reqBody: any)
 
 function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
-
+    console.log(issue);
     const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
         email: {
             missing: AppErrorEnum.MISSING_EMAIL,
@@ -85,6 +85,7 @@ function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     };
 
     const entry = map[campo];
+    // Se il campo non è nella mappa di errori, ritorniamo l'errore generico INCORRECT_DATA.
     if (!entry){
         return AppErrorEnum.INCORRECT_DATA;
     }

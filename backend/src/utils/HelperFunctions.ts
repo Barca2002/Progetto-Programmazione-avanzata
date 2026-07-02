@@ -46,7 +46,7 @@ export function isMissingIssueGeoJSON(issue: z.core.$ZodIssue, reqBody: any) {
 }
 
 /**
- * ErrorMapper è un tipo che rappresenta una funzione che prende campo, issue e body, restituendo un errore custom. Permette di prendere le mappe di errori definite nei vari middleware.
+ * ErrorMapper è un tipo che rappresenta una funzione che prende campo, issue e body, restituendo un errore custom AppErrorName. Permette di prendere le mappe di errori definite nei vari middleware.
  */
 type ErrorMapper = (campo: string, issue: z.core.$ZodIssue, body: any) => AppErrorName;
 
@@ -67,17 +67,19 @@ export function validateBody(body: any, schema: z.ZodSchema, errorMapper: ErrorM
     }
 
     const issue = result.error.issues[0];
+    // Se per qualche errore interno di zod esso restituisce un vettore di issues vuoto, l'app crasherebbe all'assegnazione della variabile campo.
     if (!issue) {
         next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
         return;
     }
 
     const campo = issue.path[0] as string | undefined;
+    // Controllo dei campi extra. Se il path è vuoto, allora vuol dire che è un campo extra.
     if (!campo) {
         next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
         return;
     }
-
+    // Chiama la mappa di errori per prendere l'errore giusto.
     const errorEnum = errorMapper(campo, issue, body);
     next(ErrorFactory.getError(errorEnum));
 }
