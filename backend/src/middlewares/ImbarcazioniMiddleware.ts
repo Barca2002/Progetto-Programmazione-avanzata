@@ -38,7 +38,7 @@ export function validateImbarcazioneCreationBody(req: Request, _res: Response, n
                 case "name":
                     return next(ErrorFactory.getError(AppErrorEnum.MISSING_NAME));
                 case "type":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_TYPE));
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_TYPE_IMBARCAZIONE));
                 case "descr":
                     return next(ErrorFactory.getError(AppErrorEnum.MISSING_DESCR));
                 case "max_capacity":

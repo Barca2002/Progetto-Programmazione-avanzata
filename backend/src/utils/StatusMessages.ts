@@ -99,6 +99,8 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Parametro 'type' di 'features' mancante nella richiesta." },
     MISSING_TYPE_FEATURE_GEOMETRY:
         { statusCode: 400, message: "Parametro 'type' di 'geometry' mancante nella richiesta." },
+    MISSING_TYPE_IMBARCAZIONE:
+        { statusCode: 400, message: "Parametro 'type' mancante nella richiesta." },
     MISSING_NAME:
         { statusCode: 400, message: "Parametro 'name' mancante nella richiesta." },
     MISSING_DESCR:
