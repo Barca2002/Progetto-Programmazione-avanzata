@@ -249,7 +249,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"properties\": {\r\n        \"name\": \"test arezsdsszs2\",\r\n        \"max_speed\": 3\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [\r\n          [\r\n            [\r\n              4.6274281,\r\n              31.3803515\r\n            ],\r\n            [\r\n              4.59313,\r\n              31.2227126\r\n            ],\r\n            [\r\n              4.8869829,\r\n              31.1605834\r\n            ],\r\n            [\r\n              4.9487588,\r\n              31.3233181\r\n            ],\r\n            [\r\n              4.6274281,\r\n              31.3803515\r\n            ]\r\n          ]\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
+                  "raw": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"properties\": {\r\n        \"name\": \"123ttr54\",\r\n        \"max_speed\": 3\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [\r\n          [\r\n            [\r\n              4.62,\r\n              31.38\r\n            ],\r\n            [\r\n              4.59313,\r\n              31.2227126\r\n            ],\r\n            [\r\n              4.8869829,\r\n              31.160583\r\n            ],\r\n            [\r\n              4.9487588,\r\n              31.3233181\r\n            ],\r\n            [\r\n              4.62,\r\n              31.38\r\n            ]\r\n          ]\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -318,79 +318,6 @@
           "name": "Utenti",
           "item": [
             {
-              "name": "getUtenteById",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/get/utente/3",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}}",
-                  "path": [
-                    "admin",
-                    "get",
-                    "utente",
-                    "3"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "editUtenteById",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "PATCH",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"username\": \"abcd\",\r\n    \"email\": \"tess2t122@mail.com\",\r\n    \"boh\": 123\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/utente/update/4",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}}",
-                  "path": [
-                    "admin",
-                    "utente",
-                    "update",
-                    "4"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
               "name": "updateTokenBalance",
               "request": {
                 "auth": {
@@ -407,7 +334,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"newTokenAmount\": 10,\r\n    \"email\": \"user1@mail.com\"\r\n}",
+                  "raw": "{\r\n    \"newTokenAmount\": 100,\r\n    \"email\": \"user1@mail.com\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -762,6 +689,84 @@
                     "imbarcazione",
                     "geoarea",
                     "unlink"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Testing",
+          "item": [
+            {
+              "name": "editUtenteById",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"abcd\",\r\n    \"email\": \"tess2t122@mail.com\",\r\n    \"boh\": 123\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/utente/update/4",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "utente",
+                    "update",
+                    "4"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getUtenteById",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/get/utente/3",
+                  "protocol": "http",
+                  "host": [
+                    "{{HOST}}"
+                  ],
+                  "port": "{{PORT}}",
+                  "path": [
+                    "admin",
+                    "get",
+                    "utente",
+                    "3"
                   ]
                 }
               },

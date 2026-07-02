@@ -1,5 +1,6 @@
-import { MAX_POINTS } from "../middlewares/GeofenceareaMiddleware.js";
+import { MAX_POINTS, MAX_SPEED_ALLOWED, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from "../middlewares/GeofenceareaMiddleware.js";
 import { MAX_DECIMALS } from "./DecimalChecker.js";
+import { MAX_EMAIL_LENGTH } from "../middlewares/AuthMiddleware.js";
 // Enumerativi degli errori e dei messaggi di successo dell'applicazione. Questi enum forniscono una struttura centralizzata per gestire i messaggi di errore e successo.
 export const ERROR_LIST = {
     DB_CONNECTION_ERROR:
@@ -13,7 +14,7 @@ export const ERROR_LIST = {
     INCORRECT_PASSWORD:
         { statusCode: 401, message: "La password inserita non è corretta." },
     INVALID_EMAIL:
-        { statusCode: 400, message: "L'email fornita non è in un formato valido (esempio formato valido: mail@dominio.com). Sono ammessi massimo 255 caratteri." },
+        { statusCode: 400, message: `L'email fornita non è in un formato valido (esempio formato valido: mail@dominio.com). Sono ammessi massimo ${MAX_EMAIL_LENGTH} caratteri.` },
     INVALID_PASSWORD:
         { statusCode: 400, message: "La password fornita non è in un formato valido (Deve essere lunga tra 8 e 32 caratteri, comprendere almeno un numero e sono ammessi caratteri speciali)." },
     INVALID_USERNAME:
@@ -27,7 +28,32 @@ export const ERROR_LIST = {
     INVALID_MAX_CAPACITY:
         { statusCode: 400, message: "La capacità massima non è in un formato valido. Deve essere un numero intero positivo e non superiore a 1000." },
     INVALID_USERID:
-        { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
+        { statusCode: 400, message: "L'id utente fornito non è in un formato valido. Deve essere un numero intero positivo." },
+    INVALID_TYPE_FEATURECOLLECTION:
+        { statusCode: 400, message: "Il primo parametro 'type' non è in un formato valido. Deve contenere la stringa 'FeatureCollection'." },
+    INVALID_TYPE_FEATURE:
+        { statusCode: 400, message: "Il secondo parametro 'type' non è in un formato valido. Deve contenere la stringa 'Feature'." },
+    INVALID_TYPE_FEATURE_GEOMETRY:
+        { statusCode: 400, message: "Il terzo parametro 'type' non è in un formato valido. Deve contenere un poligono, quindi la stringa 'Polygon'." },
+    INVALID_FEATURE_ARRAY:
+        { statusCode: 400, message: "Il parametro 'features' non è in un formato valido. Deve contenere un array di Features con 'properties' e 'geometry'." },
+    INVALID_PROPERTIES:
+        { statusCode: 400, message: "Il parametro 'properties' non è in un formato valido. Deve contenere i parametri 'name' e 'max_speed'." },
+    INVALID_NAME_PARAM:
+        { statusCode: 400, message: `Il parametro 'name' non è in un formato valido (numero di caratteri ammessi è minimo ${MIN_NAME_LENGTH} e massimo ${MAX_NAME_LENGTH}).` },
+    INVALID_MAX_SPEED:
+        { statusCode: 400, message: `La velocità massima non è in un formato valido o supera il limite massimo consentito (${MAX_SPEED_ALLOWED} km/h).` },
+    INVALID_GEOMETRY:
+        { statusCode: 400, message: "Il parametro 'geometry' invalido, deve contenere i parametri 'type' e 'coordinates'." },
+    INVALID_POSITION_VALUES:
+        { statusCode: 400, message: "Le posizioni devono contenere esattamente 2 valori (longitudine e latitudine)." },
+    INVALID_LONGITUDINE_VALUE:
+        { statusCode: 400, message: "Manca il valore della longitudine in una posizione." },
+    INVALID_LATITUDINE_VALUE:
+        { statusCode: 400, message: "Manca il valore della longitudine in una posizione." },
+    
+    INVALID_COORDINATES:
+        { statusCode: 400, message: "Le coordinate fornite non sono in un formato valido. Devono contenere un array di posizioni e seguire il seguente formato: [[ [long, lat], [long, lat], ...]]." },
     INVALID_ASSOCIATION:
         { statusCode: 400, message: "Un associazione è già presente" },
     INCORRECT_DATA:
@@ -67,8 +93,12 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Parametro 'password' mancante nella richiesta." },
     MISSING_MMSI:
         { statusCode: 400, message: "Parametro 'mmsi' mancante nella richiesta." },
-    MISSING_TYPE:
+    MISSING_TYPE_FEATURECOLLECTION:
         { statusCode: 400, message: "Parametro 'type' mancante nella richiesta." },
+    MISSING_TYPE_FEATURE:
+        { statusCode: 400, message: "Parametro 'type' di 'features' mancante nella richiesta." },
+    MISSING_TYPE_FEATURE_GEOMETRY:
+        { statusCode: 400, message: "Parametro 'type' di 'geometry' mancante nella richiesta." },
     MISSING_NAME:
         { statusCode: 400, message: "Parametro 'name' mancante nella richiesta." },
     MISSING_DESCR:
@@ -77,8 +107,30 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Parametro 'max_capacity' mancante nella richiesta." },
     MISSING_USER_ID:
         { statusCode: 400, message: "Parametro 'user_id' mancante nella richiesta." },
-    MISSING_TOKEN_AMOUNT:
-        { statusCode: 400, message: "Parametro 'newTokenAmount' mancante nella richiesta o il valore inserito non è un numero." },
+    MISSING_START_DATE:
+        { statusCode: 400, message: "Parametro 'start_date' mancante nella richiesta." },
+    MISSING_END_DATE:
+        { statusCode: 400, message: "Parametro 'end_date' mancante nella richiesta." },
+    MISSING_LONGITUDINE:
+        { statusCode: 400, message: "Parametro 'longitudine' mancante nella richiesta." },
+    MISSING_LATITUDINE:
+        { statusCode: 400, message: "Parametro 'latitudine' mancante nella richiesta." },
+    MISSING_VELOCITA_KMH:
+        { statusCode: 400, message: "Parametro 'velocita_kmh' mancante nella richiesta." },
+    MISSING_STATO:
+        { statusCode: 400, message: "Parametro 'stato' mancante nella richiesta." },
+    MISSING_FEATURES:
+        { statusCode: 400, message: "Parametro 'features' mancante nella richiesta." },
+    MISSING_PROPERTIES:
+        { statusCode: 400, message: "Parametro 'properties' mancante nella richiesta." },
+    MISSING_MAX_SPEED:
+        { statusCode: 400, message: "Parametro 'max_speed' mancante nella richiesta." },
+    MISSING_GEOMETRY:
+        { statusCode: 400, message: "Parametro 'max_speed' mancante nella richiesta." },
+    MISSING_COORDINATES:
+        { statusCode: 400, message: "Parametro 'coordinates' mancante nella richiesta." },
+    MISSING_NEW_TOKEN_AMOUNT:
+        { statusCode: 400, message: "Parametro 'newTokenAmount' mancante nella richiesta."},
     MISSING_DATA:
         {statusCode: 400, message: "Dati mancanti nella richiesta."},
     DATO_NOT_FOUND:
@@ -97,16 +149,18 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:
         { statusCode: 403, message: "Accesso riservato agli amministratori." },
-    INVALID_LATITUDINE:
-        { statusCode: 400, message: `La latitudine deve essere un numero compreso tra -90 e 90.  Sono ammesse ${MAX_DECIMALS} cifre dopo la virgola` },
-    INVALID_LONGITUDINE:
-        { statusCode: 400, message: `La longitudine deve essere un numero compreso tra -180 e 180. Sono ammesse ${MAX_DECIMALS} cifre dopo la virgola` },
+    INVALID_LATITUDINE_RANGE:
+        { statusCode: 400, message: `La latitudine deve essere un numero compreso tra -90 e 90.` },
+    INVALID_LONGITUDINE_RANGE:
+        { statusCode: 400, message: `La longitudine deve essere un numero compreso tra -180 e 180.` },
+    INVALID_LATITUDINE_DECIMALS:
+        { statusCode: 400, message: `La latitudine può contenere al massimo ${MAX_DECIMALS} cifre dopo la virgola` },
+    INVALID_LONGITUDINE_DECIMALS:
+        { statusCode: 400, message: `La longitudine può contenere al massimo ${MAX_DECIMALS} cifre dopo la virgola` },
     INVALID_STATO:
         { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIA." },
     INVALID_VELOCITA:
         { statusCode: 400, message: "La velocità deve essere un numero intero positivo e non superiore a 200 km/h." },
-    MAX_SPEED_LIMIT:
-        { statusCode: 400, message: "La velocità deve essere inferiore a quella max oppure la geoarea non ha una velocità massima" },
     DELETE_ERROR:
         { statusCode: 400, message: "Errore nella cancellazione." },
     CREATE_ERROR:
@@ -116,23 +170,23 @@ export const ERROR_LIST = {
     FIND_ERROR:
         { statusCode: 400, message: "Errore nell'aggiornamento." },
     TOO_MANY_POINTS:
-        { statusCode: 401, message: `Inviati troppi punti per la geofence area (max ${MAX_POINTS}).` }, // Usa string interpolation per inserire la variabile nell'errore
+        { statusCode: 400, message: `Inviati troppi punti per la geofence area (max ${MAX_POINTS}).` }, // Usa string interpolation per inserire la variabile nell'errore
     TOO_LITTLE_POINTS:
-        { statusCode: 401, message: "Inviati troppi pochi punti per la geofence area (min 4)." },
+        { statusCode: 400, message: "Inviati troppi pochi punti per la geofence area (min 4)." },
     INVALID_GEOJSON_FORMAT:
-        { statusCode: 401, message: "I dati forniti non rispettano il formato GeoJSON. Inoltre, nel campo 'properties' si deve definire il campo 'name' ed opzionalmente l'attributo 'max_speed', con un valore compreso tra 1 e 200." },
+        { statusCode: 400, message: "I dati forniti non rispettano il formato GeoJSON. Inoltre, nel campo 'properties' si deve definire il campo 'name' ed opzionalmente l'attributo 'max_speed', con un valore compreso tra 1 e 200." },
     INCORRECT_COORDS:
-        { statusCode: 401, message: "Le coordinate fornite non rispettano i vincoli richiesti (il primo punto)." },
+        { statusCode: 400, message: "Le coordinate fornite non rispettano i vincoli richiesti." },
     OVERLAPPING_POLYGON:
-        { statusCode: 401, message: "Le coordinate fornite costruiscono un poligono che si sovrappone." },
+        { statusCode: 400, message: "Le coordinate fornite costruiscono un poligono che si sovrappone." },
     GEOAREA_ALREADY_EXISTS:
-        { statusCode: 401, message: "Le coordinate fornite già rappresentano una geoarea o il nome è già stato usato." },
-    INVALID_TOKEN_AMOUNT:
-        { statusCode: 401, message: "La quantità di token specificata non è ammessa (min 0.025, max 100)." },
+        { statusCode: 400, message: "Le coordinate fornite già rappresentano una geoarea o il nome è già stato usato." },
+    INVALID_NEW_TOKEN_AMOUNT:
+        { statusCode: 400, message: "La quantità di token specificata non è ammessa (min 0.025, max 100)." },
     MISSING_AUTH_HEADER:
         { statusCode: 401, message: "L'Authentication Header non è presente." },
     INVALID_AUTH_HEADER:
-        { statusCode: 401, message: "L'Authentication Header è invalido. Deve iniziare con 'Bearer '." },
+        { statusCode: 400, message: "L'Authentication Header è invalido. Deve iniziare con 'Bearer '." },
     INSUFFICIENT_TOKEN_BALANCE:
         { statusCode: 401, message: "Saldo token non sufficiente per effettuare la richiesta." },
     LOG_NOT_FOUND:

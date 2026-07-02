@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
-import { tokenValidation } from "../middlewares/TokenMiddleware.js";
+import { validateTokenAmount } from "../middlewares/TokenMiddleware.js";
 import { checkMmsi, validateImbarcazioneCreationBody } from "../middlewares/ImbarcazioniMiddleware.js";
 import { checkCreation } from "../middlewares/GeofenceareaMiddleware.js";
 import { validateDateFormat } from "../middlewares/DateMiddleware.js";
@@ -18,7 +18,7 @@ adminRouter.use(checkAdminRole);
 //      "newTokenAmount": <valore>,
 //      "email": "<email>"
 //  }
-adminRouter.patch("/update/tokenbalance", tokenValidation, async function(req: Request, res: Response){
+adminRouter.patch("/update/tokenbalance", validateTokenAmount, async function(req: Request, res: Response){
     await adminController.updateTokenBalance(req, res);
 });
 
@@ -83,6 +83,11 @@ adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, 
     await adminController.getAllImbarcazioniWithSegnalazioni(req, res);
 });
 
+// GET tutte le imbarcazioni con le geofence associate
+adminRouter.get("/imbarcazioni/geoaree/all", checkAdminRole, async function(req: Request, res: Response) {
+    await adminController.getAllImbarcazioniWithGeofenceareas(req, res);
+});
+
 // --------- ROTTE GEOFENCE AREA ------------------
 
 // CREATE area (solo admin).
@@ -90,7 +95,3 @@ adminRouter.post("/geoarea/create", checkCreation, async function(req: Request, 
   await adminController.createGeofencearea(req, res);
 });
 
-// GET tutte le imbarcazioni con le geofence associate
-adminRouter.get("/imbarcazioni/geoaree/all", checkAdminRole, async function(req: Request, res: Response) {
-    await adminController.getAllImbarcazioniWithGeofenceareas(req, res);
-});

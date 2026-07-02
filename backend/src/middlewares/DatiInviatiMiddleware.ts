@@ -4,38 +4,6 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { hasMaxDecimals } from '../utils/DecimalChecker.js';
 import { z } from 'zod';
 
-export async function checkDatiInviati(req: Request, _res: Response, next: NextFunction){
-    const result = datiInviatiSchema.safeParse(req.body);
-
-    if (!result.success) {
-        // Prendiamo il primo campo che ha fallito la validazione (path contiene il nome del campo/proprietà).
-        const firstIssue = result.error.issues[0]!;
-        const fieldName = firstIssue.path[0]; // Es: "username", "email", "password"
-
-        // Se l'errore è dovuto a chiavi non permesse (es. inviate a causa di .strict())
-        if (firstIssue.code === "unrecognized_keys") {
-            return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
-        }
-
-        // Mappiamo gli errori 
-        switch (fieldName) {
-            case 'mmsi':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-            case 'latitudine':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE);
-            case 'longitudine':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE);
-            case 'velocita_kmh':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_VELOCITA);
-            case 'stato':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
-            default:
-                throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-        }
-    }
-    next();
-}
-
 export const datiInviatiSchema = z.object({
     // L'mmsi deve essere di 9 cifre
     mmsi: z.number()
@@ -58,3 +26,53 @@ export const datiInviatiSchema = z.object({
         .max(200),
     stato: z.enum(['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'])
 }).strict(); // Modalità strict, altrimenti si possono aggiungere campi a piacere
+
+export async function checkDatiInviati(req: Request, _res: Response, next: NextFunction) {
+    const result = datiInviatiSchema.safeParse(req.body);
+
+    if (!result.success) {
+        // Prendiamo il primo campo che ha fallito la validazione (path contiene il nome del campo/proprietà).
+        const firstIssue = result.error.issues[0]!;
+        const fieldName = firstIssue.path[0]; // Es: "username", "email", "password"
+
+        // Se l'errore è dovuto a chiavi non permesse (es. inviate a causa di .strict())
+        if (firstIssue.code === "unrecognized_keys") {
+            return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
+        }
+
+
+        if (firstIssue.code === "invalid_type") {
+            switch (fieldName) {
+                case "mmsi":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_MMSI));
+                case "longitudine":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_LONGITUDINE));
+                case "latitudine":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_LATITUDINE));
+                case "velocita_kmh":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_VELOCITA_KMH));
+                case "stato":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_STATO));
+                default:
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
+            }
+        }
+
+        // Mappiamo gli errori 
+        switch (fieldName) {
+            case 'mmsi':
+                throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
+            case 'latitudine':
+                throw ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE);
+            case 'longitudine':
+                throw ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE);
+            case 'velocita_kmh':
+                throw ErrorFactory.getError(AppErrorEnum.INVALID_VELOCITA);
+            case 'stato':
+                throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
+            default:
+                throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+        }
+    }
+    next();
+}

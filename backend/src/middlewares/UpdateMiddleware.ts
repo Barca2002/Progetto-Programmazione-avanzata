@@ -29,6 +29,19 @@ export function validateUpdateBody(req: Request, _res: Response, next: NextFunct
             return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
         }
 
+        if (firstIssue.code === "invalid_type") {
+            switch (fieldName) {
+                case "username":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_USERNAME));
+                case "email":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_EMAIL));
+                case "password":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_PASSWORD));
+                default:
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
+            }
+        }
+
         switch (fieldName) {
             case "username":
                 return next(ErrorFactory.getError(AppErrorEnum.INVALID_USERNAME));
