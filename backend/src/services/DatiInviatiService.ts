@@ -36,7 +36,7 @@ export class DatiInviatiService {
 
     // Prendiamo la geoarea corrispondente alla posizione inviata.
     const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
-    const currentAreaIsAllowed: boolean = current_geoarea ? await imbarcazione.hasGeofencearea(current_geoarea!.geoarea_id) : false;
+    const currentAreaIsAllowed: boolean = current_geoarea ? await imbarcazione.hasGeofencearea(current_geoarea.geoarea_id) : false;
 
     // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
     const lastDatoInviato = await this.datiinviatiDAO.getLastDatoByMmsi(data.mmsi);

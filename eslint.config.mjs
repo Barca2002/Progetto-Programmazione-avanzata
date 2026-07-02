@@ -24,5 +24,6 @@ export default defineConfig({
         varsIgnorePattern: "^_",
       },
     ],
+    "@typescript-eslint/no-empty-object-type": "off", //Non segnalare le interfacce vuote
   },
 });

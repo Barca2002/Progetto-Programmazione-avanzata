@@ -1,5 +1,3 @@
-import { Position } from 'geojson';
-import { JwtPayload } from 'jsonwebtoken';
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 
 // Definisce i campi che avrà ogni riga della tabella users

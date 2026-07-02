@@ -50,7 +50,7 @@ export class AdminService {
 
   public async getUtenteById(id: number) {
     // Controllo se l'id è corretto
-    await this.authService.checkUserId(id);
+    this.authService.checkUserId(id);
     const utente = await this.adminDAO.get(id);
     if (!utente) {
       throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
@@ -72,7 +72,7 @@ export class AdminService {
     }
 
     // Controllo se l'id è corretto
-    await this.authService.checkUserId(id);
+    this.authService.checkUserId(id);
     // Controllo se l'username ed email inseriti già esistono
     if (data.username && await this.adminDAO.getByUsername(data.username)) {
       throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
@@ -105,7 +105,7 @@ export class AdminService {
 
   public async deleteUtente(id: number) {
     // Controllo se l'id è corretto
-    await this.authService.checkUserId(id);
+    this.authService.checkUserId(id);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       await this.adminDAO.delete(id, t);

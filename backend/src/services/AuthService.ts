@@ -36,10 +36,10 @@ export class AuthService{
         const pwdMatch = await bcrypt.compare(password.trim(), user.password);
         if (!pwdMatch)
             throw ErrorFactory.getError(AppErrorEnum.INCORRECT_PASSWORD);
-        return await this.generateJWT(user);
+        return this.generateJWT(user);
   }
 
-    public async generateJWT(user: User){
+    public generateJWT(user: User){
         if (!user)
             throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
         const payload = {
@@ -47,7 +47,7 @@ export class AuthService{
             "email": user.get("email"),
             "is_admin": user.get("is_admin")
         }
-        const jwtToken: string = jwt.sign(payload, this.privateKey, { algorithm: "RS256", expiresIn: "1h" });
+        const jwtToken = jwt.sign(payload, this.privateKey, { algorithm: "RS256", expiresIn: "1h" });
 
         return jwtToken;
     }
@@ -58,7 +58,7 @@ export class AuthService{
         return await bcrypt.hash(pwd.trim(), this.saltRounds);
     }
 
-    public async checkUserId (id: number){
+    public checkUserId (id: number){
     // Controlla se l'user id è valido, cioè se è un numero e se non è minore o uguale a 0.
     if (Number.isNaN(id) || id <= 0) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
