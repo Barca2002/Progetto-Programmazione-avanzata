@@ -19,7 +19,17 @@ export function validateDateFormat(req: Request, res: Response, next: NextFuncti
         const firstIssue = result.error.issues[0]!;
         const fieldName = firstIssue.path[0];
 
-        // Mappiamo il nome del campo fallito sul rispettivo errore
+        if (firstIssue.code === "invalid_type") {
+            switch (fieldName) {
+                case "start_date":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_START_DATE));
+                case "end_date":
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_END_DATE));
+                default:
+                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
+            }
+        }
+
         switch (fieldName) {
             case "start_date":
                 return next(ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE));

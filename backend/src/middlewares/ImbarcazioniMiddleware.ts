@@ -31,7 +31,6 @@ export function validateImbarcazioneCreationBody(req: Request, _res: Response, n
             return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
         }
 
-         // Se mancano i parametri, zod riceve come tipo undefined, quindi l'errore sarà invalid:type.
         if (firstIssue.code === "invalid_type") {
             switch (fieldName) {
                 case "mmsi":
