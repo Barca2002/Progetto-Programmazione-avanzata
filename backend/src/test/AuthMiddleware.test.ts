@@ -24,7 +24,7 @@ const validLoginBody = {
 // --------------------------------------------------
 
 describe("validateRegisterBody", () => {
-  afterEach(() => jest.clearAllMocks());
+  beforeEach(() => jest.resetAllMocks());
 
   test("valid input -> next() senza errori", () => {
     validateRegisterBody(
@@ -37,15 +37,16 @@ describe("validateRegisterBody", () => {
   });
 
   test("username mancante -> MISSING_USERNAME", () => {
+    const bodyIncompleto = {...validRegisterBody}
+    delete (bodyIncompleto as any)["username"];
     validateRegisterBody(
-      mockReq({ email: "utente@test.com", password: "Password1" }),
+      mockReq(bodyIncompleto),
       res,
       next
     );
 
     expect(getError().statusName).toBe("MISSING_USERNAME");
   });
-
   test("username non valido -> INVALID_USERNAME", () => {
     validateRegisterBody(
       mockReq({ ...validRegisterBody, username: "utente@1" }),
@@ -57,8 +58,10 @@ describe("validateRegisterBody", () => {
   });
 
   test("email mancante -> MISSING_EMAIL", () => {
+    const bodyIncompleto = {...validRegisterBody}
+    delete (bodyIncompleto as any)["email"];
     validateRegisterBody(
-      mockReq({ username: "utenteTest1", password: "Password1" }),
+      mockReq(bodyIncompleto),
       res,
       next
     );
@@ -77,8 +80,10 @@ describe("validateRegisterBody", () => {
   });
 
   test("password mancante -> MISSING_PASSWORD", () => {
+    const bodyIncompleto = {...validRegisterBody}
+    delete (bodyIncompleto as any)["password"];
     validateRegisterBody(
-      mockReq({ username: "utenteTest1", email: "utente@test.com" }),
+      mockReq(bodyIncompleto),
       res,
       next
     );
@@ -102,7 +107,7 @@ describe("validateRegisterBody", () => {
 // --------------------------------------------------
 
 describe("validateLoginBody", () => {
-  afterEach(() => jest.clearAllMocks());
+  beforeEach(() => jest.resetAllMocks());
 
   test("valid input -> next() senza errori", () => {
     validateLoginBody(
@@ -115,6 +120,8 @@ describe("validateLoginBody", () => {
   });
 
   test("email mancante -> MISSING_EMAIL", () => {
+    const bodyIncompleto = {...validLoginBody}
+    delete (bodyIncompleto as any)["email"];
     validateLoginBody(
       mockReq({ password: "Password1" }),
       res,
@@ -135,8 +142,10 @@ describe("validateLoginBody", () => {
   });
 
   test("password mancante -> MISSING_PASSWORD", () => {
+    const bodyIncompleto = {...validLoginBody}
+    delete (bodyIncompleto as any)["password"];
     validateLoginBody(
-      mockReq({ email: "utente@test.com" }),
+      mockReq(bodyIncompleto),
       res,
       next
     );

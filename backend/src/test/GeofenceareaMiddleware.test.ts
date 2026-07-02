@@ -8,6 +8,7 @@ const res = {} as any;
 const next = jest.fn();
 const getError = () => next.mock.calls[0][0] as AppError;
 
+// Siccome il body viene modificato, meglio metterlo in una funzione, cos' ad ogni chiamata viene creata una nuova copia, senza creare problemi per i vari test.
 const validBody = () => ({
   type: "FeatureCollection",
   features: [
@@ -34,10 +35,13 @@ const validBody = () => ({
 // --------------------------------------------------
 
 describe("checkGeoJsonFormat", () => {
-  afterEach(() => jest.clearAllMocks());
+  beforeEach(() => jest.resetAllMocks());
 
   test("valid GeoJSON -> next() senza errori", () => {
-    checkGeoJsonFormat(mockReq(validBody()), res, next);
+    checkGeoJsonFormat(
+      mockReq(validBody()),
+      res, 
+      next);
     expect(next).toHaveBeenCalledWith();
   });
 
@@ -45,7 +49,10 @@ describe("checkGeoJsonFormat", () => {
     const body = validBody();
     body.type = "Feature";
 
-    checkGeoJsonFormat(mockReq(body), res, next);
+    checkGeoJsonFormat(
+      mockReq(body),
+      res,
+      next);
 
     expect(getError().statusName).toBe(
       "INVALID_TYPE_FEATURECOLLECTION"
@@ -56,7 +63,10 @@ describe("checkGeoJsonFormat", () => {
     const body = validBody();
     body.features[0]!.geometry.coordinates[0]![0] = [181, 41.1];
 
-    checkGeoJsonFormat(mockReq(body), res, next);
+    checkGeoJsonFormat(
+      mockReq(body),
+      res,
+      next);
 
     expect(getError().statusName).toBe("INVALID_LONGITUDINE_RANGE");
   });

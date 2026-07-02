@@ -6,12 +6,10 @@ import * as z from "zod";
 import * as turf from "@turf/turf";
 import { hasMaxDecimals } from "../utils/DecimalChecker.js";
 import { isMissingIssueGeoJSON, validateBody, } from "../utils/HelperFunctions.js";
+import { MIN_NAME_LENGTH, MAX_NAME_LENGTH, MAX_SPEED_ALLOWED, MAX_POINTS } from "../utils/GlobalConstants.js";
 
 export const checkCreation = [checkGeoJsonFormat, checkCoordinates];
-export const MAX_POINTS = 15;
-export const MAX_SPEED_ALLOWED = 200;
-export const MAX_NAME_LENGTH = 254;
-export const MIN_NAME_LENGTH = 3;
+
 // ==================== CREAZIONE ====================
 
 // Per controllare la longitudine e latitudine delle posizioni, usiamo questo schema. ctx è il contesto e value è il dato che stiamo validando. superRefine(), a differenza di refine() che restituisce solo un booleano, permette di creare errori custom e fare validazione avanzata.
