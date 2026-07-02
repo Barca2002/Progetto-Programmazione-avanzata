@@ -28,7 +28,7 @@ export const ERROR_LIST = {
     INVALID_MAX_CAPACITY:
         { statusCode: 400, message: "La capacità massima non è in un formato valido. Deve essere un numero intero positivo e non superiore a 1000." },
     INVALID_USERID:
-        { statusCode: 400, message: "L'id utente fornito non è in un formato valido." },
+        { statusCode: 400, message: "L'id utente fornito non è in un formato valido. Deve essere un numero intero positivo." },
     INVALID_TYPE_FEATURECOLLECTION:
         { statusCode: 400, message: "Il primo parametro 'type' non è in un formato valido. Deve contenere la stringa 'FeatureCollection'." },
     INVALID_TYPE_FEATURE:
