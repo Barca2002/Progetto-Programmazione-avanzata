@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, Optional, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyHasAssociationsMixin } from 'sequelize';
+import { DataTypes, Sequelize, Model, BelongsToManyGetAssociationsMixin, BelongsToManyHasAssociationMixin, BelongsToManyAddAssociationMixin, BelongsToManyRemoveAssociationMixin, BelongsToManyHasAssociationsMixin } from 'sequelize';
 import { Geofencearea } from './GeofenceareaModel.js';
 import { Segnalazione } from './SegnalazioneModel.js';
 

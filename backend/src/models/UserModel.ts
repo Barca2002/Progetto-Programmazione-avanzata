@@ -22,9 +22,12 @@ export interface UpdateTokenBody {
   newTokenAmount: number;
 }
 
-export interface TokenPayload extends JwtPayload {
+export interface TokenPayload {
   user_id: number;
-  is_admin?: boolean;
+  email: string;
+  is_admin: boolean;
+  iat: number;
+  exp: number;
 }
 
 // Model<UserAllData, UserCreationData>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)
