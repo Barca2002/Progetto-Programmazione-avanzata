@@ -135,8 +135,8 @@ export class AdminController {
       if (!mmsi || !geoarea_id) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
-
-      await this.imbarcazioneController.unlinkGeoareaToImbarcazioni(mmsi, geoarea_id);
+      const unlink: UnlinkDataBody = {mmsi: mmsi, geoarea_id: geoarea_id}
+      await this.imbarcazioneController.unlinkGeoareaToImbarcazioni(unlink);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi: mmsi, geoarea_id: geoarea_id }));
     } catch (err) {
       if (err instanceof AppError) {

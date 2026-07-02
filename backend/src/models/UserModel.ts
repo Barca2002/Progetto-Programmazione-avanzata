@@ -1,4 +1,5 @@
 import { Position } from 'geojson';
+import { JwtPayload } from 'jsonwebtoken';
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 
 // Definisce i campi che avrà ogni riga della tabella users
@@ -19,6 +20,11 @@ export interface UserUpdateData extends Omit<Optional<UserAllData, 'is_admin' | 
 export interface UpdateTokenBody {
   email: string;
   newTokenAmount: number;
+}
+
+export interface TokenPayload extends JwtPayload {
+  user_id: number;
+  is_admin?: boolean;
 }
 
 // Model<UserAllData, UserCreationData>: usa UserAllData per controllare i dati in lettura, e UserCreation per controllare i dati quando creo un nuovo utente (DA SEQUELIZE)

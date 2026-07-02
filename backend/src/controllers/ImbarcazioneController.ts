@@ -1,6 +1,6 @@
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
-import { GetPointsAsGeoJsonBody, ImbarcazioneCreationData, LinkDataBody } from "../models/ImbarcazioneModel.js";
+import { GetPointsAsGeoJsonBody, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 export class ImbarcazioneController {
@@ -23,8 +23,8 @@ export class ImbarcazioneController {
       return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
   }
 
-  public async unlinkGeoareaToImbarcazioni(mmsi: number, geoarea_id: number){
-      return await this.imbarcazioneService.unlinkGeoareaImbarcazione(mmsi, geoarea_id);
+  public async unlinkGeoareaToImbarcazioni(unlink: UnlinkDataBody){
+      return await this.imbarcazioneService.unlinkGeoareaImbarcazione(unlink);
   }
 
   // Funzione chiamata dall'adminController per ottenere tutte le imbarcazioni con le relative segnalazioni.

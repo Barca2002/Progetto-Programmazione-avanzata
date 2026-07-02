@@ -10,6 +10,7 @@ import { SegnalazioneService } from "../services/SegnalazioneService.js";
 import { AdminService} from "../services/AdminService.js";
 import { checkToken } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneController } from "./ImbarcazioneController.js";
+import { DatiinviatiCreationData } from "../models/DatiInviatiModel.js";
 
 export class UserController {
   private readonly datiinviatiService = new DatiInviatiService();
@@ -23,8 +24,8 @@ export class UserController {
 
   public async sendData(req: Request, res: Response) {
     try {
-      const data = req.body;
-      const user_id = await checkToken(req).user_id;
+      const data = req.body as DatiinviatiCreationData;
+      const user_id = checkToken(req).user_id;
       // Invio dei dati con i relativi controlli e logging dello spostamento
       await this.datiinviatiService.sendData(data, user_id);
       // Scaliamo i token per la richiesta.
@@ -50,7 +51,7 @@ export class UserController {
   
   public async getMyImbarcazioniStatus(req: Request, res: Response) {
     try {
-      const user_id = await checkToken(req).user_id;
+      const user_id = checkToken(req).user_id;
       const geoarea_id = Number(req.params.geoarea_id);
       //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
@@ -67,7 +68,7 @@ export class UserController {
 
   public async getMyImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
-      const user_id = await checkToken(req).user_id;
+      const user_id = checkToken(req).user_id;
       const my_imbarcazioni_segnalazioni = await this.imbarcazioneController.getUserImbarcazioniWithSegnalazioni(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_segnalazioni));
     } catch (err) {
@@ -81,7 +82,7 @@ export class UserController {
 
    // Funzione usata dalla rotta utente per ritornare il saldo dei token dell'utente loggato.
   public async getMyTokenBalance(req: Request, res: Response) {
-      const token = await checkToken(req);
+      const token = checkToken(req);
       const user_id = token.user_id;
       const user = await this.adminService.getUtenteById(user_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, {tokens: user.tokens}));

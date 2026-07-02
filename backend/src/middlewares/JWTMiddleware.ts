@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
+import { TokenPayload } from '../models/UserModel.js';
 
 const JWT_PUBLIC_KEY = process.env.JWT_PUBLIC_KEY;
   if (!JWT_PUBLIC_KEY){
@@ -14,7 +15,7 @@ const publicKey = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
   }
 
 // funzione per controllare struttura del token, prende l'authorization header.
-export function checkToken (req: Request) {
+export function checkToken (req: Request): TokenPayload {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
@@ -58,10 +59,10 @@ export function checkAdminRole (req: Request, _res: Response, next: NextFunction
   next();
 };
 
-export function decodeJwt(token: string){
-  const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JwtPayload;
+export function decodeJwt(token: string): TokenPayload {
+  const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
   if(!decodedToken){
     throw ErrorFactory.getError(AppErrorEnum.JWT_VERIFY_ERROR);
   }
-  return decodedToken;
+  return decodedToken as TokenPayload;
 }

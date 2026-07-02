@@ -5,7 +5,7 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
-import { Imbarcazione, ImbarcazioneCreationData } from '../models/ImbarcazioneModel.js';
+import { Imbarcazione, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from '../models/ImbarcazioneModel.js';
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
@@ -229,27 +229,27 @@ export class ImbarcazioneService {
     return result;
   }
 
-  async unlinkGeoareaImbarcazione(mmsi: number, geoarea_id: number) {
+  async unlinkGeoareaImbarcazione(unlink: UnlinkDataBody) {
     try {
       //Controllo che l'imbarcazione esista
-      const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
+      const imbarcazione = await this.imbarcazioneDAO.get(unlink.mmsi);
       if (!imbarcazione){
         throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
       }
 
       //Controllo che la geoarea esista
-      const geoarea = await this.geofenceareaDAO.get(geoarea_id);
+      const geoarea = await this.geofenceareaDAO.get(unlink.geoarea_id);
       if (!geoarea){
         throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
       }
         
       //Controllo che l'associazione esista
-      const associazione = await imbarcazione.hasGeofencearea(geoarea_id);
+      const associazione = await imbarcazione.hasGeofencearea(unlink.geoarea_id);
       if (!associazione){
         throw ErrorFactory.getError(AppErrorEnum.ASSOCIAZIONE_NOT_FOUND);
       }
         
-      await imbarcazione.removeGeofencearea(geoarea_id);
+      await imbarcazione.removeGeofencearea(unlink.geoarea_id);
     } catch (err) {
       if (err instanceof AppError)
         throw err;
@@ -257,7 +257,7 @@ export class ImbarcazioneService {
     }
   }
 
-  async linkGeoareasToImbarcazioni(links: { mmsi: number, geoarea_ids: number[] }[]){
+  async linkGeoareasToImbarcazioni(links: LinkDataBody[]){
     // La transazione è necessaria perché si può linkare un imbarcazione a più geoaree più volte. 
     const t = await DatabaseConnection.getInstance().transaction();
     try {
