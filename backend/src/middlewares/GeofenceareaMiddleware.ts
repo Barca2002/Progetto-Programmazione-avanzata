@@ -1,10 +1,11 @@
 import { Position } from "geojson";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
-import { AppErrorEnum } from "../utils/StatusMessages.js";
+import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
 import { NextFunction, Request, Response } from "express";
 import * as z from "zod";
 import * as turf from "@turf/turf";
 import { hasMaxDecimals } from "../utils/DecimalChecker.js";
+import { isMissingIssueGeoJSON, validateBody, } from "../utils/HelperFunctions.js";
 
 export const checkCreation = [checkGeoJsonFormat, checkCoordinates];
 export const MAX_POINTS = 15;
@@ -99,89 +100,62 @@ const geofenceAreaSchema = z.object({
     ),
 }).strict();
 
-// Controllo del formato GeoJSON della richiesta.
-function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction) {
-    const result = geofenceAreaSchema.safeParse(req.body);
-    if (!result.success) {
+export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, reqBody: any): AppErrorName {
+   
+    const missing = isMissingIssueGeoJSON(issue, reqBody);
+    const pathString = issue.path.join(".");
+    console.log("missing: ", missing)
+    console.log("pathstring: ", pathString);
+    if (issue.code === "unrecognized_keys") {
+        return AppErrorEnum.INVALID_PARAMS;
+    }
 
-        const firstIssue = result.error.issues[0]!;
-        const fieldName = firstIssue.path.at(-1); // Dobbiamo prendere l'ultimo errore, altrimenti sarebbe sempre 'features'.
-        const pathString = firstIssue.path.join(".");
 
-        console.log("issues: ", result.error.issues)
-        console.log("errore: ", firstIssue)
-
-        if (firstIssue.code === "unrecognized_keys") {
-            return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
-        }
-
-        if (firstIssue.code === "invalid_type") {
-
-            switch (pathString) {
-                // Per distinguere quale parametro type è mancante, usiamo il path dell'errore.
-                case "type":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_TYPE_FEATURECOLLECTION));
-                case "features.0.type":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_TYPE_FEATURE));
-                case "features.0.geometry.type":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_TYPE_FEATURE_GEOMETRY));
-                case "features":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_FEATURES));
-                case "features.0.properties":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_PROPERTIES));
-                case "features.0.properties.name":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_NAME));
-                case "features.0.geometry":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_GEOMETRY));
-                case "features.0.geometry.coordinates":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_COORDINATES));
-                default:
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
-            }
-        }
-        // Controllo sulle posizioni contenute nelle coordinate tramite i messaggi custom negli errori
-        switch(firstIssue.message){
-            case "2_VALUES_ONLY":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_POSITION_VALUES));
-            case "MISSING_LONG":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE_VALUE));
-            case "MISSING_LAT":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE_VALUE));
-            case "RANGE_NOT_ALLOWED_LONG":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE_RANGE));
-            case "RANGE_NOT_ALLOWED_LAT":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE_RANGE));
-            case "TOO_MANY_DECIMALS_LONG":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE_DECIMALS));
-            case "TOO_MANY_DECIMALS_LAT":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE_DECIMALS));
-        }
-
+    if (issue.code === "invalid_type" && missing) {
         switch (pathString) {
-            case "type":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_TYPE_FEATURECOLLECTION));
-            case "features.0.type":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_TYPE_FEATURE));
-            case "features.0.geometry.type":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_TYPE_FEATURE_GEOMETRY));
-            case "features":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_FEATURE_ARRAY));
-            case "properties":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_PROPERTIES));
-            case "name":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_NAME_PARAM));
-            case "max_speed":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_MAX_SPEED));
-            case "geometry":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_GEOMETRY));
-            case "coordinates":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_GEOMETRY));
-            default:
-                throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
+            case "type": return AppErrorEnum.MISSING_TYPE_FEATURECOLLECTION;
+            case "features.0.type": return AppErrorEnum.MISSING_TYPE_FEATURE;
+            case "features.0.geometry.type": return AppErrorEnum.MISSING_TYPE_FEATURE_GEOMETRY;
+            case "features": return AppErrorEnum.MISSING_FEATURES;
+            case "features.0.properties": return AppErrorEnum.MISSING_PROPERTIES;
+            case "features.0.properties.name": return AppErrorEnum.MISSING_NAME;
+            case "features.0.geometry": return AppErrorEnum.MISSING_GEOMETRY;
+            case "features.0.geometry.coordinates": return AppErrorEnum.MISSING_COORDINATES;
+            default: return AppErrorEnum.MISSING_DATA;
         }
     }
-    // Vado al controllo del contenuto delle coordinate
-    next();
+
+    // Controllo basato sui messaggi custom impostati in PositionSchema, serve per le coordinate.
+    if (issue.code === "custom") {
+        switch (issue.message) {
+            case "2_VALUES_ONLY": return AppErrorEnum.INVALID_POSITION_VALUES;
+            case "MISSING_LONG": return AppErrorEnum.INVALID_LONGITUDINE_VALUE;
+            case "MISSING_LAT": return AppErrorEnum.INVALID_LATITUDINE_VALUE;
+            case "RANGE_NOT_ALLOWED_LONG": return AppErrorEnum.INVALID_LONGITUDINE_RANGE;
+            case "RANGE_NOT_ALLOWED_LAT": return AppErrorEnum.INVALID_LATITUDINE_RANGE;
+            case "TOO_MANY_DECIMALS_LONG": return AppErrorEnum.INVALID_LONGITUDINE_DECIMALS;
+            case "TOO_MANY_DECIMALS_LAT": return AppErrorEnum.INVALID_LATITUDINE_DECIMALS;
+        }
+    }
+
+    // Fallback finale sul path generico
+    switch (pathString) {
+        case "type": return AppErrorEnum.INVALID_TYPE_FEATURECOLLECTION;
+        case "features.0.type": return AppErrorEnum.INVALID_TYPE_FEATURE;
+        case "features.0.geometry.type": return AppErrorEnum.INVALID_TYPE_FEATURE_GEOMETRY;
+        case "features": return AppErrorEnum.INVALID_FEATURE_ARRAY;
+        case "features.0.properties": return AppErrorEnum.INVALID_PROPERTIES;
+        case "features.0.properties.name": return AppErrorEnum.INVALID_NAME_PARAM;
+        case "features.0.properties.max_speed": return AppErrorEnum.INVALID_MAX_SPEED;
+        case "features.0.geometry": return AppErrorEnum.INVALID_GEOMETRY
+        case "features.0.geometry.coordinates": return AppErrorEnum.INVALID_COORDINATES;
+        default: return AppErrorEnum.INCORRECT_DATA;
+    }
+}
+
+
+export function checkGeoJsonFormat(req: Request, _res: Response, next: NextFunction) {
+    validateBody(req.body, geofenceAreaSchema, mapGeofenceAreaErrors, next);
 }
 
 function checkCoordinates(req: Request, _res: Response, next: NextFunction) {

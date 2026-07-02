@@ -20,26 +20,27 @@ export function isMissingIssueGeoJSON(issue: z.core.$ZodIssue, reqBody: any) {
         throw ErrorFactory.getError(AppErrorEnum.VALIDATION_ERROR);
     }
 
-    // 
+    // Prendiamo il body della richiesta
     let current = reqBody;
     
-    // Navighiamo fino al penultimo elemento del path
+    // Navighiamo fino al penultimo elemento del path, perché da esso accedo all'ultimo elemento figlio.
     for (let i = 0; i < path.length - 1; i++) {
-        const key = path[i]!;
+        const key = path[i]!; // Man mano vado avanti nel path, quindi accedo agli altri elementi.
         
-        // Se a metà strada troviamo un undefined o null, significa che il pezzo forte manca 
+        // Se a metà strada troviamo un undefined o null, significa che il parametro che ci interessa manca sicuramente.
         if (current === undefined || current === null) {
-            return true; 
+            return true;
         }
-        // Contiene il parametro del body dell'iterazioen corrente.
+        // Accediamo all'elemento figlio.
         current = current[key];
     }
 
-    // Controllo finale di sicurezza sul target
+    // Controllo finale sul target
     if (current === undefined || current === null) {
         return true;
     }
 
+    // Accediamo all'elemento figlio dell'penultimo parametro.
     const lastKey = path[path.length - 1]!;
     return current[lastKey] === undefined;
 }
