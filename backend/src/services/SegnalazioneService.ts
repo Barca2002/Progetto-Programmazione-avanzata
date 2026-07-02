@@ -10,13 +10,13 @@ import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { GeofenceareaDAO } from '../dao/GeofenceareaDAO.js';
 import { Violazione } from '../models/ViolazioneModel.js';
 
-export class SegnalazioneService{
+export class SegnalazioneService {
     private readonly segnalazioneDao = new SegnalazioneDAO();
     private readonly geofenceareaService = new GeofenceareaService();
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaDAO = new GeofenceareaDAO();
 
-    async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]){
+    async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]) {
         const t = await DatabaseConnection.getInstance().transaction();
         try {
             const geoarea = await this.geofenceareaDAO.get(data.geoarea_id);
@@ -34,13 +34,13 @@ export class SegnalazioneService{
                 imbarcazioniMmsi.add(imbarcazione.mmsi);
             }
             // Sfruttiamo l'associazione con segnalazione e imbarcazione per aggiungere tutti le imbarcazioni tramite mmsi. ignoreDuplicates è sicurezza ridondante contro i duplicati.
-            await newSegnalazione.addImbarcazioni([...imbarcazioniMmsi], {ignoreDuplicates: true, transaction: t});
+            await newSegnalazione.addImbarcazioni([...imbarcazioniMmsi], { ignoreDuplicates: true, transaction: t });
 
             await t.commit();
 
         } catch (err) {
             await t.rollback();
-            if (err instanceof AppError) { 
+            if (err instanceof AppError) {
                 throw err;
             }
             throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
@@ -48,26 +48,24 @@ export class SegnalazioneService{
     }
 
     // Funzione per controllare se generare o no una segnalazione per una geoarea.
-    async checkIfSegnalazione(data: DatiinviatiCreationData){
+    async checkIfSegnalazione(data: DatiinviatiCreationData) {
         const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
-        
-        if(!current_geoarea){
+        if (!current_geoarea) {
             // Possono esserci posizioni fuori dalle geoaree, quindi in tal caso non si controlla neanche se generare una segnalazione perché non si entra in nessuna geoarea.
             return;
         }
         // Prendo l'ultima violazione valida della geoarea corrente.
         let ultimaViolazioneValida = await this.violazioneDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
 
-        if(!ultimaViolazioneValida){
+        if (!ultimaViolazioneValida) {
             // C'è il caso in cui non è stata mai commessa una violazione per una geoarea, quindi in tal caso si ritorna e basta, non si controlla per niente se geneare la segnalazione.
             return;
         }
-        
         // Prendo le violazioni della geoarea che sono vecchie al massimo 2 giorni dall'ultima violazione valida perché le altre non servono. Potrebbe contenere nuove violazioni non valide (potrebbe avere n violazioni che sono arrivate prima di 1 ora dall'ultima violazioen valida).
         const violazioniRecenti = await this.violazioneDAO.getRecentByGeoarea(current_geoarea.geoarea_id);
         const ultimaViolazione = violazioniRecenti![0];
 
-        if(!ultimaViolazione){
+        if (!ultimaViolazione) {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
 
@@ -75,15 +73,15 @@ export class SegnalazioneService{
         const ultimaViolazioneIsValid = (ultimaViolazione!.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 60 * 60 * 1000;
 
         // Se l'ultima violazione è valida, allora aggiorniamo quella nella geofence area.
-        if(ultimaViolazioneIsValid){
+        if (ultimaViolazioneIsValid) {
             const t = await DatabaseConnection.getInstance().transaction();
-            await this.geofenceareaDAO.update(current_geoarea.geoarea_id, {ultima_violazione_valida_id: ultimaViolazione.id}, t);
+            await this.geofenceareaDAO.update(current_geoarea.geoarea_id, { ultima_violazione_valida_id: ultimaViolazione.id }, t);
             await t.commit();
             ultimaViolazioneValida = ultimaViolazione;
         }
 
         // Se non ci sono violazioni recenti (cioè entro 2 giorni) o sono < di 5 non bisogna generare una segnalazione.
-        if(!violazioniRecenti || violazioniRecenti?.length <= 5){
+        if (!violazioniRecenti || violazioniRecenti?.length <= 5) {
             return;
         }
 
@@ -95,9 +93,9 @@ export class SegnalazioneService{
 
         // Filtriamo le violazioni in base al vincolo temporale.
         let violazioniValide: Violazione[] = [];
-        for (const v of violazioniRecenti){
+        for (const v of violazioniRecenti) {
             const t = new Date(v.created_at).getTime();
-            if (t <= inizioFinestra && t >= fineFinestra){
+            if (t <= inizioFinestra && t >= fineFinestra) {
                 violazioniValide.push(v);
             }
         }
@@ -105,45 +103,34 @@ export class SegnalazioneService{
         // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea (se già non c'è).
         if (violazioniValide.length > 5) {
             // Se già c'è una segnalazione in corso, non serve ricrearla
-            if (await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id)){
+            if (await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id)) {
                 return;
             }
             // Se non c'è una segnalazione in corso, la creiamo.
-            const t = await DatabaseConnection.getInstance().transaction();
-            try {
-                const newSegnalazione: SegnalazioneCreationData = {geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO"};
-                await this.createSegnalazione(newSegnalazione, violazioniValide);
-                await t.commit();
-            } catch (err) {
-                await t.rollback();
-                if (err instanceof AppError) { 
-                    throw err;
-                }
-                throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-            } 
+            const newSegnalazione: SegnalazioneCreationData = { geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO" };
+            await this.createSegnalazione(newSegnalazione, violazioniValide);
         } else {
             await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
         }
     }
     // Funzione chiamata da checkIfSegnalazione per controllare se impostare lo stato della segnalazione a RIENTRATA.
-    async checkRientroSegnalazione(geoarea_id: number){
+    async checkRientroSegnalazione(geoarea_id: number) {
         const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
-            
-            if (!lastSegnalazioneInCorso){
-                // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
-                return;
+        if (!lastSegnalazioneInCorso) {
+            // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
+            return;
+        }
+        // Se c'è almeno una violazione (ovviamente meno di 6), setta lo stato della segnalazione associata a quella geoarea a RIENTRATA.
+        const t = await DatabaseConnection.getInstance().transaction();
+        try {
+            await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, { stato: "RIENTRATA" }, t);
+            await t.commit();
+        } catch (err) {
+            await t.rollback();
+            if (err instanceof AppError) {
+                throw err;
             }
-            // Se c'è almeno una violazione (ovviamente meno di 6), setta lo stato della segnalazione associata a quella geoarea a RIENTRATA.
-            const t = await DatabaseConnection.getInstance().transaction();
-            try {
-                await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, {stato: "RIENTRATA"}, t);
-                await t.commit();
-            } catch (err) {
-                await t.rollback();
-                if (err instanceof AppError) { 
-                    throw err;
-                }
-                throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
-            }
+            throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
+        }
     }
 }
