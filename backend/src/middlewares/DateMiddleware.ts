@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-
+import { AppErrorEnum, AppErrorName } from '../utils/StatusMessages.js';
+import { isMissingIssue, validateBody } from '../utils/HelperFunctions.js';
 
 const dateFormatRegex = /^\d{2}[-/]\d{2}[-/]\d{4}$/;
 
@@ -11,34 +10,28 @@ const dateSchema = z.object({
   end_date: z.string().regex(dateFormatRegex).optional()
 });
 
-export function validateDateFormat(req: Request, res: Response, next: NextFunction): void {
-  const result = dateSchema.safeParse(req.body);
+function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
+    const missing = isMissingIssue(issue, reqBody);
 
-  if (!result.success) {
-    // Prendiamo il primo errore riscontrato da Zod
-        const firstIssue = result.error.issues[0]!;
-        const fieldName = firstIssue.path[0];
+    const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
+        start_date: {
+            missing: AppErrorEnum.MISSING_START_DATE,
+            invalid: AppErrorEnum.INVALID_START_DATE,
+        },
+        end_date: {
+            missing: AppErrorEnum.MISSING_END_DATE,
+            invalid: AppErrorEnum.INVALID_END_DATE,
+        },
+    };
 
-        if (firstIssue.code === "invalid_type") {
-            switch (fieldName) {
-                case "start_date":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_START_DATE));
-                case "end_date":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_END_DATE));
-                default:
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
-            }
-        }
+    const entry = map[campo];
+    if (!entry){
+        return AppErrorEnum.INCORRECT_DATA;
+    }
 
-        switch (fieldName) {
-            case "start_date":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_START_DATE));
-            case "end_date":
-                return next(ErrorFactory.getError(AppErrorEnum.INVALID_END_DATE));
-            default:
-                return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
-        }
-  }
+    return missing ? entry.missing : entry.invalid;
+}
 
-  next();
+export function validateDateFormat(req: Request, _res: Response, next: NextFunction) {
+    validateBody(req.body, dateSchema, mapErroriDate, next)
 }

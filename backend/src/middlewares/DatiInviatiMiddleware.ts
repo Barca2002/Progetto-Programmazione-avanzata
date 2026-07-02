@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppErrorEnum } from '../utils/StatusMessages.js';
-import { ErrorFactory } from '../factory/ErrorFactory.js';
+import { AppErrorEnum, AppErrorName } from '../utils/StatusMessages.js';
 import { hasMaxDecimals } from '../utils/DecimalChecker.js';
 import { z } from 'zod';
+import { isMissingIssue, validateBody } from '../utils/HelperFunctions.js';
 
 export const datiInviatiSchema = z.object({
     // L'mmsi deve essere di 9 cifre
@@ -27,52 +27,40 @@ export const datiInviatiSchema = z.object({
     stato: z.enum(['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'])
 }).strict(); // Modalità strict, altrimenti si possono aggiungere campi a piacere
 
-export async function checkDatiInviati(req: Request, _res: Response, next: NextFunction) {
-    const result = datiInviatiSchema.safeParse(req.body);
+function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
+    const missing = isMissingIssue(issue, reqBody);
 
-    if (!result.success) {
-        // Prendiamo il primo campo che ha fallito la validazione (path contiene il nome del campo/proprietà).
-        const firstIssue = result.error.issues[0]!;
-        const fieldName = firstIssue.path[0]; // Es: "username", "email", "password"
+    const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
+        mmsi: {
+            missing: AppErrorEnum.MISSING_MMSI,
+            invalid: AppErrorEnum.INVALID_MMSI,
+        },
+        longitudine: {
+            missing: AppErrorEnum.MISSING_LONGITUDINE,
+            invalid: AppErrorEnum.INVALID_LONGITUDINE,
+        },
+        latitudine: {
+            missing: AppErrorEnum.MISSING_TYPE_IMBARCAZIONE,
+            invalid: AppErrorEnum.INVALID_LATITUDINE,
+        },
+        velocita_kmh: {
+            missing: AppErrorEnum.MISSING_VELOCITA_KMH,
+            invalid: AppErrorEnum.INVALID_VELOCITA,
+        },
+        stato: {
+            missing: AppErrorEnum.MISSING_STATO,
+            invalid: AppErrorEnum.INVALID_STATO,
+        },
+    };
 
-        // Se l'errore è dovuto a chiavi non permesse (es. inviate a causa di .strict())
-        if (firstIssue.code === "unrecognized_keys") {
-            return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
-        }
-
-
-        if (firstIssue.code === "invalid_type") {
-            switch (fieldName) {
-                case "mmsi":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_MMSI));
-                case "longitudine":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_LONGITUDINE));
-                case "latitudine":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_LATITUDINE));
-                case "velocita_kmh":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_VELOCITA_KMH));
-                case "stato":
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_STATO));
-                default:
-                    return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
-            }
-        }
-
-        // Mappiamo gli errori 
-        switch (fieldName) {
-            case 'mmsi':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-            case 'latitudine':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_LATITUDINE);
-            case 'longitudine':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_LONGITUDINE);
-            case 'velocita_kmh':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_VELOCITA);
-            case 'stato':
-                throw ErrorFactory.getError(AppErrorEnum.INVALID_STATO);
-            default:
-                throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
-        }
+    const entry = map[campo];
+    if (!entry){
+        return AppErrorEnum.INCORRECT_DATA;
     }
-    next();
+
+    return missing ? entry.missing : entry.invalid;
+}
+
+export function checkDatiInviati(req: Request, _res: Response, next: NextFunction) {
+    validateBody(req.body, datiInviatiSchema, mapErroriDatiInviati, next)
 }

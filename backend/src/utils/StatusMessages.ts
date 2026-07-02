@@ -51,7 +51,10 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Manca il valore della longitudine in una posizione." },
     INVALID_LATITUDINE_VALUE:
         { statusCode: 400, message: "Manca il valore della longitudine in una posizione." },
-    
+    INVALID_LONGITUDINE:
+        { statusCode: 400, message: "La longitudine deve essere un numero da -180 a 180." },
+    INVALID_LATITUDINE:
+        { statusCode: 400, message: "La longitudine deve essere un numero da -90 a 90." },
     INVALID_COORDINATES:
         { statusCode: 400, message: "Le coordinate fornite non sono in un formato valido. Devono contenere un array di posizioni e seguire il seguente formato: [[ [long, lat], [long, lat], ...]]." },
     INVALID_ASSOCIATION:
@@ -88,7 +91,7 @@ export const ERROR_LIST = {
     MISSING_USERNAME:
         { statusCode: 400, message: "Parametro 'username' mancante nella richiesta." },
     MISSING_EMAIL: 
-        { statusCode: 400, message: "Parametro 'email' mancante nella richiesta o il valore inserito non è una stringa." },
+        { statusCode: 400, message: "Parametro 'email' mancante nella richiesta." },
     MISSING_PASSWORD:
         { statusCode: 400, message: "Parametro 'password' mancante nella richiesta." },
     MISSING_MMSI:
@@ -162,7 +165,7 @@ export const ERROR_LIST = {
     INVALID_STATO:
         { statusCode: 400, message: "Lo stato deve essere uno tra: IN NAVIGAZIONE, IN PESCA, STAZIONARIA." },
     INVALID_VELOCITA:
-        { statusCode: 400, message: "La velocità deve essere un numero intero positivo e non superiore a 200 km/h." },
+        { statusCode: 400, message: `La velocità deve essere un numero intero positivo e non superiore a ${MAX_SPEED_ALLOWED} km/h.` },
     DELETE_ERROR:
         { statusCode: 400, message: "Errore nella cancellazione." },
     CREATE_ERROR:
@@ -219,6 +222,8 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "I parametri forniti non sono corretti." },
     IMBARCAZIONE_ALREADY_EXISTS:
         { statusCode: 400, message: "L'imbarcazione già esiste." },
+    VALIDATION_ERROR:
+        { statusCode: 400, message: "Errore durante la validazione della richiesta." },
 
 } as const;
 
