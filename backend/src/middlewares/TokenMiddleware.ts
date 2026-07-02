@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
-import { AppErrorEnum } from "../utils/StatusMessages.js";
+import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
 import { checkToken } from "./JWTMiddleware.js";
 import { AdminService } from "../services/AdminService.js"
 import { emailSchema } from "./AuthMiddleware.js";
 import * as z from "zod";
+import { isMissingIssue, validateBody } from "../utils/HelperFunctions.js";
 
 const adminService = new AdminService();
 
@@ -16,40 +17,32 @@ const tokenUpdateSchema = z.object({
   email: emailSchema,
 }).strict();
 
+function mapErroriUpdateToken(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
+    const missing = isMissingIssue(issue, reqBody);
+
+    const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
+        newTokenAmount: {
+            missing: AppErrorEnum.MISSING_NEW_TOKEN_AMOUNT,
+            invalid: AppErrorEnum.INVALID_NEW_TOKEN_AMOUNT,
+        },
+        email: {
+            missing: AppErrorEnum.MISSING_EMAIL,
+            invalid: AppErrorEnum.INVALID_EMAIL,
+        },
+        
+    };
+
+    const entry = map[campo];
+    if (!entry){
+        return AppErrorEnum.INCORRECT_DATA;
+    }
+
+    return missing ? entry.missing : entry.invalid;
+}
+
 // Controllo valore token nella ricarica del saldo (rotta admin). Usata solo internamente.
 export function validateTokenAmount(req: Request, _res: Response, next: NextFunction) {
-  const result = tokenUpdateSchema.safeParse(req.body);
-  if (!result.success) {
-    const firstIssue = result.error.issues[0]!;
-    const fieldName = firstIssue.path[0];
-
-    // Se l'errore è dovuto a chiavi non permesse (cioè parametri che non sono nello schema, è generato da .strict()), lancio l'errore INVALID_PARAMS.
-    if (firstIssue.code === "unrecognized_keys") {
-      return next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
-    }
-
-    // Mapping errori per parametri mancanti. Se mancano i parametri, zod riceve come tipo undefined, quindi l'errore sarà invalid_type.
-    if (firstIssue.code === "invalid_type") {
-      switch (fieldName) {
-        case "email":
-          return next(ErrorFactory.getError(AppErrorEnum.MISSING_EMAIL));
-        case "newTokenAmount":
-          return next(ErrorFactory.getError(AppErrorEnum.MISSING_NEW_TOKEN_AMOUNT));
-        default:
-          return next(ErrorFactory.getError(AppErrorEnum.MISSING_DATA));
-      }
-    }
-
-    switch (fieldName) {
-        case "email":
-          return next(ErrorFactory.getError(AppErrorEnum.INVALID_EMAIL));
-        case "newTokenAmount":
-          return next(ErrorFactory.getError(AppErrorEnum.INVALID_NEW_TOKEN_AMOUNT));
-        default:
-          return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
-      }
-  }
-  next();
+  validateBody(req.body, tokenUpdateSchema, mapErroriUpdateToken, next)
 }
 
 export async function checkTokenBalance(req: Request, _res: Response, next: NextFunction) {
