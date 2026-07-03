@@ -148,6 +148,8 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 
 <img src="./immagini/mermaid-diagram-2.png">
 
+
+## SENDSTATUS CODICE
 ```mermaid
 ---
 config:
@@ -389,4 +391,5 @@ sequenceDiagram
     end
 ```
 
+## IMMAGINE
 <img src="./immagini/mermaid-diagram-sendStatus.png">
