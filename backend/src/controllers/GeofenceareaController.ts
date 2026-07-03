@@ -16,7 +16,7 @@ export class GeofenceAreaController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -30,7 +30,7 @@ export class GeofenceAreaController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }

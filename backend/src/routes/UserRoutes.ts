@@ -23,7 +23,7 @@ userRouter.use(checkUserRole);
  * 
  */
 userRouter.post("/imbarcazione/send/status", checkTokenBalance, checkDatiInviati, async function(req: Request, res: Response) {
-    await userController.sendData(req, res);
+    await userController.sendStatus(req, res);
 });
 
 /**

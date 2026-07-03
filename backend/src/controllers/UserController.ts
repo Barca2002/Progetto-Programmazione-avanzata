@@ -21,15 +21,18 @@ export class UserController {
   private readonly adminService = new AdminService();
   private readonly imbarcazioneController = new ImbarcazioneController();
 
-  public async sendData(req: Request, res: Response) {
+  /**
+   * Controlla se il token JWT è valido, poi effettua il controllo ed il salvataggio dei dati inviati. Successivamente scala i token per la richiesta e controlla se generare le violazioni. Infine, controlla se generare una segnalazione per la geofence area corrispondente ai dati inviati (se applicabile).
+   * @param req oggetto contenente il body della richiesta con tutti i dati necessari come l'mmsi della barca, longitudine e latitudine, etc.
+   * @param res oggetto AppSuccess con i dati inviati dall'utente.
+   */
+  public async sendStatus(req: Request, res: Response) {
     try {
       const data = req.body as DatiinviatiCreationData;
       const user_id = checkToken(req).user_id;
-      // Invio dei dati con i relativi controlli e logging dello spostamento
+      
       await this.datiinviatiService.sendData(data, user_id);
-      // Scaliamo i token per la richiesta.
       await this.spendToken(user_id);
-      // Controllo se generare una violazione ed eventualmente una segnalazione
       await this.violazioneService.checkIfViolazione(data);
       await this.segnalazioneService.checkIfSegnalazione(data);
       SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, data).send(res);
@@ -37,7 +40,7 @@ export class UserController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   };
@@ -59,7 +62,7 @@ export class UserController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -79,7 +82,7 @@ export class UserController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -110,7 +113,7 @@ export class UserController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }

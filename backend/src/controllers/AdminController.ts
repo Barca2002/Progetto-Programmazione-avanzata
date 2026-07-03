@@ -31,7 +31,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -45,7 +45,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -59,7 +59,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -73,7 +73,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -92,7 +92,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   };
@@ -105,7 +105,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -123,7 +123,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -142,7 +142,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -164,7 +164,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   }
@@ -202,7 +202,7 @@ export class AdminController {
         err.send(res);
       } else {
         console.log(err);
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   };
@@ -215,7 +215,7 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
   };

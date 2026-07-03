@@ -45,7 +45,7 @@ export class AuthController {
             if (err instanceof AppError){
                 err.send(res)
             } else {
-                res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+                ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
             }
         }
     }
@@ -68,7 +68,7 @@ export class AuthController {
             if (err instanceof AppError){
                 err.send(res)
             } else {
-                res.send(ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR));
+                ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
             }
         }
     }

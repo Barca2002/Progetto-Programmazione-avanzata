@@ -240,7 +240,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{JWT_TOKEN_USER}}",
+                      "value": "{{JWT_TOKEN_ADMIN}}",
                       "type": "string"
                     }
                   ]
