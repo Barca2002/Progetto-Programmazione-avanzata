@@ -3,8 +3,7 @@ import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
 import * as z from "zod";
 import { isMissingIssue } from "../utils/HelperFunctions.js";
 import { validateBody } from "../utils/HelperFunctions.js";
-
-export const MAX_EMAIL_LENGTH = 254;
+import { MAX_EMAIL_LENGTH } from "../utils/GlobalConstants.js";
 /**
  * Definizione dello schema di validazione dell'email, della password e dell'username tramite Zod. 
  * I parametri della request devono essere solamente quelli in registerBodySchema.

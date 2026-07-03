@@ -1,6 +1,6 @@
 
 
-import { MAX_EMAIL_LENGTH } from "../middlewares/AuthMiddleware.js";
+import { MAX_EMAIL_LENGTH } from "./GlobalConstants.js";
 import { MAX_DECIMALS, MAX_NAME_LENGTH, MAX_POINTS, MAX_SPEED_ALLOWED, MIN_NAME_LENGTH } from "./GlobalConstants.js";
 // Enumerativi degli errori e dei messaggi di successo dell'applicazione. Questi enum forniscono una struttura centralizzata per gestire i messaggi di errore e successo.
 export const ERROR_LIST = {
