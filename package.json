@@ -19,9 +19,7 @@
     "start": "node ts-build/app.js",
     "dev": "nodemon",
     "test": "jest --config backend/src/test/jest.config.js",
-    "lint": "eslint . --no-cache",
-    "db:reset": "node db-reset.js",
-    "generate-keys": "bun backend/src/utils/generateCryptoKeysV2.ts"
+    "generate-keys": "bun backend/src/utils/generateCryptoKeys.ts"
   },
   "dependencies": {
     "@turf/turf": "^7.3.5",
@@ -44,11 +42,9 @@
     "@types/node": "^22.19.21",
     "bcrypt": "^6.0.0",
     "bun": "^1.3.14",
-    "eslint": "^10.6.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
     "ts-jest": "^29.4.11",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.0"
+    "typescript": "^6.0.3"
   }
 }

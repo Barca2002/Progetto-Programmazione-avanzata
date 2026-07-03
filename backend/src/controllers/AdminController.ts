@@ -50,7 +50,7 @@ export class AdminController {
     }
   }
 
-  public async getAllImbarcazioniStatusPerGeoarea(req: Request, res: Response) {
+  public async getAllImbarcazioniStatusByGeoarea(req: Request, res: Response) {
     try {
       const geoarea_id = Number(req.params.geoareaid);
       const imbarcazione_status = await this.imbarcazioneService.getAllImbarcazioniStatus(geoarea_id);
@@ -97,7 +97,7 @@ export class AdminController {
     }
   };
 
-  public async getAllImbarcazioniWithSegnalazioni(_req: Request, res: Response) {
+  public async getAllImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
       const imbarcazioni_segnalazioni = await this.imbarcazioneController.getAllImbarcazioniWithSegnalazioni();
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
@@ -128,7 +128,7 @@ export class AdminController {
     }
   }
 
-  public async unlinkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
+  public async unlinkGeoareaFromImbarcazione(req: Request, res: Response): Promise<void> {
     try {
       const { mmsi, geoarea_id } = req.body as UnlinkDataBody;
 
@@ -147,10 +147,8 @@ export class AdminController {
     }
   }
 
-  public async getPointsAsGeoJson(req: Request, res: Response): Promise<void> {
+  public async getPositionsInDateRange(req: Request, res: Response): Promise<void> {
     try {
-
-
       // Se si inserisce la data di fine si usa quella, altrimenti prendo la data al momento della richiesta
       const { mmsi, start_date, end_date } = req.body as GetPointsAsGeoJsonBody;
 

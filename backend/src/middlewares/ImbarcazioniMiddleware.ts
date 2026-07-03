@@ -34,7 +34,7 @@ const unlinkImbarcazioneGeoareaSchema = z.object({
 }).strict();
 
 
-export async function checkLinkBody(req: Request, _res: Response, next: NextFunction) {
+export function checkLinkBody(req: Request, res: Response, next: NextFunction) {
     const result = linkImbarcazioneGeoareaSchema.safeParse(req.body);
     if (!result.success) {
         throw ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS);
@@ -42,7 +42,7 @@ export async function checkLinkBody(req: Request, _res: Response, next: NextFunc
     next();
 }
 
-export async function checkUnlinkBody(req: Request, _res: Response, next: NextFunction) {
+export function checkUnlinkBody(req: Request, res: Response, next: NextFunction) {
     const result = unlinkImbarcazioneGeoareaSchema.safeParse(req.body);
     if (!result.success) {
         throw ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS);
@@ -88,6 +88,6 @@ function mapErroriCreazioneImbarcazione(campo: string, issue: z.core.$ZodIssue, 
     return missing ? entry.missing : entry.invalid;
 }
 
-export function validateImbarcazioneCreationBody(req: Request, _res: Response, next: NextFunction) {
+export function validateImbarcazioneCreationBody(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, imbarcazioneCreationSchema, mapErroriCreazioneImbarcazione, next);
 }

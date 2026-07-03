@@ -44,7 +44,7 @@ export function checkToken (req: Request): TokenPayload {
 };
 
 // Controlliamo il token, ma non ci interessa il campo is admin
-export function checkUserRole (req: Request, _res: Response, next: NextFunction): void {
+export function checkUserRole (req: Request, res: Response, next: NextFunction): void {
   try {
     // Basta controllare il token
     checkToken(req);
@@ -55,7 +55,7 @@ export function checkUserRole (req: Request, _res: Response, next: NextFunction)
 };
 
 // Si controlla il campo is_admin nel token
-export function checkAdminRole (req: Request, _res: Response, next: NextFunction): void {
+export function checkAdminRole (req: Request, res: Response, next: NextFunction): void {
   try {
     const jwtdecoded = checkToken(req);
     if (!jwtdecoded.is_admin) {

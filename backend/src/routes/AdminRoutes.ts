@@ -65,17 +65,17 @@ adminRouter.post("/imbarcazioni/geoaree/link", checkLinkBody, async function(req
 //     "geoarea_id": <numero>
 // }
 adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function(req: Request, res: Response) {
-    await adminController.unlinkGeoareasToImbarcazioni(req, res);
+    await adminController.unlinkGeoareaFromImbarcazione(req, res);
 });
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
 adminRouter.post("/imbarcazioni/get/positions", validateDateFormat, async function(req: Request, res: Response) {
-    await adminController.getPointsAsGeoJson(req, res);
+    await adminController.getPositionsInDateRange(req, res);
 });
 
 // GET status imbarcazioni, cioè se per ogni imbarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
 adminRouter.get("/imbarcazioni/status/geoareaid/:geoareaid", async function(req: Request, res: Response) {
-    await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
+    await adminController.getAllImbarcazioniStatusByGeoarea(req, res);
 });
 
 

@@ -97,10 +97,10 @@ function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
  * una certa mappa di errori. 
  */
 
-export function validateRegisterBody(req: Request, _res: Response, next: NextFunction) {
+export function validateRegisterBody(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, registerBodySchema, mapErroriRegister, next);
 }
 
-export function validateLoginBody(req: Request, _res: Response, next: NextFunction) {
+export function validateLoginBody(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, loginBodySchema, mapErroriLogin, next);
 }

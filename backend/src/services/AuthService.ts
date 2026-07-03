@@ -49,7 +49,7 @@ export class AuthService{
      * @param user oggetto contenete l'utente autenticato.
      * @returns stringa contenente il token JWT.
      */
-    public async generateJWT(user: User): Promise<string>{
+    public generateJWT(user: User): string{
         if (!user){
             throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
         }

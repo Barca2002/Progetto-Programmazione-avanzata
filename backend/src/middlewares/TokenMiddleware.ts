@@ -41,11 +41,11 @@ function mapErroriUpdateToken(campo: string, issue: z.core.$ZodIssue, reqBody: a
 }
 
 // Controllo valore token nella ricarica del saldo (rotta admin). Usata solo internamente.
-export function validateTokenAmount(req: Request, _res: Response, next: NextFunction) {
+export function validateTokenAmount(req: Request, res: Response, next: NextFunction) {
   validateBody(req.body, tokenUpdateSchema, mapErroriUpdateToken, next)
 }
 
-export async function checkTokenBalance(req: Request, _res: Response, next: NextFunction) {
+export async function checkTokenBalance(req: Request, res: Response, next: NextFunction) {
   try {
     const jwtDecoded = checkToken(req);
     if (!jwtDecoded) {

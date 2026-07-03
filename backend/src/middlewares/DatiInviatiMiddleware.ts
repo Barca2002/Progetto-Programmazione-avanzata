@@ -64,6 +64,6 @@ function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: a
     return missing ? entry.missing : entry.invalid;
 }
 
-export function checkDatiInviati(req: Request, _res: Response, next: NextFunction) {
+export function checkDatiInviati(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, datiInviatiSchema, mapErroriDatiInviati, next)
 }

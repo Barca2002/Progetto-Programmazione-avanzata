@@ -1,28 +1,16 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
+
 // ----------------------------------------------------
 // Per eseguire lo script, usare npm run generate-keys
+// Le chiavi vengono appese nel file .env
 // ----------------------------------------------------
 
 function generateCryptoKeys(): void {
-  console.log('[Script] Generazione della coppia di chiavi RSA');
+  console.log('[Script] Generazione della coppia di chiavi RSA.');
 
-  // Path partendo dalla root del progetto
-  const dirPath = 'keys';
-
-  // Verifica se la directory esiste, altrimenti la crea
-  if (!fs.existsSync(dirPath)) {
-    try {
-      fs.mkdirSync(dirPath, { recursive: true });
-      console.log(`[Success] Directory creata: ${dirPath}`);
-    } catch (error) {
-      console.error(`[Err] Errore nella creazione della directory: ${error}`);
-      process.exit(1);
-    }
-  }
-
-  // Genera la coppia di chiavi asimmetriche, lunghezza 2048
+  // Genera la coppia di chiavi asimmetriche, lunghezza 4096
   const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
     modulusLength: 4096,
     publicKeyEncoding: {
@@ -35,15 +23,29 @@ function generateCryptoKeys(): void {
     },
   });
 
-  // Salva i file al path specificato
+  // Converte le chiavi in stringhe Base64 per il file .env, evitando problemi di a capo
+  const privateKeyBase64 = Buffer.from(privateKey).toString('base64');
+  const publicKeyBase64 = Buffer.from(publicKey).toString('base64');
+
+  // Identifica il path del file .env nella root del progetto
+  const envPath = path.join(process.cwd(), '.env');
+
+  // Costruisce il blocco di testo da appendere
+  const envBlock = `
+# --- JWT RSA KEYS GENERATED AT ${new Date().toISOString()} ---
+JWT_PRIVATE_KEY="${privateKeyBase64}"
+JWT_PUBLIC_KEY="${publicKeyBase64}"
+`;
+
   try {
-    fs.writeFileSync(path.join(dirPath, 'jwtRS256.key'), privateKey);
-    fs.writeFileSync(path.join(dirPath, 'jwtRS256.key.pub'), publicKey);
-    console.log('[Success] Chiavi generate con successo, path: ' + dirPath);
-    console.log('[Script] jwtRS256.key (Da tenere SEGRETA - Usata per firmare)');
-    console.log('[Script] jwtRS256.key.pub (Può essere pubblica - Usata per verificare)');
+    // Appende il blocco al file .env (lo crea se non esiste)
+    fs.appendFileSync(envPath, envBlock, 'utf8');
+    
+    console.log('[Success] Chiavi generate e salvate nel file .env con successo!');
+    console.log('[Script] JWT_PRIVATE_KEY (Da tenere SEGRETA - Usata per firmare)');
+    console.log('[Script] JWT_PUBLIC_KEY (Può essere pubblica - Usata per verificare)');
   } catch (error) {
-    console.error(`[Err] Errore nella scrittura dei file: ${error}`);
+    console.error(`[Err] Errore nella scrittura del file .env: ${error}`);
     process.exit(1);
   }
 }

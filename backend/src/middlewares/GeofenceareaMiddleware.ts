@@ -148,13 +148,13 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
     }
 }
 
-export function checkGeoJsonFormat(req: Request, _res: Response, next: NextFunction) {
+export function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, geofenceAreaSchema, mapGeofenceAreaErrors, next);
 }
 
-function checkCoordinates(req: Request, _res: Response, next: NextFunction) {
+function checkCoordinates(req: Request, res: Response, next: NextFunction) {
     // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
-    const coordinates: Position[][] = req.body?.features?.[0]?.geometry?.coordinates;
+    const coordinates = req.body?.features?.[0]?.geometry?.coordinates as Position[][];
     const punti = coordinates?.[0]; // Prendiamo l'array di punti
     if (!coordinates || !punti) {
         return next(ErrorFactory.getError(AppErrorEnum.MISSING_COORDINATES));

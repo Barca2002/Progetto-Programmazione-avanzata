@@ -33,6 +33,6 @@ function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     return missing ? entry.missing : entry.invalid;
 }
 
-export function validateDateFormat(req: Request, _res: Response, next: NextFunction) {
+export function validateDateFormat(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, getPositionsSchema, mapErroriDate, next)
 }

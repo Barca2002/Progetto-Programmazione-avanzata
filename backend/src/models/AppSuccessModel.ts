@@ -21,6 +21,6 @@ export class AppSuccess {
 
     // Setta lo status code della success e restituisce la risposta in JSON con il nome e messaggio.
     send(res: Response) {
-        res.status(this.statusCode).json({"success_name": this.statusName, "message": this.message});
+        res.status(this.statusCode).json({"statusCode": this.statusCode,"statusName": this.statusName, "message": this.message});
     }
 }
