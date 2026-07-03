@@ -230,21 +230,23 @@ sequenceDiagram
 
 ```mermaid
 %%{init: { 
- 'theme': 'base',
+ 'theme': 'dark',
  'themeVariables': { 
-    'primaryColor': '#f8d7da',
-    'primaryBorderColor': '#dc3545',
-    'primaryTextColor': '#000000',
-    'lineColor': '#dc3545', 
-    'signalColor': '#dc3545',
-    'signalTextColor': '#000000', 
-    'noteBkgColor': '#f8d7da',
-    'noteBorderColor': '#dc3545',
-    'noteTextColor': '#000000',
-    'activationBkgColor': '#f5c6cb',
-    'activationBorderColor': '#dc3545',
-    'sequenceNumberColor': '#000000',
-    'actorTextColor': '#000000',
+    'primaryColor': '#dc3545',
+    'primaryBorderColor': '#ff6b81',
+    'primaryTextColor': '#ffffff',
+    'lineColor': '#ff6b81', 
+    'signalColor': '#ff6b81',
+    'signalTextColor': '#ffffff', 
+    'noteBkgColor': '#8b1e2f',
+    'noteBorderColor': '#ff6b81',
+    'noteTextColor': '#ffffff',
+    'activationBkgColor': '#a83246',
+    'activationBorderColor': '#ff6b81',
+    'sequenceNumberColor': '#ffffff',
+    'actorTextColor': '#ffffff',
+    'actorBkg': '#8b1e2f',
+    'actorBorder': '#ff6b81',
     'fontSize': '18px'
     }}}%%
 sequenceDiagram
