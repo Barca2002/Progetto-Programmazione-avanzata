@@ -67,7 +67,7 @@ export const ERROR_LIST = {
     CREATEDAT_EDIT_NOT_ALLOWED:
     { statusCode: 400, message: "Non è possibile modificare il campo created_at." },
     EMAIL_ALREADY_EXISTS:
-        { statusCode: 409, message: "L'email fornita è già esistente." },
+        { statusCode: 400, message: "L'email fornita è già esistente." },
     USERNAME_ALREADY_EXISTS: { statusCode: 409, message: "Lo username fornito è già esistente e associato ad un altro utente." },
     JWT_SECRET_MISSING:
         { statusCode: 500, message: "Chiave privata per JWT non configurata nel file env." },
@@ -78,15 +78,15 @@ export const ERROR_LIST = {
     JWT_TOKEN_ADMIN_MISSING:
         { statusCode: 500, message: "Controlla JWT_TOKEN_ADMIN nelle variabili d'ambiente" },
     JWT_TOKEN_EMPTY:
-        { statusCode: 401, message: "Token JWT vuoto." },
+        { statusCode: 401, message: "Il Token JWT è vuoto." },
     JWT_NOT_PROVIDED:
-        { statusCode: 401, message: "Token JWT non fornito." },
+        { statusCode: 401, message: "Token JWT non presente nella richiesta." },
     JWT_TOKEN_EXPIRED:
-        { statusCode: 401, message: "Token JWT scaduto." },
+        { statusCode: 401, message: "Il Token JWT è scaduto." },
     JWT_TOKEN_INVALID:
-        { statusCode: 401, message: "Token JWT non valido o malformato." },
+        { statusCode: 401, message: "Il Token JWT è non valido o malformato." },
     JWT_TOKEN_KEY_ERROR:
-        { statusCode: 401, message: "Errore durante il reperimento della chiave per la generazione dei token JWT." },
+        { statusCode: 500, message: "Errore durante il reperimento della chiave per la generazione dei token JWT." },
     USER_NOT_FOUND:
         { statusCode: 404, message: "Utente non trovato." },
     USERNAME_NOT_FOUND:
@@ -156,7 +156,7 @@ export const ERROR_LIST = {
     INVALID_MMSI:
         { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:
-        { statusCode: 403, message: "Accesso riservato agli amministratori." },
+        { statusCode: 401, message: "Accesso riservato agli amministratori." },
     INVALID_LATITUDINE_RANGE:
         { statusCode: 400, message: `La latitudine deve essere un numero compreso tra -90 e 90.` },
     INVALID_LONGITUDINE_RANGE:
