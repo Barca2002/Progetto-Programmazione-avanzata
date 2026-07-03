@@ -142,15 +142,19 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 
 ### Rotta /register
 
+<img src="./immagini/mermaid-diagram-1.svg" width="auto" height="auto">
+
+## test
 ```mermaid
 ---
 config:
     theme: base
     themeVariables:
-        background: '#ffffff'
+        lineColor: '#ffffff'
         actorBkg: '#ffffff'
         actorTextColor: '#000000'
-        actorBorder: '#ff0019'
+        actorLineColor: '#ffffff'
+        actorBorder: '#ffffff'
         labelBoxBkgColor: '#d61125'
         labelBoxBorderColor: '#ffffff'
         signalColor: '#ffffff'
@@ -161,15 +165,6 @@ config:
         activationBkgColor: '#00ffff'
         activationBorderColor: '#009494'        
 ---
-%%{init: { 'theme': 'dark',
- 'themeVariables': { 
-    'actorBkg': '#d1ecf1', 
-    'actorBorder': '#17a2b8',
-    'labelBoxBkgColor': '#fff3cd',
-    'lineColor': '#6c757d', 
-    'signalTextColor': '#ffffff', 
-    'canvasBackground': '#ffffff' 
-    }}}%%
 sequenceDiagram
     autonumber
     actor Utente as Client (Browser/Postman)
