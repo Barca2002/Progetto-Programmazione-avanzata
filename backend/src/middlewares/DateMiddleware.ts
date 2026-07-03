@@ -8,7 +8,7 @@ const dateFormatRegex = /^\d{2}[-/]\d{2}[-/]\d{4}$/;
 const dateSchema = z.object({
   start_date: z.string().regex(dateFormatRegex),
   end_date: z.string().regex(dateFormatRegex).optional()
-});
+}).strict();
 
 function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);

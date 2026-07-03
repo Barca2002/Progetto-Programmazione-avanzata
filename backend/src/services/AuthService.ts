@@ -80,7 +80,7 @@ export class AuthService{
      * @param id numero che rappresenta l'id dell'utente.
      */
     public checkUserId (id: number){
-        if (Number.isNaN(id) || id <= 0 || Number.isInteger(id)) {
+        if (Number.isNaN(id) || id <= 0 || !Number.isInteger(id)) {
             throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
         }
     }

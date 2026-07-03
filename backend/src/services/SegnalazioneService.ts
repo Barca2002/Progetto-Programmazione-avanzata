@@ -3,7 +3,7 @@ import { ErrorFactory } from '../factory/ErrorFactory.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { SegnalazioneDAO } from '../dao/SegnalazioneDAO.js';
-import { SegnalazioneCreationData } from '../models/SegnalazioneModel.js';
+import { Segnalazione, SegnalazioneCreationData } from '../models/SegnalazioneModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { ViolazioneDAO } from '../dao/ViolazioneDAO.js';
 import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
@@ -16,28 +16,38 @@ export class SegnalazioneService {
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaDAO = new GeofenceareaDAO();
 
+    async addImbarcazioniToSegnalazione(segnalazione: Segnalazione, violazioni: Violazione[]) {
+        if (!await this.segnalazioneDao.get(segnalazione.id)) {
+            throw ErrorFactory.getError(AppErrorEnum.SEGNALAZIONE_NOT_FOUND)
+        }
+        const t = await DatabaseConnection.getInstance().transaction();
+        const imbarcazioniMmsi = new Set<number>();
+        try {
+            for (const violazione of violazioni) {
+                imbarcazioniMmsi.add(violazione.mmsi);
+            }
+            // Sfruttiamo l'associazione con segnalazione e imbarcazione per aggiungere tutti le imbarcazioni tramite mmsi. ignoreDuplicates è sicurezza ridondante contro i duplicati.
+            await segnalazione.addImbarcazioni([...imbarcazioniMmsi], { ignoreDuplicates: true, transaction: t });
+            await t.commit();
+        } catch (error) {
+            await t.rollback()
+            throw ErrorFactory.getError(AppErrorEnum.ADD_IMBARCAZIONI_TO_SEGNALAZIONE_ERROR);
+        }
+
+    }
+
     async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]) {
         const t = await DatabaseConnection.getInstance().transaction();
         try {
             const geoarea = await this.geofenceareaDAO.get(data.geoarea_id);
-            // Siccome possiamo avere posizioni che non sono in una geoarea, possiamo non controllare se effettuare la segnalazione visto che le geoaree non vengono toccate.
             if (!geoarea) {
                 throw ErrorFactory.getError(AppErrorEnum.GEOAREA_NOT_FOUND);
             }
-
             const newSegnalazione = await this.segnalazioneDao.create(data, t);
-            // Vogliamo gli mmsi univoci, perché non possiamo inserire duplicati nella tabella imbarcazioni_segnalazioni.
-            const imbarcazioniMmsi = new Set<number>();
-
-            for (const violazione of violazioni) {
-                const imbarcazione = await violazione.getImbarcazione();
-                imbarcazioniMmsi.add(imbarcazione.mmsi);
-            }
-            // Sfruttiamo l'associazione con segnalazione e imbarcazione per aggiungere tutti le imbarcazioni tramite mmsi. ignoreDuplicates è sicurezza ridondante contro i duplicati.
-            await newSegnalazione.addImbarcazioni([...imbarcazioniMmsi], { ignoreDuplicates: true, transaction: t });
-
             await t.commit();
-
+            // Vogliamo gli mmsi univoci, perché non possiamo inserire duplicati nella tabella imbarcazioni_segnalazioni.
+            await this.addImbarcazioniToSegnalazione(newSegnalazione, violazioni);
+            await t.commit();
         } catch (err) {
             await t.rollback();
             if (err instanceof AppError) {
@@ -80,8 +90,9 @@ export class SegnalazioneService {
             ultimaViolazioneValida = ultimaViolazione;
         }
 
-        // Se non ci sono violazioni recenti (cioè entro 2 giorni) o sono < di 5 non bisogna generare una segnalazione.
+        // Se non ci sono violazioni recenti (cioè entro 2 giorni) o sono < di 5 non bisogna generare una segnalazione, ma controllare se l'ultima deve essere ritirata.
         if (!violazioniRecenti || violazioniRecenti?.length <= 5) {
+            await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
             return;
         }
 
@@ -102,10 +113,12 @@ export class SegnalazioneService {
 
         // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea (se già non c'è).
         if (violazioniValide.length > 5) {
-            // Se già c'è una segnalazione in corso, non serve ricrearla
-            if (await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id)) {
-                return;
-            }
+            // Se già c'è una segnalazione in corso, non serve ricrearla, ma solo aggiungere le nuove imbarcazioni che hanno generato le violazioni valide.
+            const lastSegnalazione = await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id);
+            if (lastSegnalazione) {
+                    await this.addImbarcazioniToSegnalazione(lastSegnalazione, violazioniValide);
+                    return;
+                }
             // Se non c'è una segnalazione in corso, la creiamo.
             const newSegnalazione: SegnalazioneCreationData = { geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO" };
             await this.createSegnalazione(newSegnalazione, violazioniValide);

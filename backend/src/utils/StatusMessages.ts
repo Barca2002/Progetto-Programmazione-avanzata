@@ -226,7 +226,9 @@ export const ERROR_LIST = {
     IMBARCAZIONE_ALREADY_EXISTS:
         { statusCode: 400, message: "L'imbarcazione già esiste." },
     VALIDATION_ERROR:
-        { statusCode: 400, message: "Errore durante la validazione della richiesta." }
+        { statusCode: 400, message: "Errore durante la validazione della richiesta." },
+    ADD_IMBARCAZIONI_TO_SEGNALAZIONE_ERROR:
+        { statusCode: 400, message: "Errore durante l'aggiunta delle imbarcazioni alla segnalazione." },
 
 } as const;
 
