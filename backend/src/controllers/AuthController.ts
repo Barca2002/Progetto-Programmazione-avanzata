@@ -6,6 +6,9 @@ import { AuthService } from "../services/AuthService.js"
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AdminService } from "../services/AdminService.js";
 
+/**
+ * Interfacce per tipizzare i body delle richieste.
+ */
 interface LoginBody {
   email: string;
   password: string;
@@ -18,12 +21,16 @@ interface RegisterBody {
 }
 
 export class AuthController {
-    public readonly authService = new AuthService();
-    public readonly adminService = new AdminService();
     /**
-     * Metodo del controller per la gestione del login. Si occupa di recuperare i
-     * dati nel body della richiesta per poi mandarli al service che si occupa di
-     * generare il token JWT
+     * Istanziazione dei services necessari. Essi possono essere istanziati come attributo dato che non abbiamo necessità di fare dependency injection, riduce il boilerplate.
+     */
+    private readonly authService = new AuthService();
+    private readonly adminService = new AdminService();
+   
+    /**
+     * Funzione di login. Prede dal body della richiesta l'email e la password, poi genera il token JWT tramite l'authService con le credenziali prese precedentemente. Infine genera la response inviando il token JWT e sfruttando la SuccessFactory.
+     * @param req Oggetto di tipo Request contenente i dati della richiesta, tra cui l'email e la password.
+     * @param res Oggetto di tipo Response che permette di restutire una risposta alla richiesta, in questo caso il token JWT se la generazione va a buon fine.
      */
     public async login(req: Request, res: Response){
         try {
@@ -43,6 +50,11 @@ export class AuthController {
         }
     }
 
+    /**
+     * Funzione di registrazione. Prede dal body della richiesta l'email, l'username e la password e le salva nel database tramite l'authService. Infine genera la response restituendo l'email e username salvati e sfruttando la SuccessFactory.
+     * @param req Oggetto di tipo Request contenente i dati della richiesta, tra cui l'email e la password.
+     * @param res Oggetto di tipo Response che permette di restutire una risposta alla richiesta, in questo caso il token JWT se la generazione va a buon fine.
+     */
     public async register(req: Request, res: Response){
         try {
             const { username, email, password } = req.body as RegisterBody;
@@ -50,7 +62,7 @@ export class AuthController {
             const newUser = await this.authService.register(email, username, password);
             await this.adminService.createUtente(newUser);
 
-            const responseData = {"username": username, "email": email};
+            const responseData = {"username": newUser.username, "email": newUser.email};
             res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));
         } catch (err) {
             if (err instanceof AppError){
@@ -61,5 +73,4 @@ export class AuthController {
         }
     }
 
-    
 }

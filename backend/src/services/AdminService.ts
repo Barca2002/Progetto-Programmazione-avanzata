@@ -32,22 +32,6 @@ export class AdminService {
     return utente;
   };
 
-  public async findByUsername(username: string) {
-    const utente = await this.adminDAO.getByUsername(username);
-    if (!utente)
-      throw ErrorFactory.getError(AppErrorEnum.USER_NOT_FOUND);
-    return utente;
-  };
-
-  public async getUtenti() {
-    const utenti = await this.adminDAO.getAll();
-    if (!utenti || utenti.length === 0) {
-      throw ErrorFactory.getError(AppErrorEnum.FIND_ERROR);
-    }
-
-    return utenti;
-  };
-
   public async getUtenteById(id: number) {
     // Controllo se l'id è corretto
     this.authService.checkUserId(id);

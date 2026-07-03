@@ -85,6 +85,8 @@ export const ERROR_LIST = {
         { statusCode: 401, message: "Token JWT scaduto." },
     JWT_TOKEN_INVALID:
         { statusCode: 401, message: "Token JWT non valido o malformato." },
+    JWT_TOKEN_KEY_ERROR:
+        { statusCode: 401, message: "Errore durante il reperimento della chiave per la generazione dei token JWT." },
     USER_NOT_FOUND:
         { statusCode: 404, message: "Utente non trovato." },
     USERNAME_NOT_FOUND:
@@ -224,7 +226,7 @@ export const ERROR_LIST = {
     IMBARCAZIONE_ALREADY_EXISTS:
         { statusCode: 400, message: "L'imbarcazione già esiste." },
     VALIDATION_ERROR:
-        { statusCode: 400, message: "Errore durante la validazione della richiesta." },
+        { statusCode: 400, message: "Errore durante la validazione della richiesta." }
 
 } as const;
 
