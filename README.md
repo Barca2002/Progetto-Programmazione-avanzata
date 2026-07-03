@@ -145,7 +145,7 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 ```mermaid
 ---
 config:
-    theme: dark
+    theme: neutral
     themeVariables:
         'actorBkg': '#ffffff'
         'actorBorder': '#ff0019'
