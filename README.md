@@ -142,7 +142,7 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 
 ### Rotta /register
 
-<img src="./immagini/mermaid-diagram-1.png">
+<img src="./immagini/mermaid-diagram-register.png">
 
 ### Rotta /admin/imbarcazione/create
 
