@@ -91,16 +91,3 @@ function mapErroriCreazioneImbarcazione(campo: string, issue: z.core.$ZodIssue, 
 export function validateImbarcazioneCreationBody(req: Request, _res: Response, next: NextFunction) {
     validateBody(req.body, imbarcazioneCreationSchema, mapErroriCreazioneImbarcazione, next);
 }
-
-// Usata da altre funzioni
-export async function checkMmsi(req: Request, _res: Response, next: NextFunction) {
-    const mmsi = req.body.mmsi;
-    if (!mmsi) {
-        throw ErrorFactory.getError(AppErrorEnum.MISSING_MMSI);
-    }
-    const result = mmsiSchema.safeParse(mmsi);
-    if (!result.success) {
-        throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
-    }
-    next();
-}

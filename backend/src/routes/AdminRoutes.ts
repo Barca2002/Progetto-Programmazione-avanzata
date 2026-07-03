@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 import { validateTokenAmount } from "../middlewares/TokenMiddleware.js";
-import { checkLinkBody, checkMmsi, checkUnlinkBody, validateImbarcazioneCreationBody } from "../middlewares/ImbarcazioniMiddleware.js";
+import { checkLinkBody, checkUnlinkBody, validateImbarcazioneCreationBody } from "../middlewares/ImbarcazioniMiddleware.js";
 import { checkCreation } from "../middlewares/GeofenceareaMiddleware.js";
 import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 
@@ -69,7 +69,7 @@ adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function
 });
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
-adminRouter.post("/imbarcazioni/get/positions", checkMmsi, validateDateFormat, async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/get/positions", validateDateFormat, async function(req: Request, res: Response) {
     await adminController.getPointsAsGeoJson(req, res);
 });
 

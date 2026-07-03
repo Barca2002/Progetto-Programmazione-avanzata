@@ -170,26 +170,54 @@ INSERT INTO users (username, email, password, is_admin, tokens) VALUES
 --  imbarcazioni
 -- ------------------------------------------------------------
 INSERT INTO imbarcazioni (mmsi, name, type, descr, max_capacity, user_id) VALUES
+
+-- peschereccio_strascico
 (247123456, 'Adriatica Uno','peschereccio_strascico','Peschereccio a strascico oceanico per pesce bianco', 10, 3),
-(247234567, 'Conero Explorer','peschereccio_circuizione', 'Peschereccio a circuizione per pesce azzurro',10, 3),
-(247345678, 'San Ciriaco','nave_fattoria','Nave fattoria per congelamento e lavorazione pesce',40, 4),
-(215456789, 'Marche Star','trasporto_pescato','Nave da trasporto e logistica del pescato',6, 4),
-(247567890, 'Riviera Blu','pesca_artigianale','Barca per pesca artigianale costiera',12, 3),
-(247789012, 'Don Bosco II','palamitaro','Palamitaro per la pesca d’altura di tonno e spada',10, 5),
-(247890123, 'Bora Bora','reti_da_posta','Imbarcazione da pesca con reti da posta',10, 5),
-(247901234, 'Eurocargo Ancona','trasporto_pescato','Nave trasporto per rifornimento mercati ittici',25, 1),
-(247012345, 'Falco Marino','vigilanza_pesca','Unità di vigilanza e controllo attività ittiche',25, 2),
-(247112233, 'Medusa','ricerca_ittica','Nave per la ricerca e monitoraggio degli stock ittici',40, 5),
+(247012345, 'Falco Marino','peschereccio_strascico','Unità di vigilanza e controllo attività ittiche',25, 2),
+(247112233, 'Medusa','peschereccio_strascico','Nave per la ricerca e monitoraggio degli stock ittici',40, 5),
 (247113344, 'Stella del Mare','peschereccio_strascico','Peschereccio a strascico costiero per fondali bassi',15, 6),
-(247114455, 'Vento di Levante','lampara','Lampara per la pesca notturna del pesce azzurro',9, 6),
-(247115566, 'Porto Recanati','vongolara_turbosoffiante', 'Turbosoffiante per la pesca di molluschi e vongole',10, 7),
-(247116677, 'Sirena Adriatica','pesca_artigianale','Imbarcazione locale per la piccola pesca costiera',14, 4),
+(247200101, 'San Marco I', 'peschereccio_strascico', 'Peschereccio a strascico per pesca costiera nel medio Adriatico', 16, 2),
+(247114455, 'Vento di Levante','peschereccio_strascico','peschereccio_strascico per la pesca notturna del pesce azzurro',9, 6),
+(247120011, 'Costa Conero','peschereccio_strascico','Palamitaro d’altura per grandi pelagici',1800, 9),
+(247121122, 'Albatros Due','peschereccio_strascico','Unità di assistenza e soccorso alla flotta peschereccia',18, 5),
 (247117788, 'Orizzonte Blu','peschereccio_strascico','Peschereccio per la pesca a strascico adriatica',22, 8),
-(247118899, 'Punta Trave','pesca_nasse','Barca specializzata nella pesca con trappole e nasse',8, 8),
-(247119900, 'Mare Nostrum','nave_fattoria','Nave da grande pesca con impianti di surgelazione',21, 9),
-(247120011, 'Costa Conero','palamitaro','Palamitaro d’altura per grandi pelagici',1800, 9),
-(247121122, 'Albatros Due','assistenza_pesca','Unità di assistenza e soccorso alla flotta peschereccia',18, 5),
-(247122233, 'Tritone','ricerca_ittica','Nave per lo studio biologico delle risorse marine',   20, 10);
+(247200102, 'Adriatico Nord', 'peschereccio_strascico', 'Unità a strascico per la pesca di specie bentoniche in alto Adriatico', 28, 7),
+
+-- trasporto_pescato (7 mancanti)
+(247901234, 'Eurocargo Ancona','trasporto_pescato','Nave trasporto per rifornimento mercati ittici',25, 1),
+(215456789, 'Marche Star','trasporto_pescato','Nave da trasporto e logistica del pescato',6, 4),
+(247234567, 'Conero Explorer','trasporto_pescato', 'Trasporto pesce azzurro',10, 3),
+(247200103, 'Logistica Adriatica', 'trasporto_pescato', 'Nave per il trasporto refrigerato del pescato verso i mercati regionali', 12, 1),
+(247200104, 'Pesca Express', 'trasporto_pescato', 'Unità veloce per il trasferimento del pescato fresco dai pescherecci al porto', 8, 6),
+(247200105, 'Cargo Ittico Marche', 'trasporto_pescato', 'Nave cargo dedicata alla distribuzione del pescato su scala regionale', 20, 2),
+(247200106, 'Maris Transporter', 'trasporto_pescato', 'Imbarcazione logistica per il trasporto di prodotti ittici refrigerati', 15, 9),
+(247200107, 'Blu Freight', 'trasporto_pescato', 'Nave cargo per il trasporto di pesce azzurro e prodotti congelati', 10, 4),
+(247200108, 'Porto Logistics', 'trasporto_pescato', 'Unità logistica portuale per la movimentazione del pescato', 25, 8),
+(247200109, 'Adriatic Supply', 'trasporto_pescato', 'Nave di rifornimento e distribuzione del pescato lungo la costa adriatica', 30, 3),
+
+-- ricerca_ittica
+(247116677, 'Sirena Adriatica','ricerca_ittica','Imbarcazione locale per la piccola pesca costiera',14, 4),
+(247122233, 'Tritone','ricerca_ittica','Nave per lo studio biologico delle risorse marine',   20, 10),
+(247118899, 'Punta Trave','ricerca_ittica','Barca specializzata nella pesca con trappole e nasse',8, 8),
+(247345678, 'San Ciriaco','ricerca_ittica','Nave per ricerca ittica',40, 4),
+(247567890, 'Riviera Blu','ricerca_ittica','Nave per ricerca ittica costiera',12, 3),
+(247200110, 'Aquila Marina', 'ricerca_ittica', 'Unità di ricerca per il monitoraggio delle specie pelagiche', 12, 5),
+(247200111, 'Nautilus Lab', 'ricerca_ittica', 'Laboratorio galleggiante per studi oceanografici e ittici', 18, 2),
+(247200112, 'Bio Mare', 'ricerca_ittica', 'Nave per analisi biologiche delle risorse marine costiere', 10, 7),
+(247200113, 'Ecosonda', 'ricerca_ittica', 'Imbarcazione per rilievi sonar e studio degli stock ittici', 22, 6),
+(247200114, 'Ocean Surveyor', 'ricerca_ittica', 'Unità scientifica per la mappatura degli ecosistemi marini', 14, 1),
+
+-- vongolara_turbosoffiante
+(247789012, 'Don Bosco II','vongolara_turbosoffiante','Vongolara per pesca di vongole',10, 5),
+(247890123, 'Bora Bora','vongolara_turbosoffiante','Imbarcazione da pesca con reti da posta',10, 5),
+(247115566, 'Porto Recanati','vongolara_turbosoffiante', 'Turbosoffiante per la pesca di molluschi e vongole',10, 7),
+(247119900, 'Mare Nostrum','vongolara_turbosoffiante','Nave da grande pesca con impianti di surgelazione',21, 9),
+(247200115, 'Vongola Viva', 'vongolara_turbosoffiante', 'Vongolara a turbina per la raccolta sostenibile di vongole e molluschi', 9, 3),
+(247200116, 'Sabbia Blu', 'vongolara_turbosoffiante', 'Imbarcazione per pesca di molluschi con sistema a turbosoffiante', 11, 5),
+(247200117, 'Laguna Adriatica', 'vongolara_turbosoffiante', 'Unità per la pesca di vongole in aree lagunari e costiere', 14, 2),
+(247200118, 'Golfo Nassa', 'vongolara_turbosoffiante', 'Vongolara attrezzata per la raccolta intensiva di molluschi bivalvi', 7, 9),
+(247200119, 'Delta Vongole', 'vongolara_turbosoffiante', 'Imbarcazione per la pesca di vongole nei delta fluviali e zone costiere', 10, 4),
+(247200120, 'Adriatic Clam II', 'vongolara_turbosoffiante', 'Vongolara moderna per la pesca e selezione di molluschi di fondale', 6, 8);
 
 -- ------------------------------------------------------------
 --  violazioni
