@@ -1,4 +1,4 @@
-export const MAX_DECIMALS = 7;
+import { MAX_DECIMALS } from "./GlobalConstants.js";
 
 // Funzione per controllare se i numeri dopo la virgola non superano MAX_DECIMALS
 export const hasMaxDecimals = (value: number) => {

@@ -22,7 +22,7 @@ export class ImbarcazioneService {
   // Usata dall'adminController tramite imbarcazioneController.
   async createImbarcazione(data: ImbarcazioneCreationData) {
     if (!data.mmsi){
-      throw ErrorFactory.getError(AppErrorEnum.MISSING_DATA);
+      throw ErrorFactory.getError(AppErrorEnum.MISSING_MMSI);
     }
     const utenteEsistente = await this.adminDAO.get(data.user_id);
       if (!utenteEsistente) {

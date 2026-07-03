@@ -143,7 +143,7 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 ### Rotta /register
 
 ```mermaid
-%%{init: { 'base': 'default',
+%%{init: { 'theme': 'dark',
  'themeVariables': { 
     'actorBkg': '#d1ecf1', 
     'actorBorder': '#17a2b8',
@@ -205,6 +205,121 @@ sequenceDiagram
     alt catch (err)
         Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
         Ctrl->>Utente: res.send(ErrorFactory.getError o err.send)
+    end
+    deactivate Ctrl
+```
+### Rotta /admin/imbarcazione/create
+
+```mermaid
+%%{init: { 'base': 'default',
+ 'themeVariables': { 
+    'actorBkg': '#f8d7da', 
+    'actorBorder': '#dc3545',
+    'labelBoxBkgColor': '#f5c6cb',
+    'labelBoxBorderColor': '#dc3545',
+    'lineColor': '#dc3545', 
+    'signalColor': '#dc3545',
+    'signalTextColor': '#000000', 
+    'canvasBackground': '#ffffff',
+    'noteBkgColor': '#f8d7da',
+    'noteBorderColor': '#dc3545',
+    'activationBkgColor': '#f5c6cb',
+    'activationBorderColor': '#dc3545',
+    'fontSize': '108px',
+    'actorFontSize': '108px',
+    'noteFontSize': '100px',
+    'messageFontSize': '106px'
+    }}}%%
+sequenceDiagram
+    autonumber
+    actor Admin as Admin (Client/Postman)
+    participant Router as AdminRoutes
+    participant MW as ImbarcazioniMiddleware
+    participant Ctrl as AdminController
+    participant IC as ImbarcazioneController
+    participant Serv as ImbarcazioneService
+    participant ADAO as AdminDAO
+    participant IDAO as ImbarcazioneDAO
+    participant Fact as Success/Error Factory
+
+    Admin->>Router: POST /imbarcazione/create {mmsi, name, type, descr, max_capacity, user_id}
+    Router->>MW: validateImbarcazioneCreationBody(req, res, next)
+    activate MW
+
+    MW->>MW: valida body con imbarcazioneCreationSchema (zod)
+
+    alt Body non valido
+        MW->>Admin: res con errore (campo mancante/invalido)
+    end
+
+    MW-->>Router: next()
+    deactivate MW
+
+    Router->>Ctrl: createImbarcazione(req, res)
+    activate Ctrl
+
+    Note over Ctrl: try block start
+    Ctrl->>Ctrl: estrae {mmsi, name, type, descr, max_capacity, user_id} da req.body
+
+    alt Campo obbligatorio mancante
+        Ctrl->>Fact: getError(INCORRECT_DATA)
+        Ctrl-->>Ctrl: lancia AppError
+    end
+
+    Ctrl->>IC: createImbarcazione(data)
+    activate IC
+
+    IC->>Serv: createImbarcazione(data)
+    activate Serv
+
+    alt mmsi mancante
+        Serv->>Fact: getError(MISSING_DATA)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>ADAO: get(user_id)
+    ADAO-->>Serv: restituisce User o null
+
+    alt Utente non trovato
+        Serv->>Fact: getError(USER_NOT_FOUND)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>IDAO: get(mmsi)
+    IDAO-->>Serv: restituisce Imbarcazione o null
+
+    Serv->>IDAO: getByName(name)
+    IDAO-->>Serv: restituisce Imbarcazione o null
+
+    alt mmsi o name già esistenti
+        Serv->>Fact: getError(IMBARCAZIONE_ALREADY_EXISTS)
+        Serv-->>IC: lancia AppError
+    end
+
+    Note over Serv: apre transazione (t)
+    Serv->>IDAO: create(data, t)
+    IDAO-->>Serv: nuova Imbarcazione
+
+    alt Errore durante la create
+        Serv->>Serv: t.rollback()
+        Serv->>Fact: getError(CREATE_ERROR)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>Serv: t.commit()
+    Serv-->>IC: restituisce result (nuova imbarcazione)
+    deactivate Serv
+
+    IC-->>Ctrl: restituisce nuovaImbarcazione
+    deactivate IC
+
+    Ctrl->>Fact: getSuccess(IMBARCAZIONE_CREATED, nuovaImbarcazione)
+    Fact-->>Ctrl: Oggetto di successo
+    Ctrl->>Admin: res.json(success JSON)
+
+    alt catch (err)
+        Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
+        Ctrl->>Admin: res.send(ErrorFactory.getError o err.send)
     end
     deactivate Ctrl
 ```
