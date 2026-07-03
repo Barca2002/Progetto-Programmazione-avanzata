@@ -147,19 +147,20 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 config:
     theme: dark
     themeVariables:
-        'actorBkg': '#ffffff'
-        'actorTextColor': '#000000'
-        'actorBorder': '#ff0019'
-        'labelBoxBkgColor': '#d61125'
-        'labelBoxBorderColor': '#ffffff'
-        'signalColor': '#ffffff'
-        'signalTextColor': '#ffffff'
-        'noteBkgColor': '#ff4d5c'
-        'noteBorderColor': '#e50000'
-        'noteTextColor': '#ffffff'
-        'activationBkgColor': '#00ffff'
-        'activationBorderColor': '#009494'
-        'fontSize': '30px'
+        actorBkg: '#ffffff'
+        actorTextColor: '#000000'
+        actorFontSize: "25px"
+        actorBorder: '#ff0019'
+        labelBoxBkgColor: '#d61125'
+        labelBoxBorderColor: '#ffffff'
+        signalColor: '#ffffff'
+        signalTextColor: '#ffffff'
+        noteBkgColor: '#ff4d5c'
+        noteBorderColor: '#e50000'
+        noteTextColor: '#ffffff'
+        activationBkgColor: '#00ffff'
+        activationBorderColor: '#009494'
+        fontSize: '30px'
         
 ---
 sequenceDiagram
