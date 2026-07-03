@@ -159,6 +159,7 @@ config:
         'noteTextColor': '#ffffff'
         'activationBkgColor': '#00ffff'
         'activationBorderColor': '#009494'
+        'fontSize': '20px'
         
 ---
 sequenceDiagram
