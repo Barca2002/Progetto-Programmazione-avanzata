@@ -40,7 +40,7 @@ export class AuthController {
             const jwtToken = await this.authService.login(email, password);
             const responseData = {token: jwtToken};
 
-            res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_LOGGED_IN, responseData));
+            SuccessFactory.getSuccess(AppSuccessEnum.USER_LOGGED_IN, responseData).send(res);
         } catch (err) {
             if (err instanceof AppError){
                 err.send(res)
@@ -63,7 +63,7 @@ export class AuthController {
             await this.adminService.createUtente(newUser);
 
             const responseData = {"username": newUser.username, "email": newUser.email};
-            res.send(SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData));
+            SuccessFactory.getSuccess(AppSuccessEnum.USER_REGISTERED, responseData).send(res);
         } catch (err) {
             if (err instanceof AppError){
                 err.send(res)

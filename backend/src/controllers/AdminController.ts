@@ -54,7 +54,7 @@ export class AdminController {
     try {
       const geoarea_id = Number(req.params.geoareaid);
       const imbarcazione_status = await this.imbarcazioneService.getAllImbarcazioniStatus(geoarea_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status));
+      SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -68,7 +68,7 @@ export class AdminController {
     try {
       const data = req.body as ViolazioneCreationData;
       const result = await this.violazioneService.createViolazione(data);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.VIOLAZIONE_CREATED, result));
+      SuccessFactory.getSuccess(AppSuccessEnum.VIOLAZIONE_CREATED, result).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -87,7 +87,7 @@ export class AdminController {
       }
 
       const nuovaImbarcazione = await this.imbarcazioneController.createImbarcazione({ mmsi, name, type, descr, max_capacity, user_id });
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione));
+      SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -100,7 +100,7 @@ export class AdminController {
   public async getAllImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
       const imbarcazioni_segnalazioni = await this.imbarcazioneController.getAllImbarcazioniWithSegnalazioni();
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni));
+      SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -118,7 +118,7 @@ export class AdminController {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
       await this.imbarcazioneController.linkGeoareasToImbarcazioni(links);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links));
+      SuccessFactory.getSuccess(AppSuccessEnum.GEOAREAS_LINKED, links).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -137,7 +137,7 @@ export class AdminController {
       }
       const unlink: UnlinkDataBody = {mmsi: mmsi, geoarea_id: geoarea_id}
       await this.imbarcazioneController.unlinkGeoareaToImbarcazioni(unlink);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi: mmsi, geoarea_id: geoarea_id }));
+      SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi: mmsi, geoarea_id: geoarea_id }).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -159,7 +159,7 @@ export class AdminController {
 
       const posizioni = await this.imbarcazioneController.getPointsAsGeoJson(data);
 
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni));
+      SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -196,7 +196,7 @@ export class AdminController {
       };
 
       const nuovaArea = await this.geofenceareaController.createArea(geoJsonArea);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea));
+      SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -210,7 +210,7 @@ export class AdminController {
   public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
     try {
       const imbarcazioni = await this.imbarcazioneController.getAllImbarcazioniWithGeofenceareas();
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
+      SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

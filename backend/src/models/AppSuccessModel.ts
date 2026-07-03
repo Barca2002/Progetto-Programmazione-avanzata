@@ -16,11 +16,16 @@ export class AppSuccess {
         public readonly message: string,
         public readonly data: SuccessDataStructure | null
     ) {
-        
+
     }
 
     // Setta lo status code della success e restituisce la risposta in JSON con il nome e messaggio.
     send(res: Response) {
-        res.status(this.statusCode).json({"statusCode": this.statusCode,"statusName": this.statusName, "message": this.message});
+        res.status(this.statusCode).json({
+            statusCode: this.statusCode,
+            statusName: this.statusName,
+            message: this.message,
+            data: this.data
+        });
     }
 }

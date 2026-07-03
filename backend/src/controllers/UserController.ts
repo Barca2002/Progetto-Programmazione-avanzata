@@ -32,7 +32,7 @@ export class UserController {
       // Controllo se generare una violazione ed eventualmente una segnalazione
       await this.violazioneService.checkIfViolazione(data);
       await this.segnalazioneService.checkIfSegnalazione(data);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, data));
+      SuccessFactory.getSuccess(AppSuccessEnum.SEND_STATUS_OK, data).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -54,7 +54,7 @@ export class UserController {
       const geoarea_id = Number(req.params.geoarea_id);
       //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_status));
+      SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_status).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -74,7 +74,7 @@ export class UserController {
         imbarcazione: (({ user_id, ...rest }) => rest)(item.imbarcazione.toJSON()),
         segnalazioni: item.segnalazioni.map(s => {const { id, geoarea_id, ...rest } = s.toJSON(); return rest})
       }));
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, myImbarcazioniSegnalazioniFiltered));
+      SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, myImbarcazioniSegnalazioniFiltered).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -89,7 +89,7 @@ export class UserController {
     const token = checkToken(req);
     const user_id = token.user_id;
     const user = await this.adminService.getUtenteById(user_id);
-    res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, { tokens: user.tokens }));
+    SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, { tokens: user.tokens }).send(res);
   }
 
   // Funzione usata dalla rotta utente per ritornare se tutte le imbarcazioni dell'utente loggato sono nella geoarea inserita nella richiesta.
@@ -105,7 +105,7 @@ export class UserController {
           ({ geoarea_id, ultima_violazione_valida_id, ...rest }) => rest
         )
       }));
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioniFiltered));
+      SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioniFiltered).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
