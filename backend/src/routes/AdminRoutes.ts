@@ -84,7 +84,7 @@ adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, 
 });
 
 // GET tutte le imbarcazioni con le geofence associate
-adminRouter.get("/imbarcazioni/geoaree/all", checkAdminRole, async function(req: Request, res: Response) {
+adminRouter.get("/imbarcazioni/geoaree/all", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniWithGeofenceareas(req, res);
 });
 

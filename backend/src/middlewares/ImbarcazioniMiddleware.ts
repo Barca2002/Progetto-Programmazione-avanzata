@@ -65,7 +65,7 @@ export function validateImbarcazioneCreationBody(req: Request, _res: Response, n
 
 // Usata da altre funzioni
 export async function checkMmsi(req: Request, _res: Response, next: NextFunction) {
-    const mmsi = req.params.mmsi ? req.params.mmsi : String(req.body.mmsi);
+    const mmsi = req.body.mmsi;
     if (!mmsi) {
         throw ErrorFactory.getError(AppErrorEnum.MISSING_MMSI);
     }
