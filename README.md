@@ -137,3 +137,74 @@ Il campo `spostamento` può assumere i seguenti valori:
 - `USCITA`
 
 Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle imbarcazioni all'interno delle geofence aree e per determinare il tempo trascorso al loro interno.
+
+## Rotte e diagrammi di sequenza
+
+### Rotta /register
+
+```mermaid
+%%{init: { 'base': 'default',
+ 'themeVariables': { 
+    'actorBkg': '#d1ecf1', 
+    'actorBorder': '#17a2b8',
+    'labelBoxBkgColor': '#fff3cd',
+    'lineColor': '#6c757d', 
+    'signalTextColor': '#ffffff', 
+    'canvasBackground': '#ffffff' 
+    }}}%%
+sequenceDiagram
+    autonumber
+    actor Utente as Client (Browser/Postman)
+    participant Router as Express Router (Auth)
+    participant Ctrl as AuthController
+    participant Serv as AuthService
+    participant DAO as AdminDAO
+    participant AdminServ as AdminService
+    participant Fact as Success/Error Factory
+
+    Utente->>Router: POST /register {username, email, password}
+    Router->>Ctrl: register(req, res)
+    activate Ctrl
+
+    Note over Ctrl: try block start
+    Ctrl->>Serv: register(email, username, password)
+    activate Serv
+
+    Serv->>DAO: getByEmail(email)
+    DAO-->>Serv: restituisce User o null
+    
+    alt L'email esiste già
+        Serv->>Fact: getError(EMAIL_ALREADY_EXISTS)
+        Serv-->>Ctrl: lancia AppError
+    end
+
+    Serv->>DAO: getByUsername(username)
+    DAO-->>Serv: restituisce User o null
+
+    alt L'username esiste già
+        Serv->>Fact: getError(USERNAME_ALREADY_EXISTS)
+        Serv-->>Ctrl: lancia AppError
+    end
+
+    Serv->>Serv: hashPassword(password)
+    Note over Serv: bcrypt.hash con 12 salt rounds
+    
+    Serv-->>Ctrl: restituisce userInfo (UserCreationData)
+    deactivate Serv
+
+    Ctrl->>AdminServ: createUtente(newUser)
+    activate AdminServ
+    Note over AdminServ: Salva l'utente nel DB tramite DAO
+    AdminServ-->>Ctrl: Utente creato con successo
+    deactivate AdminServ
+
+    Ctrl->>Fact: getSuccess(USER_REGISTERED, responseData)
+    Fact-->>Ctrl: Oggetto di successo
+    Ctrl->>Utente: res.send(success JSON)
+
+    alt catch (err)
+        Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
+        Ctrl->>Utente: res.send(ErrorFactory.getError o err.send)
+    end
+    deactivate Ctrl
+```
