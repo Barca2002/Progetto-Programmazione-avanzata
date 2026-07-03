@@ -145,19 +145,21 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 ```mermaid
 ---
 config:
-    theme: neutral
+    theme: dark
     themeVariables:
         'actorBkg': '#ffffff'
+        'actorTextColor': '#000000'
         'actorBorder': '#ff0019'
         'labelBoxBkgColor': '#d61125'
-        'labelBoxBorderColor': '#020000'
-        'signalColor': '#000000'
-        'signalTextColor': '#000000'
+        'labelBoxBorderColor': '#ffffff'
+        'signalColor': '#ffffff'
+        'signalTextColor': '#ffffff'
         'noteBkgColor': '#ff4d5c'
-        'noteBorderColor': '#000000'
+        'noteBorderColor': '#e50000'
+        'noteTextColor': '#ffffff'
         'activationBkgColor': '#00ffff'
         'activationBorderColor': '#009494'
-        'fontSize': '20px'
+        
 ---
 sequenceDiagram
     autonumber
