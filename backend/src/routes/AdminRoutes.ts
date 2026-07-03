@@ -12,68 +12,51 @@ const adminController = new AdminController();
 // Applichiamo i middleware definiti qui in tutte le rotte.
 adminRouter.use(checkAdminRole);
 
-// Questa rotta permette di aggiungere dei token al saldo di un utente tramite la sua email.
-// Il format della richiesta deve essere:
-//  {
-//      "newTokenAmount": <valore>,
-//      "email": "<email>"
-//  }
+/**
+ * Rotta per l'aggiornamento dei token di un utente attraverso l'inserimento dell'email e di quanto si vuole ricaricare
+ */
 adminRouter.patch("/update/tokenbalance", validateTokenAmount, async function(req: Request, res: Response){
     await adminController.updateTokenBalance(req, res);
 });
 
+/**
+ * Rotta per ritornare il credito residuo di un utente tramite l'inserimento nella rotta del suo id
+ */
 adminRouter.get("/get/tokenbalance/:id", async function(req: Request, res: Response){
     await adminController.getTokenBalance(req, res);
 });
 
-// --------- ROTTE IMBARCAZIONI ----------------
-// CREATE imbarcazione (solo admin)
-// Il format della richiesta deve essere:
-//  {
-//   "mmsi": <numero>,
-//   "name": <stringa>,
-//   "type": <stringa>,
-//   "descr": <stringa>,
-//   "max_capacity": <numero>,
-//   "user_id": <numero>
-// }
+/** 
+ * Rotta per la creazione di un'imbarcazione passando nel body della richiesta tutti i parametri necessari: mmsi, name, type, descr, max_capacity e lo user_id dell'utente proprietario di questa imbarcazione
+*/
 adminRouter.post("/imbarcazione/create", validateImbarcazioneCreationBody, async function(req: Request, res: Response) {
     await adminController.createImbarcazione(req, res);
 });
 
-// Associa più geoareae a più imbarcazioni (solo admin). Si possono passare più dati e un mmsi può ricevere più geoaree.
-// Il format della richiesta deve essere:
-// [
-//   {
-//     "mmsi": <numero>,
-//     "geoarea_ids": [<numero>, ...]
-//   },
-//   {
-//     "mmsi": <numero>,
-//     "geoarea_ids": [<numero>, ...]
-//   },
-//   ....
-// ]
+/*
+* Rotta per associare un imbarcazione a una o più geoaree, tramite l'inserimento nel body della richiesta dell'mmsi dell'imbarcazione e degli id delle geofence aree a cui si vuole associare l'imbarcazione. È possibile associare più imbarcazioni contemporaneamente nella stessa richiesta
+*/
 adminRouter.post("/imbarcazioni/geoaree/link", checkLinkBody, async function(req: Request, res: Response) {
     await adminController.linkGeoareasToImbarcazioni(req, res);
 });
 
-// Disassocia una geoarea ad un'imbarcazione (solo admin). Usiamo una POST, perché passiamo un body con i dati della richiesta, invece nella DELETE, come nella GET, si dovrebbe passare i dati tramite i query params.
-// Il format della richiesta deve essere:
-// {
-//     "mmsi": <numero>,
-//     "geoarea_id": <numero>
-// }
+/**
+ * Rotta per disassociare un imbarcazione da una geofence area associata tramite l'inserimento dell'mmsi e dell'id della geofence area da disassociare 
+ */
 adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function(req: Request, res: Response) {
     await adminController.unlinkGeoareaFromImbarcazione(req, res);
 });
 
-// GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
+/**
+ * Rotta per la ricerca delle posizioni di un'imbarcazione in un intervallo di date, restituite in formato GeoJSON. Riceve nel body della richiesta l'mmsi dell'imbarcazione e le date di inizio (start_date, obbligatoria) e fine (end_date, opzionale) dell'intervallo; se end_date non è specificata, viene utilizzata la data corrente.
+ */
 adminRouter.post("/imbarcazioni/get/positions", validateDateFormat, async function(req: Request, res: Response) {
     await adminController.getPositionsInDateRange(req, res);
 });
 
-// GET status imbarcazioni, cioè se per ogni imbarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
+/**
+ * Rotta per tornare lo stato di tutte le imbarcazioni DA FINIRE
+ */
 adminRouter.get("/imbarcazioni/status/geoareaid/:geoareaid", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniStatusByGeoarea(req, res);
 });
