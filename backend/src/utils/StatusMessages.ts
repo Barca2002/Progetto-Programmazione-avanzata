@@ -1,6 +1,7 @@
-import { MAX_POINTS, MAX_SPEED_ALLOWED, MAX_NAME_LENGTH, MIN_NAME_LENGTH } from "../middlewares/GeofenceareaMiddleware.js";
-import { MAX_DECIMALS } from "./DecimalChecker.js";
+
+
 import { MAX_EMAIL_LENGTH } from "../middlewares/AuthMiddleware.js";
+import { MAX_DECIMALS, MAX_NAME_LENGTH, MAX_POINTS, MAX_SPEED_ALLOWED, MIN_NAME_LENGTH } from "./GlobalConstants.js";
 // Enumerativi degli errori e dei messaggi di successo dell'applicazione. Questi enum forniscono una struttura centralizzata per gestire i messaggi di errore e successo.
 export const ERROR_LIST = {
     DB_CONNECTION_ERROR:

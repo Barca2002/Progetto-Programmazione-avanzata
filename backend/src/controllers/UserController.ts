@@ -11,6 +11,7 @@ import { AdminService} from "../services/AdminService.js";
 import { checkToken } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneController } from "./ImbarcazioneController.js";
 import { DatiinviatiCreationData } from "../models/DatiInviatiModel.js";
+import { REQ_COST } from "../utils/GlobalConstants.js";
 
 export class UserController {
   private readonly datiinviatiService = new DatiInviatiService();
@@ -19,8 +20,6 @@ export class UserController {
   private readonly segnalazioneService = new SegnalazioneService();
   private readonly adminService = new AdminService();
   private readonly imbarcazioneController = new ImbarcazioneController();
-
-  private readonly REQ_COST = 0.025;
 
   public async sendData(req: Request, res: Response) {
     try {
@@ -45,7 +44,7 @@ export class UserController {
 
   public async spendToken(user_id: number) {
     const user = await this.adminService.getUtenteById(user_id);
-    await this.adminService.updateTokenBalance(user.email, user.tokens - this.REQ_COST);
+    await this.adminService.updateTokenBalance(user.email, user.tokens - REQ_COST);
     return true;
   }
   
