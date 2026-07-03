@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import { AdminController } from "../controllers/AdminController.js";
 import { checkAdminRole } from "../middlewares/JWTMiddleware.js";
 import { validateTokenAmount } from "../middlewares/TokenMiddleware.js";
-import { checkMmsi, validateImbarcazioneCreationBody } from "../middlewares/ImbarcazioniMiddleware.js";
+import { checkLinkBody, checkMmsi, checkUnlinkBody, validateImbarcazioneCreationBody } from "../middlewares/ImbarcazioniMiddleware.js";
 import { checkCreation } from "../middlewares/GeofenceareaMiddleware.js";
 import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 
@@ -54,7 +54,7 @@ adminRouter.post("/imbarcazione/create", validateImbarcazioneCreationBody, async
 //   },
 //   ....
 // ]
-adminRouter.post("/imbarcazioni/geoaree/link",  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/geoaree/link", checkLinkBody, async function(req: Request, res: Response) {
     await adminController.linkGeoareasToImbarcazioni(req, res);
 });
 
@@ -64,7 +64,7 @@ adminRouter.post("/imbarcazioni/geoaree/link",  async function(req: Request, res
 //     "mmsi": <numero>,
 //     "geoarea_id": <numero>
 // }
-adminRouter.post("/imbarcazione/geoarea/unlink",  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function(req: Request, res: Response) {
     await adminController.unlinkGeoareasToImbarcazioni(req, res);
 });
 

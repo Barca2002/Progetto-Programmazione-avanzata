@@ -21,6 +21,35 @@ const imbarcazioneCreationSchema = z.object({
     user_id: userIdSchema
 }).strict();
 
+const linkImbarcazioneGeoareaSchema = z.array(
+    z.object({
+        mmsi: mmsiSchema,
+        geoarea_ids: z.array(z.number().int().positive()),
+    }).strict()
+).min(1);
+
+const unlinkImbarcazioneGeoareaSchema = z.object({
+    mmsi: mmsiSchema,
+    geoarea_id: z.number().int().positive()
+}).strict();
+
+
+export async function checkLinkBody(req: Request, _res: Response, next: NextFunction) {
+    const result = linkImbarcazioneGeoareaSchema.safeParse(req.body);
+    if (!result.success) {
+        throw ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS);
+    }
+    next();
+}
+
+export async function checkUnlinkBody(req: Request, _res: Response, next: NextFunction) {
+    const result = unlinkImbarcazioneGeoareaSchema.safeParse(req.body);
+    if (!result.success) {
+        throw ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS);
+    }
+    next();
+}
+
 function mapErroriCreazioneImbarcazione(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
 
