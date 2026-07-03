@@ -77,7 +77,7 @@ export function validateBody(body: any, schema: z.ZodSchema, errorMapper: ErrorM
     const campo = issue.path[0] as string | undefined;
     // Controllo dei campi extra. Se il path è vuoto, allora vuol dire che è un campo extra.
     if (!campo) {
-        next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
+        next(ErrorFactory.getError(AppErrorEnum.INVALID_PARAMS));
         return;
     }
     // Chiama/inietta la mappa di errori per prendere l'errore giusto.
