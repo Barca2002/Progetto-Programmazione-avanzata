@@ -231,24 +231,23 @@ sequenceDiagram
 ### Rotta /admin/imbarcazione/create
 
 ```mermaid
-%%{init: { 'base': 'default',
+%%{init: { 
+ 'theme': 'base',
  'themeVariables': { 
-    'actorBkg': '#f8d7da', 
-    'actorBorder': '#dc3545',
-    'labelBoxBkgColor': '#f5c6cb',
-    'labelBoxBorderColor': '#dc3545',
+    'primaryColor': '#f8d7da',
+    'primaryBorderColor': '#dc3545',
+    'primaryTextColor': '#000000',
     'lineColor': '#dc3545', 
     'signalColor': '#dc3545',
     'signalTextColor': '#000000', 
-    'canvasBackground': '#ffffff',
     'noteBkgColor': '#f8d7da',
     'noteBorderColor': '#dc3545',
+    'noteTextColor': '#000000',
     'activationBkgColor': '#f5c6cb',
     'activationBorderColor': '#dc3545',
-    'fontSize': '108px',
-    'actorFontSize': '108px',
-    'noteFontSize': '100px',
-    'messageFontSize': '106px'
+    'sequenceNumberColor': '#000000',
+    'actorTextColor': '#000000',
+    'fontSize': '18px'
     }}}%%
 sequenceDiagram
     autonumber
