@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "34c84595-b17a-4231-8239-02941f9f9aaa",
+    "_postman_id": "3dab9565-de7d-48ac-90f5-d2ac6e87a37e",
     "name": "Collection_ProgettoPA",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "53270562",
-    "_collection_link": "https://go.postman.co/collection/53270562-34c84595-b17a-4231-8239-02941f9f9aaa?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/53270562-3dab9565-de7d-48ac-90f5-d2ac6e87a37e?source=collection_link"
   },
   "item": [
     {
@@ -202,7 +202,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"tr\",\r\n    \"email\": \"test@mail.com\",\r\n    \"password\": \"testpass1\"\r\n}",
+              "raw": "{\r\n    \"username\": \"test34user\",\r\n    \"email\": \"test@mail.com\",\r\n    \"password\": \"testpass1\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -250,46 +250,6 @@
                 "body": {
                   "mode": "raw",
                   "raw": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"properties\": {\r\n        \"name\": \"123ttr54\",\r\n        \"max_speed\": 3\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [\r\n          [\r\n            [\r\n              4.62,\r\n              31.38\r\n            ],\r\n            [\r\n              4.59313,\r\n              31.2227126\r\n            ],\r\n            [\r\n              4.8869829,\r\n              31.160583\r\n            ],\r\n            [\r\n              4.9487588,\r\n              31.3233181\r\n            ],\r\n            [\r\n              4.62,\r\n              31.38\r\n            ]\r\n          ]\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/geoarea/create",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}}",
-                  "path": [
-                    "admin",
-                    "geoarea",
-                    "create"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "CreateArea(poligono sovrapposto)",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"properties\": {\r\n        \"name\": \"test area\",\r\n        \"max_speed\": 50\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [\r\n          [\r\n            [\r\n              4.7019707,\r\n              31.4613478\r\n            ],\r\n            [\r\n              4.4686918,\r\n              31.1959124\r\n            ],\r\n            [\r\n              4.9592251,\r\n              31.1473308\r\n            ],\r\n            [\r\n              4.4473351,\r\n              31.4614216\r\n            ],\r\n            [\r\n              4.7019707,\r\n              31.4613478\r\n            ]\r\n          ]\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -411,7 +371,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"mmsi\": 247556697,\r\n  \"name\": \"Nuovo Pegaso\",\r\n  \"type\": \"palamitaro\",\r\n  \"descr\": \"Nuova unità palamitara per la pesca del tonno\",\r\n  \"max_capacity\": 8,\r\n  \"user_id\": 4\r\n}",
+                  "raw": "{\r\n  \"mmsi\": 247356697,\r\n  \"name\": \"Nuo3vo Pegaso\",\r\n  \"type\": \"palamitaro\",\r\n  \"descr\": \"Nuova unità palamitara per la pesca del tonno\",\r\n  \"max_capacity\": 8,\r\n  \"user_id\": 4\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -436,9 +396,6 @@
             },
             {
               "name": "getAllImbarcazioniWithGeofenceareas",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -450,7 +407,7 @@
                     }
                   ]
                 },
-                "method": "GET",
+                "method": "POST",
                 "header": [],
                 "body": {
                   "mode": "raw",
@@ -462,7 +419,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/geoaree/all",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/geoaree/get/all",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -472,6 +429,7 @@
                     "admin",
                     "imbarcazioni",
                     "geoaree",
+                    "get",
                     "all"
                   ]
                 }
@@ -480,9 +438,6 @@
             },
             {
               "name": "getAllImbarcazioniWithSegnalazioni",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -494,7 +449,7 @@
                     }
                   ]
                 },
-                "method": "GET",
+                "method": "POST",
                 "header": [],
                 "body": {
                   "mode": "raw",
@@ -506,7 +461,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/segnalazioni/all",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/segnalazioni/get/all",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -516,6 +471,7 @@
                     "admin",
                     "imbarcazioni",
                     "segnalazioni",
+                    "get",
                     "all"
                   ]
                 }
@@ -568,7 +524,7 @@
               "response": []
             },
             {
-              "name": "getPointsAsGeoJson",
+              "name": "getPositionsInDateRange",
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -592,7 +548,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/positions",
+                  "raw": "http://{{HOST}}:{{PORT}}/admin/imbarcazioni/get/positions",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -601,6 +557,7 @@
                   "path": [
                     "admin",
                     "imbarcazioni",
+                    "get",
                     "positions"
                   ]
                 }
@@ -670,7 +627,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"mmsi\": 215456789,\r\n    \"geoarea_id\": 1\r\n}",
+                  "raw": "{\r\n    \"mmsi\": 215456789,\r\n    \"geoarea_id\": 1,\r\n    \"test\": 123\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -695,84 +652,6 @@
               "response": []
             }
           ]
-        },
-        {
-          "name": "Testing",
-          "item": [
-            {
-              "name": "editUtenteById",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "PATCH",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"username\": \"abcd\",\r\n    \"email\": \"tess2t122@mail.com\",\r\n    \"boh\": 123\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/utente/update/4",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}}",
-                  "path": [
-                    "admin",
-                    "utente",
-                    "update",
-                    "4"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "getUtenteById",
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{JWT_TOKEN_ADMIN}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://{{HOST}}:{{PORT}}/admin/get/utente/3",
-                  "protocol": "http",
-                  "host": [
-                    "{{HOST}}"
-                  ],
-                  "port": "{{PORT}}",
-                  "path": [
-                    "admin",
-                    "get",
-                    "utente",
-                    "3"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
         }
       ]
     },
@@ -784,9 +663,6 @@
           "item": [
             {
               "name": "getMyImbarcazioniWithGeofenceareas",
-              "protocolProfileBehavior": {
-                "disableBodyPruning": true
-              },
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -798,17 +674,8 @@
                     }
                   ]
                 },
-                "method": "GET",
+                "method": "POST",
                 "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/geoaree/get/my",
                   "protocol": "http",
@@ -855,7 +722,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/get/status/geoareaid/1",
+                  "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/get/my/status/geoareaid/1",
                   "protocol": "http",
                   "host": [
                     "{{HOST}}"
@@ -865,6 +732,7 @@
                     "user",
                     "imbarcazioni",
                     "get",
+                    "my",
                     "status",
                     "geoareaid",
                     "1"
@@ -886,7 +754,7 @@
                     }
                   ]
                 },
-                "method": "GET",
+                "method": "POST",
                 "header": [],
                 "url": {
                   "raw": "http://{{HOST}}:{{PORT}} /user/imbarcazioni/segnalazioni/get/my",
@@ -925,7 +793,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{   \r\n    \"mmsi\": 247123456,\r\n    \"longitudine\": 13.5114,\r\n    \"latitudine\": 43.6850,\r\n    \"velocita_kmh\": 100,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}",
+              "raw": "{   \r\n    \"mmsi\": 247567890,\r\n    \"longitudine\": 13.5114,\r\n    \"latitudine\": 43.6850,\r\n    \"velocita_kmh\": 100,\r\n    \"stato\": \"IN NAVIGAZIONE\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"

@@ -7,7 +7,7 @@ import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SegnalazioneService } from "../services/SegnalazioneService.js";
-import { AdminService} from "../services/AdminService.js";
+import { AdminService } from "../services/AdminService.js";
 import { checkToken } from "../middlewares/JWTMiddleware.js";
 import { ImbarcazioneController } from "./ImbarcazioneController.js";
 import { DatiinviatiCreationData } from "../models/DatiInviatiModel.js";
@@ -47,7 +47,7 @@ export class UserController {
     await this.adminService.updateTokenBalance(user.email, user.tokens - REQ_COST);
     return true;
   }
-  
+
   public async getMyImbarcazioniStatus(req: Request, res: Response) {
     try {
       const user_id = checkToken(req).user_id;
@@ -69,7 +69,12 @@ export class UserController {
     try {
       const user_id = checkToken(req).user_id;
       const my_imbarcazioni_segnalazioni = await this.imbarcazioneController.getUserImbarcazioniWithSegnalazioni(user_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_segnalazioni));
+      const myImbarcazioniSegnalazioniFiltered = my_imbarcazioni_segnalazioni.map(item => ({
+        ...item,
+        imbarcazione: (({ user_id, ...rest }) => rest)(item.imbarcazione.toJSON()),
+        segnalazioni: item.segnalazioni.map(s => {const { id, geoarea_id, ...rest } = s.toJSON(); return rest})
+      }));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, myImbarcazioniSegnalazioniFiltered));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -79,20 +84,28 @@ export class UserController {
     }
   }
 
-   // Funzione usata dalla rotta utente per ritornare il saldo dei token dell'utente loggato.
+  // Funzione usata dalla rotta utente per ritornare il saldo dei token dell'utente loggato.
   public async getMyTokenBalance(req: Request, res: Response) {
-      const token = checkToken(req);
-      const user_id = token.user_id;
-      const user = await this.adminService.getUtenteById(user_id);
-      res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, {tokens: user.tokens}));
+    const token = checkToken(req);
+    const user_id = token.user_id;
+    const user = await this.adminService.getUtenteById(user_id);
+    res.json(SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, { tokens: user.tokens }));
   }
 
   // Funzione usata dalla rotta utente per ritornare se tutte le imbarcazioni dell'utente loggato sono nella geoarea inserita nella richiesta.
-  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response){
-    try{
-    const user_id = checkToken(req).user_id;
-    const imbarcazioni = await this.imbarcazioneController.getUserImbarcazioniWithGeofenceareas(user_id);
-    res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioni));
+  public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response) {
+    try {
+      const user_id = checkToken(req).user_id;
+      const imbarcazioni = await this.imbarcazioneController.getUserImbarcazioniWithGeofenceareas(user_id);
+      // Togliamo il campo ultima_violazione_valida_id, user_id e geoarea_id
+      const imbarcazioniFiltered = imbarcazioni.map(item => ({
+        ...item,
+        imbarcazione: (({ user_id, ...rest }) => rest)(item.imbarcazione),
+        geofenceareas: item.geofenceareas.map(
+          ({ geoarea_id, ultima_violazione_valida_id, ...rest }) => rest
+        )
+      }));
+      res.json(SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONI_GEOFENCES_FOUND, imbarcazioniFiltered));
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

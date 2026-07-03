@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { isMissingIssue, validateBody } from "../utils/HelperFunctions.js";
 
 // Per controllare che l'mmsi sia un numero a 9 cifre, imponiamo che deve essere in questo intervallo.
-const mmsiSchema = z.number().min(100000000).max(999999999);
+export const mmsiSchema = z.number().min(100000000).max(999999999);
 const nameSchema = z.string().max(100);
 const typeSchema = z.string().max(50);
 const descrSchema = z.string().max(500);

@@ -2,12 +2,13 @@ import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 import { AppErrorEnum, AppErrorName } from '../utils/StatusMessages.js';
 import { isMissingIssue, validateBody } from '../utils/HelperFunctions.js';
-
+import { mmsiSchema } from './ImbarcazioniMiddleware.js';
 const dateFormatRegex = /^\d{2}[-/]\d{2}[-/]\d{4}$/;
 
-const dateSchema = z.object({
-  start_date: z.string().regex(dateFormatRegex),
-  end_date: z.string().regex(dateFormatRegex).optional()
+const getPositionsSchema = z.object({
+    mmsi: mmsiSchema,
+    start_date: z.string().regex(dateFormatRegex),
+    end_date: z.string().regex(dateFormatRegex).optional()
 }).strict();
 
 function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
@@ -25,7 +26,7 @@ function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     };
 
     const entry = map[campo];
-    if (!entry){
+    if (!entry) {
         return AppErrorEnum.INCORRECT_DATA;
     }
 
@@ -33,5 +34,5 @@ function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
 }
 
 export function validateDateFormat(req: Request, _res: Response, next: NextFunction) {
-    validateBody(req.body, dateSchema, mapErroriDate, next)
+    validateBody(req.body, getPositionsSchema, mapErroriDate, next)
 }

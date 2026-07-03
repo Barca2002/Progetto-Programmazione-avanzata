@@ -69,22 +69,22 @@ adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function
 });
 
 // GET tutti i punti delle imbarcazioni in base ad un intervallo temporale.
-adminRouter.post("/imbarcazioni/positions", checkMmsi, validateDateFormat, async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/get/positions", checkMmsi, validateDateFormat, async function(req: Request, res: Response) {
     await adminController.getPointsAsGeoJson(req, res);
 });
 
 // GET status imbarcazioni, cioè se per ogni imbarcazione, essa è dentro o fuori dalla geoarea specificata e con tempo di permanenza (se dentro).
-adminRouter.get("/imbarcazioni/status/geoareaid/:geoareaid",  async function(req: Request, res: Response) {
+adminRouter.get("/imbarcazioni/status/geoareaid/:geoareaid", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniStatusPerGeoarea(req, res);
 });
 
 
-adminRouter.get("/imbarcazioni/segnalazioni/all",  async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/segnalazioni/get/all", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniWithSegnalazioni(req, res);
 });
 
 // GET tutte le imbarcazioni con le geofence associate
-adminRouter.get("/imbarcazioni/geoaree/all", async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/geoaree/get/all", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniWithGeofenceareas(req, res);
 });
 

@@ -29,7 +29,8 @@ export const datiInviatiSchema = z.object({
 
 function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
-
+    console.log(issue)
+    
     const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
         mmsi: {
             missing: AppErrorEnum.MISSING_MMSI,
@@ -37,11 +38,13 @@ function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: a
         },
         longitudine: {
             missing: AppErrorEnum.MISSING_LONGITUDINE,
-            invalid: AppErrorEnum.INVALID_LONGITUDINE,
+            invalid: issue.code === "custom" ? 
+            AppErrorEnum.INVALID_LONGITUDINE_DECIMALS : AppErrorEnum.INVALID_LONGITUDINE,
         },
         latitudine: {
             missing: AppErrorEnum.MISSING_LATITUDINE,
-            invalid: AppErrorEnum.INVALID_LATITUDINE,
+            invalid: issue.code === "custom" ? 
+            AppErrorEnum.INVALID_LATITUDINE_DECIMALS : AppErrorEnum.INVALID_LATITUDINE,
         },
         velocita_kmh: {
             missing: AppErrorEnum.MISSING_VELOCITA_KMH,

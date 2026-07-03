@@ -14,17 +14,17 @@ userRouter.post("/imbarcazione/send/status", checkTokenBalance, checkDatiInviati
 });
 
 // ------------- ROTTE IMBARCAZIONI ----------------
-userRouter.get("/imbarcazioni/get/status/geoareaid/:geoarea_id", checkTokenBalance, checkUserRole, async function(req: Request, res: Response) {
+userRouter.get("/imbarcazioni/get/my/status/geoareaid/:geoarea_id", checkTokenBalance, checkUserRole, async function(req: Request, res: Response) {
     await userController.getMyImbarcazioniStatus(req, res);
 });
 
 // GET imbarcazioni dell'utente loggato con geofence associate
-userRouter.get("/imbarcazioni/geoaree/get/my",  async function(req: Request, res: Response) {
+userRouter.post("/imbarcazioni/geoaree/get/my",  async function(req: Request, res: Response) {
     await userController.getMyImbarcazioniWithGeofenceareas(req, res);
 });
 
 // GET tutte le proprie imbarcazioni le relative segnalazioni associate
-userRouter.get("/imbarcazioni/segnalazioni/get/my", async function(req: Request, res: Response) {
+userRouter.post("/imbarcazioni/segnalazioni/get/my", async function(req: Request, res: Response) {
     await userController.getMyImbarcazioniWithSegnalazioni(req, res);
 });
 

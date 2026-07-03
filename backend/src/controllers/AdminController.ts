@@ -52,8 +52,8 @@ export class AdminController {
 
   public async getAllImbarcazioniStatusPerGeoarea(req: Request, res: Response) {
     try {
-      const geoarea_id = Number(req.params.geoarea_id);
-      const imbarcazione_status = await this.imbarcazioneService.getAllImbarcazioniStatus(geoarea_id)
+      const geoarea_id = Number(req.params.geoareaid);
+      const imbarcazione_status = await this.imbarcazioneService.getAllImbarcazioniStatus(geoarea_id);
       res.json(SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status));
     } catch (err) {
       if (err instanceof AppError) {
