@@ -16,7 +16,6 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   }
 
   async findByName(name: string): Promise<Geofencearea | null> {
-    // Stessa logica di findByEmail/findByUsername: serve poter restituire null senza lanciare errore
     return await Geofencearea.findOne({ where: { name } });
   }
 
