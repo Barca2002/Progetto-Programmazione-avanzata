@@ -12,20 +12,14 @@ export const authRouter = Router();
 const authController = new AuthController();
 
 /**
- * Rotta per il login.
- * 1. Valida i dati del body della richiesta tramite la funzione validateLoginBody di AuthMiddleware.ts.
- * 2. Controlla l'esistenza e la validità delle credenziali
- * 3. Genera il token JWT per autenticare le richieste successive (vale per 1 ora il token JWT)
+ * Rotta per il login. Valida i dati del body della richiesta tramite un middleware e successivamente controlla l'esistenza e la validità delle credenziali. Infine genera il token JWT per autenticare le richieste successive.
  */
 authRouter.post('/login', validateLoginBody, async function (req: Request, res: Response) {
     await authController.login(req, res);
 });
 
 /**
-* Rotta di registrazione.
- * 1. Valida i dati del body della richiesta tramite la funzione validateRegisterBody di AuthMiddleware.ts.
- * 2. Salva nel database le nuove credenziali.
- * Il login non è automatico, bisogna chiamare la rotta di login per ottenere il token JWT.
+* Rotta di registrazione. Valida i dati del body della richiesta tramite un middleware e poi salva nel database le nuove credenziali, se non sono già presenti. Dopo la registrazione il login non è automatico, bisogna chiamare la rotta di login per ottenere il token JWT per autenticarsi.
  */
 authRouter.post('/register', validateRegisterBody, async function(req: Request, res: Response) {
     await authController.register(req, res);
