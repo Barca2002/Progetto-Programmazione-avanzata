@@ -147,3 +147,249 @@ Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle im
 ### Rotta /admin/imbarcazione/create
 
 <img src="./immagini/mermaid-diagram-2.png">
+
+
+## SENDSTATUS CODICE
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    box white
+    participant Client
+    participant Router as UserRoutes
+    participant MWRole as checkUserRole
+    participant MW1 as checkTokenBalance
+    participant MW2 as checkDatiInviati
+    participant JWT as JWTMiddleware (checkToken/decodeJwt)
+    participant UC as UserController
+    participant DIS as DatiInviatiService
+    participant IDAO as ImbarcazioneDAO
+    participant IS as ImbarcazioneService
+    participant GS as GeofenceareaService
+    participant DIDAO as DatiinviatiDAO
+    participant LSS as LogSpostamentiService
+    participant DB as DatabaseConnection
+    participant AS as AdminService
+    participant VS as ViolazioneService
+    participant VDAO as ViolazioneDAO
+    participant SS as SegnalazioneService
+    participant SDAO as SegnalazioneDAO
+    end
+    Client->>Router: POST /imbarcazione/send/status
+    Router->>MWRole: checkUserRole(req, res, next)
+    MWRole->>JWT: checkToken(req)
+    JWT->>JWT: verifica authorization header (Bearer)
+    JWT->>JWT: decodeJwt(token) -> jwt.verify(token, publicKey)
+    alt token mancante/invalido/scaduto
+        JWT-->>MWRole: throw MISSING_AUTH_HEADER / INVALID_AUTH_HEADER / JWT_TOKEN_EXPIRED / JWT_TOKEN_INVALID
+        MWRole-->>Client: next(err)
+    else token valido
+        JWT-->>MWRole: TokenPayload {user_id, is_admin}
+        MWRole->>Router: next()
+
+        Router->>MW1: checkTokenBalance(req, res, next)
+        MW1->>JWT: checkToken(req)
+        JWT-->>MW1: TokenPayload {user_id}
+        MW1->>AS: getUtenteById(user_id)
+        AS-->>MW1: user
+
+        alt user non trovato
+            MW1-->>Client: next(USER_NOT_FOUND)
+        else saldo insufficiente (tokens < MIN_TOKEN_BALANCE)
+            MW1-->>Client: next(INSUFFICIENT_TOKEN_BALANCE)
+        else saldo ok
+            MW1->>Router: next()
+
+            Router->>MW2: checkDatiInviati(req, res, next)
+            MW2->>MW2: validateBody(req.body, datiInviatiSchema, mapErroriDatiInviati)
+            alt dati non validi (mmsi/lat/lon/velocita/stato)
+                MW2-->>Client: next(errore specifico campo)
+            else dati validi
+                MW2->>Router: next()
+
+                Router->>UC: sendData(req, res)
+                UC->>JWT: checkToken(req)
+                JWT-->>UC: TokenPayload {user_id}
+
+                UC->>DIS: sendData(data, user_id)
+                DIS->>IDAO: get(data.mmsi)
+                IDAO-->>DIS: imbarcazione
+
+                alt imbarcazione non trovata
+                    DIS-->>UC: throw IMBARCAZIONE_NOT_FOUND
+                else imbarcazione trovata
+                    DIS->>IS: checkOwnershipImbarcazione(user_id, mmsi)
+                    IS-->>DIS: true / throw OWNERSHIP_ERROR
+
+                    DIS->>GS: getGeoareaByPosition(longitudine, latitudine)
+                    GS-->>DIS: current_geoarea
+                    DIS->>DIS: currentAreaIsAllowed = imbarcazione.hasGeofencearea(current_geoarea)
+
+                    DIS->>DIDAO: getLastDatoByMmsi(mmsi)
+                    DIDAO-->>DIS: lastDatoInviato
+
+                    opt lastDatoInviato esiste
+                        DIS->>GS: getGeoareaByPosition(last lon/lat)
+                        GS-->>DIS: last_dato_geoarea
+                        DIS->>DIS: lastAreaIsAllowed = imbarcazione.hasGeofencearea(last_dato_geoarea)
+                    end
+
+                    DIS->>DIS: sameArea = current_geoarea === last_dato_geoarea
+
+                    alt !sameArea
+                        opt uscita da area precedente permessa
+                            DIS->>DIS: push spostamento USCITA
+                        end
+                        opt entrata in area corrente permessa
+                            DIS->>DIS: push spostamento ENTRATA
+                        end
+                    end
+
+                    DIS->>DB: transaction()
+                    DB-->>DIS: t
+
+                    loop per ogni spostamento da loggare
+                        DIS->>LSS: create(spostamento, t)
+                        LSS-->>DIS: result
+                    end
+
+                    DIS->>DIDAO: create(data, t)
+                    DIDAO-->>DIS: nuovoDato
+
+                    alt operazioni ok
+                        DIS->>DB: t.commit()
+                    else errore
+                        DIS->>DB: t.rollback()
+                        DIS-->>UC: throw AppError / INCORRECT_DATA
+                    end
+                    DIS-->>UC: void
+                end
+
+                UC->>UC: spendToken(user_id)
+                UC->>AS: getUtenteById(user_id)
+                AS-->>UC: user
+                UC->>AS: updateTokenBalance(email, tokens - REQ_COST)
+                AS-->>UC: SuccessFactory(TOKEN_BALANCE_UPDATED)
+
+                UC->>VS: checkIfViolazione(data)
+                VS->>GS: getGeoareaByPosition(longitudine, latitudine)
+                GS-->>VS: current_area
+                VS->>VS: geofence_imbarcazioni.findAll({mmsi})
+
+                alt current_area nulla
+                    VS-->>UC: return (nessuna violazione)
+                else current_area trovata
+                    alt velocita_kmh > max_speed
+                        VS->>VS: createViolazione(ECCESSO VELOCITA)
+                        VS->>GS: getAreaById(geoarea_id)
+                        VS->>IS: getImbarcazioneByMmsi(mmsi)
+                        VS->>DB: transaction()
+                        VS->>VDAO: create(data, t)
+                        VDAO-->>VS: violazione
+                        VS->>DB: t.commit()
+                    end
+                    alt geoarea non autorizzata
+                        VS->>VS: createViolazione(ACCESSO AREA NON AUTORIZZATA)
+                        VS->>GS: getAreaById(geoarea_id)
+                        VS->>IS: getImbarcazioneByMmsi(mmsi)
+                        VS->>DB: transaction()
+                        VS->>VDAO: create(data, t)
+                        VDAO-->>VS: violazione
+                        VS->>DB: t.commit()
+                    end
+                end
+                VS-->>UC: void
+
+                UC->>SS: checkIfSegnalazione(data)
+                SS->>GS: getGeoareaByPosition(longitudine, latitudine)
+                GS-->>SS: current_geoarea
+
+                alt current_geoarea nulla
+                    SS-->>UC: return
+                else current_geoarea trovata
+                    SS->>VDAO: getUltimaViolazioneValida(geoarea_id)
+                    VDAO-->>SS: ultimaViolazioneValida
+
+                    alt nessuna violazione valida precedente
+                        SS-->>UC: return
+                    else esiste
+                        SS->>VDAO: getRecentByGeoarea(geoarea_id)
+                        VDAO-->>SS: violazioniRecenti
+
+                        alt nessuna violazione recente
+                            SS-->>UC: throw VIOLAZIONE_NOT_FOUND
+                        else violazione più recente trovata
+                            opt ultimaViolazioneIsValid (> 1h dopo)
+                                SS->>DB: transaction()
+                                SS->>SS: geofenceareaDAO.update(ultima_violazione_valida_id)
+                                SS->>DB: t.commit()
+                            end
+
+                            alt violazioniRecenti.length <= 5
+                                SS-->>UC: return
+                            else violazioniRecenti.length > 5
+                                SS->>SS: filtra violazioniValide (finestra 2 giorni)
+                                alt violazioniValide.length > 5
+                                    SS->>SDAO: findLastInCorsoByGeoarea(geoarea_id)
+                                    SDAO-->>SS: segnalazioneInCorso?
+                                    alt segnalazione già in corso
+                                        SS-->>UC: return
+                                    else nessuna segnalazione in corso
+                                        SS->>SS: createSegnalazione(newSegnalazione, violazioniValide)
+                                        SS->>DB: transaction()
+                                        SS->>SDAO: create(data, t)
+                                        SDAO-->>SS: newSegnalazione
+                                        loop per ogni violazione
+                                            SS->>SS: violazione.getImbarcazione()
+                                        end
+                                        SS->>SS: newSegnalazione.addImbarcazioni(mmsi[], t)
+                                        SS->>DB: t.commit()
+                                    end
+                                else violazioniValide.length <= 5
+                                    SS->>SS: checkRientroSegnalazione(geoarea_id)
+                                    SS->>SDAO: findLastInCorsoByGeoarea(geoarea_id)
+                                    SDAO-->>SS: lastSegnalazioneInCorso
+                                    opt esiste segnalazione in corso
+                                        SS->>DB: transaction()
+                                        SS->>SDAO: update(id, {stato: RIENTRATA}, t)
+                                        SS->>DB: t.commit()
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                SS-->>UC: void
+
+                UC-->>Client: 200 SuccessFactory(SEND_STATUS_OK, data)
+            end
+        end
+    end
+
+    alt eccezione durante il processo
+        UC-->>Client: AppError.send(res) oppure INTERNAL_ERROR
+    end
+```
+
+## IMMAGINE
+<img src="./immagini/mermaid-diagram-sendStatus.png">
