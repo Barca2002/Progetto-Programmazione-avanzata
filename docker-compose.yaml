@@ -1,4 +1,3 @@
-
 services:
   db:
     container_name: postgres
@@ -12,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       TZ: Europe/Rome
     volumes: 
-    # Questo volume contiene una cartella speciale di MySql, la quale viene controllata all'avvio ed esegue gli script all'interno (in ordine alfabetico), in questo caso gli script d'inizializzazione e popolazione del db. È montato in modalità read-only (ro) per evitare che il container possa modificare i file.
+    # Questo volume contiene una cartella speciale di DOcker, la quale viene controllata all'avvio ed esegue gli script all'interno (in ordine alfabetico), in questo caso gli script d'inizializzazione e popolazione del db. È montato in modalità read-only (ro) per evitare che il container possa modificare i file.
       - ./backend/src/db:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
@@ -29,7 +28,3 @@ services:
       - .env
     ports:
       - ${APP_PORT}:3000
-    
-    # #hot-reload (DA TOGLIERE ALLA FINE)
-    volumes:
-      - ./backend/src:/app/backend/src

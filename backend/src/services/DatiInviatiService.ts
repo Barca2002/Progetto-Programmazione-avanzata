@@ -59,24 +59,19 @@ export class DatiInviatiService {
     const spostamentiDaLoggare:LogSpostamentiCreationData[] = [];
 
     if (!sameArea) {
-      // Si esce dall'area precedente solo se esisteva un'area precedente ed era permessa per l'imbarcazione.
       if (last_dato_geoarea && lastAreaIsAllowed) {
         spostamentiDaLoggare.push({ mmsi: data.mmsi, geoarea_id: last_dato_geoarea.geoarea_id, spostamento: "USCITA" });
       }
-      // Si entra nell'area corrente solo se esiste l'area corrente ed è permessa per l'imbarcazione.
       if (current_geoarea && currentAreaIsAllowed) {
         spostamentiDaLoggare.push({ mmsi: data.mmsi, geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA" });
       }
-      // Se sono entrambi falsi, vuol dire che o sono sempre fuori o che non c'è il permesso per entrambe le geoaree e quindi non loggo nessuno spostamento.
     }
 
     const t = await DatabaseConnection.getInstance().transaction();
     try {
-      // Salviamo gli spostamenti, se ci sono.
       for (const spostamento of spostamentiDaLoggare) {
         await this.logspostamentoService.create(spostamento, t);
       }
-      // Il dato va sempre salvato, indipendentemente dagli spostamenti generati.
       await this.datiinviatiDAO.create(data, t);
       await t.commit();
     } catch (err) {
