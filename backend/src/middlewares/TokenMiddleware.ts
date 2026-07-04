@@ -45,7 +45,7 @@ export function validateTokenAmount(req: Request, res: Response, next: NextFunct
   validateBody(req.body, tokenUpdateSchema, mapErroriUpdateToken, next)
 }
 
-export async function checkJWTtokenBalance(req: Request, res: Response, next: NextFunction) {
+export async function checktokenBalance(req: Request, res: Response, next: NextFunction) {
   try {
     const jwtDecoded = checkJWTtoken(req);
     if (!jwtDecoded) {
