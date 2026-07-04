@@ -31,5 +31,5 @@ services:
       - ${APP_PORT}:3000
     
     # #hot-reload (DA TOGLIERE ALLA FINE)
-    # volumes:
-    #   - ./backend/src:/app/backend/src
+    volumes:
+      - ./backend/src:/app/backend/src
