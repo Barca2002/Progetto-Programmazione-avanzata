@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
-import { checkToken } from "./JWTMiddleware.js";
+import { checkJWTtoken } from "./JWTMiddleware.js";
 import { AdminService } from "../services/AdminService.js"
 import { emailSchema } from "./AuthMiddleware.js";
 import * as z from "zod";
@@ -45,9 +45,9 @@ export function validateTokenAmount(req: Request, res: Response, next: NextFunct
   validateBody(req.body, tokenUpdateSchema, mapErroriUpdateToken, next)
 }
 
-export async function checkTokenBalance(req: Request, res: Response, next: NextFunction) {
+export async function checkJWTtokenBalance(req: Request, res: Response, next: NextFunction) {
   try {
-    const jwtDecoded = checkToken(req);
+    const jwtDecoded = checkJWTtoken(req);
     if (!jwtDecoded) {
       return next(ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_INVALID));
     }

@@ -178,9 +178,9 @@ sequenceDiagram
     participant Client
     participant Router as UserRoutes
     participant MWRole as checkUserRole
-    participant MW1 as checkTokenBalance
+    participant MW1 as checkJWTtokenBalance
     participant MW2 as checkDatiInviati
-    participant JWT as JWTMiddleware (checkToken/decodeJwt)
+    participant JWT as JWTMiddleware (checkJWTtoken/decodeJwt)
     participant UC as UserController
     participant DIS as DatiInviatiService
     participant IDAO as ImbarcazioneDAO
@@ -197,7 +197,7 @@ sequenceDiagram
     end
     Client->>Router: POST /imbarcazione/send/status
     Router->>MWRole: checkUserRole(req, res, next)
-    MWRole->>JWT: checkToken(req)
+    MWRole->>JWT: checkJWTtoken(req)
     JWT->>JWT: verifica authorization header (Bearer)
     JWT->>JWT: decodeJwt(token) -> jwt.verify(token, publicKey)
     alt token mancante/invalido/scaduto
@@ -207,8 +207,8 @@ sequenceDiagram
         JWT-->>MWRole: TokenPayload {user_id, is_admin}
         MWRole->>Router: next()
 
-        Router->>MW1: checkTokenBalance(req, res, next)
-        MW1->>JWT: checkToken(req)
+        Router->>MW1: checkJWTtokenBalance(req, res, next)
+        MW1->>JWT: checkJWTtoken(req)
         JWT-->>MW1: TokenPayload {user_id}
         MW1->>AS: getUtenteById(user_id)
         AS-->>MW1: user
@@ -228,7 +228,7 @@ sequenceDiagram
                 MW2->>Router: next()
 
                 Router->>UC: sendData(req, res)
-                UC->>JWT: checkToken(req)
+                UC->>JWT: checkJWTtoken(req)
                 JWT-->>UC: TokenPayload {user_id}
 
                 UC->>DIS: sendData(data, user_id)

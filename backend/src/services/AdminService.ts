@@ -38,9 +38,9 @@ export class AdminService {
   };
 
   /**
-   * Funzione che controlla prima se esiste un utente con quell'id e nel caso lo segnala e in seguito restituisce l'utente
-   * @param id 
-   * @returns 
+   * Funzione che controlla se esiste un utente con quell'id e, in caso positivo, restituisce l'utente
+   * @param id numero che rappresenta l'id dell'utente.
+   * @returns oggetto Utente.
    */
   public async getUtenteById(id: number) {
     this.authService.checkUserId(id);
