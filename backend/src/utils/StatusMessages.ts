@@ -217,6 +217,8 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Le data di inizio non è nel formato richiesto (gg-mm-yyyy)." },
     INVALID_END_DATE:
         { statusCode: 400, message: "Le data di fine non è nel formato richiesto (gg-mm-yyyy)." },
+    MAX_END_DATE:
+        { statusCode: 400, message: "Le data di fine non deve superare la data odierna" },
     IMBARCAZIONE_OWNERSHIP_ERROR:
         { statusCode: 400, message: "L'imbarcazione non risulta associata all'utente corrente." },
     TOKEN_SPEND_ERROR:

@@ -11,7 +11,11 @@ const dateFormatRegex = /^\d{2}[-/]\d{2}[-/]\d{4}$/;
 const getPositionsSchema = z.object({
     mmsi: mmsiSchema,
     start_date: z.string().regex(dateFormatRegex),
-    end_date: z.string().regex(dateFormatRegex).optional()
+    end_date: z.string().regex(dateFormatRegex).refine(
+        function (val) {
+            return new Date(val.split(/[-/]/).reverse().join('-')) <= new Date();
+        }, {message: "MAX_END_DATE"}
+    ).optional()
 }).strict();
 
 /**
@@ -23,7 +27,7 @@ const getPositionsSchema = z.object({
  */
 function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
-
+    console.log(issue);
     const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
         start_date: {
             missing: AppErrorEnum.MISSING_START_DATE,
@@ -31,7 +35,7 @@ function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
         },
         end_date: {
             missing: AppErrorEnum.MISSING_END_DATE,
-            invalid: AppErrorEnum.INVALID_END_DATE,
+            invalid: issue.message == "MAX_END_DATE" ? AppErrorEnum.MAX_END_DATE : AppErrorEnum.INVALID_END_DATE,
         },
     };
 
