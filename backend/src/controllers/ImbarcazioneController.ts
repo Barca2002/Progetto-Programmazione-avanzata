@@ -4,8 +4,8 @@ import { GetPositionsInDateRange, ImbarcazioneCreationData, LinkDataBody, Unlink
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 export class ImbarcazioneController {
-  public readonly imbarcazioneService = new ImbarcazioneService();
-  public readonly geofenceareaService = new GeofenceareaService();
+  private readonly imbarcazioneService = new ImbarcazioneService();
+  private readonly geofenceareaService = new GeofenceareaService();
 
   /**
    * Funzione che torna tutte le imbarcazioni con le proprie geofence aree associate
