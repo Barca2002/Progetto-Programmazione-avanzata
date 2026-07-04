@@ -24,10 +24,10 @@ export interface UnlinkDataBody {
   geoarea_id: number;
 }
 
-export interface GetPointsAsGeoJsonBody {
+export interface GetPositionsInDateRange {
   mmsi: number;
   start_date: string;
-  end_date?: string;
+  end_date: string;
 }
 
 export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreationData> implements ImbarcazioneAllData {

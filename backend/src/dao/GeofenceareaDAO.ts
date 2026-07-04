@@ -7,7 +7,12 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
     return await Geofencearea.create(data, { transaction: t });
   }
 
-  public async get(geoarea_id: number, _item_id2?: number): Promise<Geofencearea | null> {
+  /**
+   * Funzione che ritorna una geofence area con l'id passato come parametro nella funzione o null in caso non venga trovata una geofence area
+   * @param geoarea_id 
+   * @returns oggetto Geofencearea o null
+   */
+  public async get(geoarea_id: number): Promise<Geofencearea | null> {
     return await Geofencearea.findByPk(geoarea_id);
   }
 

@@ -41,7 +41,7 @@ adminRouter.post("/imbarcazioni/geoaree/link", checkLinkBody, async function(req
 });
 
 /**
- * Rotta per disassociare un imbarcazione da una geofence area associata tramite l'inserimento dell'mmsi e dell'id della geofence area da disassociare 
+ * Rotta per dissociare un imbarcazione da una geofence area associata tramite l'inserimento dell'mmsi e dell'id della geofence area da dissociare 
  */
 adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function(req: Request, res: Response) {
     await adminController.unlinkGeoareaFromImbarcazione(req, res);
