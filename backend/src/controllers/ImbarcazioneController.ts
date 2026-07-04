@@ -1,11 +1,9 @@
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
-import { GeofenceareaService } from "../services/GeofenceareaService.js";
 import { GetPositionsInDateRange, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 export class ImbarcazioneController {
   private readonly imbarcazioneService = new ImbarcazioneService();
-  private readonly geofenceareaService = new GeofenceareaService();
 
   /**
    * Funzione che torna tutte le imbarcazioni con le proprie geofence aree associate
