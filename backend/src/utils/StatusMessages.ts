@@ -34,7 +34,7 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Il primo parametro 'type' non è in un formato valido. Deve contenere la stringa 'FeatureCollection'." },
     INVALID_TYPE_FEATURE:
         { statusCode: 400, message: "Il secondo parametro 'type' non è in un formato valido. Deve contenere la stringa 'Feature'." },
-    INVALID_TYPE_FEATURE_GEOMETRY:
+    INVALID_GEOMETRY_TYPE:
         { statusCode: 400, message: "Il terzo parametro 'type' non è in un formato valido. Deve contenere un poligono, quindi la stringa 'Polygon'." },
     INVALID_FEATURE_ARRAY:
         { statusCode: 400, message: "Il parametro 'features' non è in un formato valido. Deve contenere un array di Features con 'properties' e 'geometry'." },
@@ -75,6 +75,8 @@ export const ERROR_LIST = {
         { statusCode: 500, message: "Errore nella verifica del token JWT." },
     JWT_PUBLIC_MISSING:
         { statusCode: 500, message: "Chiave pubblica per JWT non configurata nel file env." },
+    JWT_PUBLIC_DECODE_ERROR:
+        { statusCode: 500, message: "Errore nella decodifica della chiave pubblica. per i token JWT." },
     JWT_TOKEN_ADMIN_MISSING:
         { statusCode: 500, message: "Controlla JWT_TOKEN_ADMIN nelle variabili d'ambiente" },
     JWT_TOKEN_EMPTY:
@@ -103,7 +105,7 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Parametro 'type' mancante nella richiesta." },
     MISSING_TYPE_FEATURE:
         { statusCode: 400, message: "Parametro 'type' di 'features' mancante nella richiesta." },
-    MISSING_TYPE_FEATURE_GEOMETRY:
+    MISSING_GEOMETRY_TYPE:
         { statusCode: 400, message: "Parametro 'type' di 'geometry' mancante nella richiesta." },
     MISSING_TYPE_IMBARCAZIONE:
         { statusCode: 400, message: "Parametro 'type' mancante nella richiesta." },
@@ -134,7 +136,7 @@ export const ERROR_LIST = {
     MISSING_MAX_SPEED:
         { statusCode: 400, message: "Parametro 'max_speed' mancante nella richiesta." },
     MISSING_GEOMETRY:
-        { statusCode: 400, message: "Parametro 'max_speed' mancante nella richiesta." },
+        { statusCode: 400, message: "Parametro 'geometry' mancante nella richiesta." },
     MISSING_COORDINATES:
         { statusCode: 400, message: "Parametro 'coordinates' mancante nella richiesta." },
     MISSING_NEW_TOKEN_AMOUNT:

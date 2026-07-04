@@ -11,7 +11,7 @@ const JWT_PUBLIC_KEY = process.env.JWT_PUBLIC_KEY;
 // Decodifica della chiave pubblica da base64 al formato normale (formato PEM).
 const publicKey = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
   if(!publicKey){
-    throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
+    throw ErrorFactory.getError(AppErrorEnum.JWT_PUBLIC_DECODE_ERROR);
   }
 
 // funzione per controllare struttura del token, prende l'authorization header.
