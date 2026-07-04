@@ -47,10 +47,4 @@ export class SegnalazioneDAO implements InterfacciaDAO<Segnalazione> {
     const segnalazione = await Segnalazione.findByPk(segnalazione_id);
     return await segnalazione!.update(new_data, { transaction: t });
   }
-
-  public async delete(segnalazione_id: number, t: Transaction): Promise<Segnalazione | null> {
-    const segnalazione = await Segnalazione.findByPk(segnalazione_id);
-    await segnalazione!.destroy({ transaction: t });
-    return segnalazione;
-  }
 }

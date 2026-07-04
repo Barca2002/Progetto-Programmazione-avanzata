@@ -101,21 +101,6 @@ export class AdminService {
     }
   };
 
-  public async deleteUtente(id: number) {
-    this.authService.checkUserId(id);
-    const t = await DatabaseConnection.getInstance().transaction();
-    try {
-      await this.adminDAO.delete(id, t);
-      await t.commit();
-      return SuccessFactory.getSuccess(AppSuccessEnum.USER_DELETED, null);
-    } catch (err) {
-      await t.rollback();
-      if (err instanceof AppError)
-        throw err;
-      throw ErrorFactory.getError(AppErrorEnum.DELETE_ERROR);
-    }
-  };
-
   /**
    * Funzione per aggiornare il credito residuo di un utente passando l'email e il nuovo credito residuo, controllando che l'utente con quella e-mail esista
    * @param email 

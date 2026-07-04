@@ -33,7 +33,7 @@ export class SegnalazioneService {
             }
             await segnalazione.addImbarcazioni([...imbarcazioniMmsi], { ignoreDuplicates: true, transaction: t });
             await t.commit();
-        } catch (error) {
+        } catch {
             await t.rollback()
             throw ErrorFactory.getError(AppErrorEnum.ADD_IMBARCAZIONI_TO_SEGNALAZIONE_ERROR);
         }

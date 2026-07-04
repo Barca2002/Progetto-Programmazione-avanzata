@@ -3,6 +3,12 @@ import { Geofencearea, GeofenceareaCreationData } from '../models/GeofenceareaMo
 import { InterfacciaDAO } from './InterfacciaDAO.js';
 
 export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
+  /**
+   * Funzione che crea una nuova geofence area nel database, attraverso una transazione, che nel caso di errore esegue un rollback e non permette la creazione
+   * @param data oggetto che contiene i dati necessari per la creazione di una geofencearea
+   * @param t oggetto Transaction di Sequelize che rappresenta la transazione SQL attiva
+   * @returns oggetto Geofencearea
+   */
   public async create(data: GeofenceareaCreationData, t: Transaction): Promise<Geofencearea> {
     return await Geofencearea.create(data, { transaction: t });
   }
@@ -20,6 +26,11 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
     return await Geofencearea.findAll();
   }
 
+  /**
+   * Funzione che restituisce una geofence area cercandola per nome, oppure null se non ne esiste una con quel nome
+   * @param name stringa con il nome dell'area che si vuole trovare
+   * @returns oggetto Geofencearea trovato, oppure null se non esiste
+   */
   public async findByName(name: string): Promise<Geofencearea | null> {
     return await Geofencearea.findOne({ where: { name } });
   }
@@ -27,11 +38,5 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
   public async update(geoarea_id: number, new_data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea | null> {
     const geoarea = await Geofencearea.findByPk(geoarea_id);
     return await geoarea!.update(new_data, { transaction: t });
-  }
-
-  public async delete(geoarea_id: number, t: Transaction): Promise<Geofencearea | null> {
-    const geoarea = await Geofencearea.findByPk(geoarea_id);
-    await geoarea!.destroy({ transaction: t });
-    return geoarea;
   }
 }

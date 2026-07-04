@@ -6,7 +6,7 @@ import { InterfacciaDAO } from './InterfacciaDAO.js';
 export class AdminDAO implements InterfacciaDAO<User> {
   /**
    * Funzione che crea un utente nel database.
-   * @param data oggetto che implementa l'interfaccioa UserCreationData, quindi che contiene i dati necessari per la creazioni.
+   * @param data oggetto che implementa l'interfaccia UserCreationData, quindi che contiene i dati necessari per la creazioni.
    * @param t oggetto Transaction che rappresenta una transazione nel database.
    * @returns oggetto User.
    */
@@ -33,15 +33,6 @@ export class AdminDAO implements InterfacciaDAO<User> {
       return null;
     }
     return await user.update(new_data, { transaction: t });
-  }
-
-  public async delete(user_id: number, t: Transaction): Promise<User | null> {
-    const user = await User.findByPk(user_id);
-    if (!user) {
-      return null;
-    }
-    await user.destroy({ transaction: t });
-    return user;
   }
 
   /**

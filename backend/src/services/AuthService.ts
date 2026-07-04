@@ -96,7 +96,7 @@ export class AuthService {
             throw ErrorFactory.getError(AppErrorEnum.MISSING_DATA);
         }
         const user = await this.autenticateUser(email, password);
-        return await this.generateJWT(user);
+        return this.generateJWT(user);
     }
 
     /**

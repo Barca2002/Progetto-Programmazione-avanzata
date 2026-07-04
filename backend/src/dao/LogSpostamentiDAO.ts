@@ -30,12 +30,4 @@ export class LogSpostamentiDAO implements InterfacciaDAO<LogSpostamenti> {
     const log_spostamento = await LogSpostamenti.findByPk(log_id);
     return await log_spostamento!.update(new_data, {transaction: t});
   }
-  
-  public async delete(log_id: number, t: Transaction): Promise<LogSpostamenti | null> {
-    const log_spostamento = await LogSpostamenti.findByPk(log_id);
-    await log_spostamento!.destroy({ transaction: t });
-    return log_spostamento;
-  }
-
-
 }

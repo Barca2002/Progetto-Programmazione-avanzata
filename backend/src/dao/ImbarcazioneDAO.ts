@@ -80,10 +80,4 @@ public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imb
     const imbarcazione = await Imbarcazione.findByPk(mmsi);
     return await imbarcazione!.update(new_data, { transaction: t });
   }
-
-  public async delete(mmsi: number, t: Transaction): Promise<Imbarcazione | null> {
-    const imbarcazione = await Imbarcazione.findByPk(mmsi);
-    await imbarcazione!.destroy({ transaction: t });
-    return imbarcazione;
-  }
 }

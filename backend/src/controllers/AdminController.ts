@@ -3,20 +3,16 @@ import { Request, Response } from "express";
 import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppSuccessEnum } from "../utils/StatusMessages.js";
 import { AppError } from "../models/AppErrorModel.js";
-import { ViolazioneService } from "../services/ViolazioneService.js";
 import { SuccessFactory } from "../factory/SuccessFactory.js";
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { ImbarcazioneController } from "./ImbarcazioneController.js";
-import { Position } from "geojson";
 import { CreateGeofenceAreaBody, GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 import { GeofenceAreaController } from "./GeofenceareaController.js";
-import { ViolazioneCreationData } from "../models/ViolazioneModel.js";
 import { UpdateTokenBody } from "../models/UserModel.js";
 import { GetPositionsInDateRange, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
 
 export class AdminController {
   private readonly adminService = new AdminService();
-  private readonly violazioneService = new ViolazioneService();
   private readonly imbarcazioneService = new ImbarcazioneService();
   private readonly imbarcazioneController = new ImbarcazioneController();
   private readonly geofenceareaController = new GeofenceAreaController();
@@ -69,20 +65,6 @@ export class AdminController {
       const geoarea_id = Number(req.params.geoareaid);
       const imbarcazione_status = await this.imbarcazioneService.getAllImbarcazioniStatus(geoarea_id);
       SuccessFactory.getSuccess(AppSuccessEnum.STATUS_FOUND, imbarcazione_status).send(res);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
-      }
-    }
-  }
-
-  public async createViolazione(req: Request, res: Response) {
-    try {
-      const data = req.body as ViolazioneCreationData;
-      const result = await this.violazioneService.createViolazione(data);
-      SuccessFactory.getSuccess(AppSuccessEnum.VIOLAZIONE_CREATED, result).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);
@@ -202,6 +184,11 @@ export class AdminController {
     }
   }
 
+  /**
+   * Funzione che crea una geofence area a partire da un oggetto GeoJSON ricevuto nel body della richiesta, estraendone nome, coordinate del poligono ed eventuale velocità massima consentita.
+   * @param req oggetto che contiene il body della richiesta, in particolare un array di features GeoJSON da cui viene estratta la prima
+   * @param res oggetto della risposta alla richiesta
+   */
   public async createGeofencearea(req: Request, res: Response) {
     try {
       const { features } = req.body as CreateGeofenceAreaBody;
@@ -211,23 +198,14 @@ export class AdminController {
       if (!name || !coordinates) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
-      /*
-      // Lo standard di geojson richiede prima la longituide e poi la latitudine, quindi coppie [long, lat], ...
-      
-      Inoltre, per definire un'area, richiede Position[][] (array di anelli, dove ogni anello è un array di punti):
-      "coordinates": [ [ [125.6, 10.1], [124.6, 10.0], [124.0, 9.5], [125.6, 10.1] ] ]
-      */
-      const coordinatesGeoJson: Position[][] = coordinates;
-      // Creazione della nuova area.
       const geoJsonArea: GeofenceareaCreationData = {
         name: name,
         area: {
           type: 'Polygon',
-          coordinates: coordinatesGeoJson,
+          coordinates: coordinates,
         },
         max_speed: max_speed ?? null,
       };
-
       const nuovaArea = await this.geofenceareaController.createArea(geoJsonArea);
       SuccessFactory.getSuccess(AppSuccessEnum.GEOAREA_CREATED, nuovaArea).send(res);
     } catch (err) {
