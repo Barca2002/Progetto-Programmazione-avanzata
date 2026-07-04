@@ -6,15 +6,34 @@ import { mmsiSchema } from './ImbarcazioniMiddleware.js';
 const dateFormatRegex = /^\d{2}[-/]\d{2}[-/]\d{4}$/;
 
 /**
- * Definizione dello schema di validazione per la richiesta delle posizioni in una finestra temporale.
+ * Definizione dello schema di validazione per la richiesta delle posizioni in una finestra temporale. Si controlla se la data fornita è valida e non eccede il giorno corrente.
  */
 const getPositionsSchema = z.object({
     mmsi: mmsiSchema,
     start_date: z.string().regex(dateFormatRegex),
-    end_date: z.string().regex(dateFormatRegex).refine(
-        function (val) {
-            return new Date(val.split(/[-/]/).reverse().join('-')) <= new Date();
-        }, {message: "MAX_END_DATE"}
+    end_date: z.string().regex(dateFormatRegex).superRefine((value, ctx) => {
+        const parsedDate = new Date(value.split(/[-/]/).reverse().join('-'));
+        const oggi = new Date();
+        console.log("Data parsed ", parsedDate);
+        console.log("oggi ", oggi);
+        console.log(parsedDate <= oggi)
+
+        if (isNaN(parsedDate.getTime())) {
+            ctx.addIssue({
+                code: "custom",
+                message: "INVALID_DATE",
+            });
+            return;
+        }
+
+        if (parsedDate >= oggi) {
+            ctx.addIssue({
+                code: "custom",
+                message: "MAX_END_DATE",
+            });
+            return;
+        }
+    }
     ).optional()
 }).strict();
 
@@ -35,7 +54,7 @@ function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
         },
         end_date: {
             missing: AppErrorEnum.MISSING_END_DATE,
-            invalid: issue.message == "MAX_END_DATE" ? AppErrorEnum.MAX_END_DATE : AppErrorEnum.INVALID_END_DATE,
+            invalid: issue.message === "MAX_END_DATE" ? AppErrorEnum.MAX_END_DATE : AppErrorEnum.INVALID_END_DATE,
         },
     };
 

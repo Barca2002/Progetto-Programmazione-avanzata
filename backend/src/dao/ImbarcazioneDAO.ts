@@ -68,7 +68,6 @@ public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imb
    * @returns vettore di oggetti di tipo Datiinviati
    */
   public async getPositionsByMmsiAndDateRange(mmsi: number, start_date: Date, end_date: Date): Promise<Datiinviati[]> {
-    //Per via del formato linux epoch con cui sono salvati i dati inviati
     return await Datiinviati.findAll({
       where: {
         mmsi,
