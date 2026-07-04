@@ -19,9 +19,6 @@ const validLoginBody = {
   password: "Password1",
 };
 
-// --------------------------------------------------
-// validateRegisterBody
-// --------------------------------------------------
 
 describe("validateRegisterBody", () => {
   beforeEach(() => jest.resetAllMocks());
@@ -37,7 +34,7 @@ describe("validateRegisterBody", () => {
   });
 
   test("username mancante -> MISSING_USERNAME", () => {
-    const bodyIncompleto = {...validRegisterBody}
+    const bodyIncompleto = { ...validRegisterBody }
     delete (bodyIncompleto as any)["username"];
     validateRegisterBody(
       mockReq(bodyIncompleto),
@@ -58,7 +55,7 @@ describe("validateRegisterBody", () => {
   });
 
   test("email mancante -> MISSING_EMAIL", () => {
-    const bodyIncompleto = {...validRegisterBody}
+    const bodyIncompleto = { ...validRegisterBody }
     delete (bodyIncompleto as any)["email"];
     validateRegisterBody(
       mockReq(bodyIncompleto),
@@ -80,7 +77,7 @@ describe("validateRegisterBody", () => {
   });
 
   test("password mancante -> MISSING_PASSWORD", () => {
-    const bodyIncompleto = {...validRegisterBody}
+    const bodyIncompleto = { ...validRegisterBody }
     delete (bodyIncompleto as any)["password"];
     validateRegisterBody(
       mockReq(bodyIncompleto),
@@ -102,10 +99,6 @@ describe("validateRegisterBody", () => {
   });
 });
 
-// --------------------------------------------------
-// validateLoginBody
-// --------------------------------------------------
-
 describe("validateLoginBody", () => {
   beforeEach(() => jest.resetAllMocks());
 
@@ -120,7 +113,7 @@ describe("validateLoginBody", () => {
   });
 
   test("email mancante -> MISSING_EMAIL", () => {
-    const bodyIncompleto = {...validLoginBody}
+    const bodyIncompleto = { ...validLoginBody }
     delete (bodyIncompleto as any)["email"];
     validateLoginBody(
       mockReq({ password: "Password1" }),
@@ -142,7 +135,7 @@ describe("validateLoginBody", () => {
   });
 
   test("password mancante -> MISSING_PASSWORD", () => {
-    const bodyIncompleto = {...validLoginBody}
+    const bodyIncompleto = { ...validLoginBody }
     delete (bodyIncompleto as any)["password"];
     validateLoginBody(
       mockReq(bodyIncompleto),
