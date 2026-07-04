@@ -139,7 +139,7 @@ Il campo `spostamento` può assumere i seguenti valori:
 Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle imbarcazioni all'interno delle geofence aree e per determinare il tempo trascorso al loro interno.
 
 ## 📝Diagramma dei casi d'uso
-Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato, Utente autenticato, Admin. L'admin non ha accesso alle funzionalità dell'utente autenticato.
+Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato, Utente autenticato e Admin. L'admin non ha accesso alle funzionalità dell'utente autenticato.
 
 <img src="./immagini/Diagramma_casi_d_uso.svg">
 
@@ -153,14 +153,209 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 
 ### Rotta /register
 
-<img src="./immagini/mermaid-diagram-register.png">
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    autonumber
+    box white
+    actor Utente as Client (Browser/Postman)
+    participant Router as Express Router (Auth)
+    participant Ctrl as AuthController
+    participant Serv as AuthService
+    participant DAO as AdminDAO
+    participant AdminServ as AdminService
+    participant Fact as Success/Error Factory
+    end
+    Utente->>Router: POST /register {username, email, password}
+    Router->>Ctrl: register(req, res)
+    activate Ctrl
+
+    Note over Ctrl: try block start
+    Ctrl->>Serv: register(email, username, password)
+    activate Serv
+
+    Serv->>DAO: getByEmail(email)
+    DAO-->>Serv: restituisce User o null
+    
+    alt L'email esiste già
+        Serv->>Fact: getError(EMAIL_ALREADY_EXISTS)
+        Serv-->>Ctrl: lancia AppError
+    end
+
+    Serv->>DAO: getByUsername(username)
+    DAO-->>Serv: restituisce User o null
+
+    alt L'username esiste già
+        Serv->>Fact: getError(USERNAME_ALREADY_EXISTS)
+        Serv-->>Ctrl: lancia AppError
+    end
+
+    Serv->>Serv: hashPassword(password)
+    Note over Serv: bcrypt.hash con 12 salt rounds
+    
+    Serv-->>Ctrl: restituisce userInfo (UserCreationData)
+    deactivate Serv
+
+    Ctrl->>AdminServ: createUtente(newUser)
+    activate AdminServ
+    Note over AdminServ: Salva l'utente nel DB tramite DAO
+    AdminServ-->>Ctrl: Utente creato con successo
+    deactivate AdminServ
+
+    Ctrl->>Fact: getSuccess(USER_REGISTERED, responseData)
+    Fact-->>Ctrl: Oggetto di successo
+    Ctrl->>Utente: res.send(success JSON)
+
+    alt catch (err)
+        Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
+        Ctrl->>Utente: res.send(ErrorFactory.getError o err.send)
+    end
+    
+    deactivate Ctrl
+```
 
 ### Rotta /admin/imbarcazione/create
 
-<img src="./immagini/mermaid-diagram-2.png">
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    autonumber
+    box white
+    actor Admin as Admin (Client/Postman)
+    participant Router as AdminRoutes
+    participant MW as ImbarcazioniMiddleware
+    participant Ctrl as AdminController
+    participant IC as ImbarcazioneController
+    participant Serv as ImbarcazioneService
+    participant ADAO as AdminDAO
+    participant IDAO as ImbarcazioneDAO
+    participant Fact as Success/Error Factory
+    end
+    Admin->>Router: POST /imbarcazione/create {mmsi, name, type, descr, max_capacity, user_id}
+    Router->>MW: validateImbarcazioneCreationBody(req, res, next)
+    activate MW
 
+    MW->>MW: valida body con imbarcazioneCreationSchema (zod)
 
-## SENDSTATUS CODICE
+    alt Body non valido
+        MW->>Admin: res con errore (campo mancante/invalido)
+    end
+
+    MW-->>Router: next()
+    deactivate MW
+
+    Router->>Ctrl: createImbarcazione(req, res)
+    activate Ctrl
+
+    Note over Ctrl: try block start
+    Ctrl->>Ctrl: estrae {mmsi, name, type, descr, max_capacity, user_id} da req.body
+
+    alt Campo obbligatorio mancante
+        Ctrl->>Fact: getError(INCORRECT_DATA)
+        Ctrl-->>Ctrl: lancia AppError
+    end
+
+    Ctrl->>IC: createImbarcazione(data)
+    activate IC
+
+    IC->>Serv: createImbarcazione(data)
+    activate Serv
+
+    alt mmsi mancante
+        Serv->>Fact: getError(MISSING_DATA)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>ADAO: get(user_id)
+    ADAO-->>Serv: restituisce User o null
+
+    alt Utente non trovato
+        Serv->>Fact: getError(USER_NOT_FOUND)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>IDAO: get(mmsi)
+    IDAO-->>Serv: restituisce Imbarcazione o null
+
+    Serv->>IDAO: getByName(name)
+    IDAO-->>Serv: restituisce Imbarcazione o null
+
+    alt mmsi o name già esistenti
+        Serv->>Fact: getError(IMBARCAZIONE_ALREADY_EXISTS)
+        Serv-->>IC: lancia AppError
+    end
+
+    Note over Serv: apre transazione (t)
+    Serv->>IDAO: create(data, t)
+    IDAO-->>Serv: nuova Imbarcazione
+
+    alt Errore durante la create
+        Serv->>Serv: t.rollback()
+        Serv->>Fact: getError(CREATE_ERROR)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>Serv: t.commit()
+    Serv-->>IC: restituisce result (nuova imbarcazione)
+    deactivate Serv
+
+    IC-->>Ctrl: restituisce nuovaImbarcazione
+    deactivate IC
+
+    Ctrl->>Fact: getSuccess(IMBARCAZIONE_CREATED, nuovaImbarcazione)
+    Fact-->>Ctrl: Oggetto di successo
+    Ctrl->>Admin: res.json(success JSON)
+
+    alt catch (err)
+        Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
+        Ctrl->>Admin: res.send(ErrorFactory.getError o err.send)
+    end
+    deactivate Ctrl
+```
+
+### Rotta /user/sendStatus/
 ```mermaid
 ---
 config:
@@ -189,9 +384,9 @@ sequenceDiagram
     participant Client
     participant Router as UserRoutes
     participant MWRole as checkUserRole
-    participant MW1 as checkJWTtokenBalance
+    participant MW1 as checkTokenBalance
     participant MW2 as checkDatiInviati
-    participant JWT as JWTMiddleware (checkJWTtoken/decodeJwt)
+    participant JWT as JWTMiddleware (checkToken/decodeJwt)
     participant UC as UserController
     participant DIS as DatiInviatiService
     participant IDAO as ImbarcazioneDAO
@@ -208,7 +403,7 @@ sequenceDiagram
     end
     Client->>Router: POST /imbarcazione/send/status
     Router->>MWRole: checkUserRole(req, res, next)
-    MWRole->>JWT: checkJWTtoken(req)
+    MWRole->>JWT: checkToken(req)
     JWT->>JWT: verifica authorization header (Bearer)
     JWT->>JWT: decodeJwt(token) -> jwt.verify(token, publicKey)
     alt token mancante/invalido/scaduto
@@ -218,8 +413,8 @@ sequenceDiagram
         JWT-->>MWRole: TokenPayload {user_id, is_admin}
         MWRole->>Router: next()
 
-        Router->>MW1: checkJWTtokenBalance(req, res, next)
-        MW1->>JWT: checkJWTtoken(req)
+        Router->>MW1: checkTokenBalance(req, res, next)
+        MW1->>JWT: checkToken(req)
         JWT-->>MW1: TokenPayload {user_id}
         MW1->>AS: getUtenteById(user_id)
         AS-->>MW1: user
@@ -239,7 +434,7 @@ sequenceDiagram
                 MW2->>Router: next()
 
                 Router->>UC: sendData(req, res)
-                UC->>JWT: checkJWTtoken(req)
+                UC->>JWT: checkToken(req)
                 JWT-->>UC: TokenPayload {user_id}
 
                 UC->>DIS: sendData(data, user_id)
@@ -402,5 +597,430 @@ sequenceDiagram
     end
 ```
 
-## IMMAGINE
-<img src="./immagini/mermaid-diagram-sendStatus.png">
+### Rotta /admin/imbarcazioni/get/positions/date
+
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    autonumber
+    box white
+    participant Client
+    participant Router as AdminRoutes
+    participant MWRole as checkAdminRole
+    participant JWT as JWTMiddleware (checkToken/decodeJwt)
+    participant MWMmsi as checkMmsi
+    participant MWDate as validateDateFormat
+    participant HF as HelperFunctions (validateBody)
+    participant AC as AdminController
+    participant IC as ImbarcazioneController
+    participant IS as ImbarcazioneService
+    participant IDAO as ImbarcazioneDAO
+    end
+    Client->>Router: POST /imbarcazioni/positions
+    Router->>MWRole: checkAdminRole(req, res, next)
+    MWRole->>JWT: checkToken(req)
+    JWT->>JWT: verifica authorization header (Bearer)
+    JWT->>JWT: decodeJwt(token) -> jwt.verify(token, publicKey)
+    alt token mancante/invalido/scaduto
+        JWT-->>MWRole: throw MISSING_AUTH_HEADER / INVALID_AUTH_HEADER / JWT_TOKEN_EXPIRED / JWT_TOKEN_INVALID
+        MWRole-->>Client: next(err)
+    else token valido
+        JWT-->>MWRole: TokenPayload {user_id, is_admin}
+        alt is_admin === false
+            MWRole-->>Client: next(NOT_ADMIN)
+        else is_admin === true
+            MWRole->>Router: next()
+
+            Router->>MWMmsi: checkMmsi(req, res, next)
+            MWMmsi->>MWMmsi: mmsi = req.params.mmsi ?? String(req.body.mmsi)
+            alt mmsi mancante
+                MWMmsi-->>Client: throw MISSING_MMSI
+            else mmsi presente
+                MWMmsi->>MWMmsi: mmsiSchema.safeParse(mmsi)
+                alt formato mmsi non valido
+                    MWMmsi-->>Client: throw INVALID_MMSI
+                else mmsi valido
+                    MWMmsi->>Router: next()
+
+                    Router->>MWDate: validateDateFormat(req, res, next)
+                    MWDate->>HF: validateBody(req.body, dateSchema, mapErroriDate, next)
+                    HF->>HF: dateSchema.safeParse(body)
+
+                    alt validazione fallita
+                        HF->>HF: issue = result.error.issues[0]
+                        alt nessuna issue trovata
+                            HF-->>Client: next(INCORRECT_DATA)
+                        else issue presente
+                            HF->>HF: campo = issue.path[0]
+                            alt campo vuoto (campo extra)
+                                HF-->>Client: next(INCORRECT_DATA)
+                            else campo valido
+                                HF->>HF: mapErroriDate(campo, issue, body)
+                                HF->>HF: isMissingIssue(issue, reqBody) -> reqBody[campo] === undefined
+                                HF-->>Client: next(MISSING_START_DATE / INVALID_START_DATE / MISSING_END_DATE / INVALID_END_DATE)
+                            end
+                        end
+                    else validazione ok
+                        HF->>Router: next()
+
+                        Router->>AC: getPointsAsGeoJson(req, res)
+                        AC->>AC: estrae {mmsi, start_date, end_date} da req.body
+
+                        alt mmsi o start_date mancanti
+                            AC-->>Client: ErrorFactory.INCORRECT_DATA
+                        else dati presenti
+                            AC->>AC: data = {mmsi, start_date, end_date: end_date ?? oggi (it-IT)}
+
+                            AC->>IC: getPointsAsGeoJson(data)
+                            IC->>IC: end_date = data.end_date ?? oggi (it-IT)
+                            IC->>IS: getPosizioniImbarcazioneAsGeoJson(mmsi, start_date, end_date)
+
+                            IS->>IDAO: get(mmsi)
+                            IDAO-->>IS: imbarcazione
+
+                            alt imbarcazione non trovata
+                                IS-->>IC: throw IMBARCAZIONE_NOT_FOUND
+                            else imbarcazione trovata
+                                IS->>IS: parsed_start_date = new Date(start_date riformattata)
+                                alt parsed_start_date non valida (NaN)
+                                    IS-->>IC: throw INVALID_START_DATE
+                                else parsed_start_date valida
+                                    IS->>IS: parsed_end_date = new Date(end_date riformattata)
+                                    alt parsed_end_date non valida (NaN)
+                                        IS-->>IC: throw INVALID_END_DATE
+                                    else parsed_end_date valida
+                                        alt parsed_start_date > parsed_end_date
+                                            IS-->>IC: throw INVALID_DATE_RANGE
+                                        else range valido
+                                            IS->>IDAO: getPositionsByMmsiAndDateRange(mmsi, parsed_start_date, parsed_end_date)
+                                            IDAO-->>IS: dati[] (Datiinviati)
+                                            IS->>IS: mappa dati in FeatureCollection GeoJson (Point per ognuno)
+                                            IS-->>IC: FeatureCollection
+                                        end
+                                    end
+                                end
+                            end
+
+                            IC-->>AC: posizioni (FeatureCollection)
+                            AC-->>Client: 200 SuccessFactory(POSIZIONI_FOUND, posizioni)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    alt eccezione durante il processo
+        AC-->>Client: AppError.send(res) oppure INTERNAL_ERROR
+    end
+```
+
+### Rotta admin/imbarcazioni/geoaree/link
+
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    autonumber
+    box white
+    actor Admin as Admin (Client/Postman)
+    participant Router as AdminRoutes
+    participant Ctrl as AdminController
+    participant IC as ImbarcazioneController
+    participant Serv as ImbarcazioneService
+    participant IDAO as ImbarcazioneDAO
+    participant GDAO as GeofenceareaDAO
+    end
+    Admin->>Router: POST /imbarcazioni/geoaree/link [{mmsi, geoarea_ids[]}, ...]
+    Router->>Ctrl: linkGeoareasToImbarcazioni(req, res)
+    activate Ctrl
+
+    Note over Ctrl: try block start
+    Ctrl->>Ctrl: estrae links da req.body
+
+    alt links mancante o non è un array
+        Ctrl-->>Ctrl: throw INCORRECT_DATA
+    end
+
+    Ctrl->>IC: linkGeoareasToImbarcazioni(links)
+    activate IC
+
+    IC->>Serv: linkGeoareasToImbarcazioni(links)
+    activate Serv
+
+    Note over Serv: apre transazione (t)
+
+    loop per ogni {mmsi, geoarea_ids} in links
+        Serv->>IDAO: get(mmsi)
+        IDAO-->>Serv: restituisce Imbarcazione o null
+
+        alt Imbarcazione non trovata
+            Serv->>Serv: throw IMBARCAZIONE_NOT_FOUND
+        end
+
+        loop per ogni geoarea_id in geoarea_ids
+            Serv->>GDAO: get(geoarea_id)
+            GDAO-->>Serv: restituisce Geofencearea o null
+
+            alt Geoarea non trovata
+                Serv->>Serv: throw GEOAREA_NOT_FOUND
+            end
+
+            Serv->>Serv: imbarcazione.hasGeofencearea(geoarea_id)
+
+            alt Associazione già esistente
+                Serv->>Serv: throw INVALID_ASSOCIATION
+            end
+
+            Serv->>Serv: imbarcazione.addGeofencearea(geoarea_id, {transaction: t})
+        end
+    end
+
+    alt Errore durante il ciclo
+        Serv->>Serv: t.rollback()
+        Serv-->>IC: throw AppError | CREATE_ERROR
+    end
+
+    Serv->>Serv: t.commit()
+    Serv-->>IC: (void)
+    deactivate Serv
+
+    IC-->>Ctrl: (void)
+    deactivate IC
+
+    Ctrl->>Ctrl: getSuccess(GEOAREAS_LINKED, links)
+    Ctrl->>Admin: res.json(success JSON con links)
+
+    alt catch (err)
+        Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
+        Ctrl->>Admin: res.send(ErrorFactory.getError o err.send)
+    end
+    deactivate Ctrl
+```
+
+### Rotta admin/imbarcazione/create
+
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    autonumber
+    box white
+    actor Admin as Admin (Client/Postman)
+    participant Router as AdminRoutes
+    participant MW as ImbarcazioniMiddleware
+    participant Ctrl as AdminController
+    participant IC as ImbarcazioneController
+    participant Serv as ImbarcazioneService
+    participant ADAO as AdminDAO
+    participant IDAO as ImbarcazioneDAO
+    participant Fact as Success/Error Factory
+    end
+
+    Admin->>Router: POST /imbarcazione/create {mmsi, name, type, descr, max_capacity, user_id}
+    Router->>MW: validateImbarcazioneCreationBody(req, res, next)
+    activate MW
+
+    MW->>MW: valida body con imbarcazioneCreationSchema (zod)
+
+    alt Body non valido
+        MW->>Admin: res con errore (campo mancante/invalido)
+    end
+
+    MW-->>Router: next()
+    deactivate MW
+
+    Router->>Ctrl: createImbarcazione(req, res)
+    activate Ctrl
+
+    Note over Ctrl: try block start
+    Ctrl->>Ctrl: estrae {mmsi, name, type, descr, max_capacity, user_id} da req.body
+
+    alt Campo obbligatorio mancante
+        Ctrl->>Fact: getError(INCORRECT_DATA)
+        Ctrl-->>Ctrl: lancia AppError
+    end
+
+    Ctrl->>IC: createImbarcazione(data)
+    activate IC
+
+    IC->>Serv: createImbarcazione(data)
+    activate Serv
+
+    alt mmsi mancante
+        Serv->>Fact: getError(MISSING_DATA)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>ADAO: get(user_id)
+    ADAO-->>Serv: restituisce User o null
+
+    alt Utente non trovato
+        Serv->>Fact: getError(USER_NOT_FOUND)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>IDAO: get(mmsi)
+    IDAO-->>Serv: restituisce Imbarcazione o null
+
+    Serv->>IDAO: getByName(name)
+    IDAO-->>Serv: restituisce Imbarcazione o null
+
+    alt mmsi o name già esistenti
+        Serv->>Fact: getError(IMBARCAZIONE_ALREADY_EXISTS)
+        Serv-->>IC: lancia AppError
+    end
+
+    Note over Serv: apre transazione (t)
+    Serv->>IDAO: create(data, t)
+    IDAO-->>Serv: nuova Imbarcazione
+
+    alt Errore durante la create
+        Serv->>Serv: t.rollback()
+        Serv->>Fact: getError(CREATE_ERROR)
+        Serv-->>IC: lancia AppError
+    end
+
+    Serv->>Serv: t.commit()
+    Serv-->>IC: restituisce result (nuova imbarcazione)
+    deactivate Serv
+
+    IC-->>Ctrl: restituisce nuovaImbarcazione
+    deactivate IC
+
+    Ctrl->>Fact: getSuccess(IMBARCAZIONE_CREATED, nuovaImbarcazione)
+    Fact-->>Ctrl: Oggetto di successo
+    Ctrl->>Admin: res.json(success JSON)
+
+    alt catch (err)
+        Note over Ctrl: Se viene lanciato un errore in qualsiasi punto
+        Ctrl->>Admin: res.send(ErrorFactory.getError o err.send)
+    end
+    deactivate Ctrl
+```
+
+### Rotta admin/imbarcazioni/segnalazioni/get/all
+
+```mermaid
+---
+config:
+  theme: base
+  fontSize: 20
+  themeVariables:
+    primaryColor: "#000000"
+    primaryTextColor: "#ffffff"
+    lineColor: "#0000ff"
+    "actorBkg": "#FF2121"
+    "actorTextColor": "#000000"
+    "actorLineColor": "#000000"
+    "actorBorder": "#000000"
+    "labelBoxBkgColor": "#FF2121"
+    "labelBoxBorderColor": "#000000"
+    "signalColor": "#000000"
+    "signalTextColor": "#000000"
+    "noteBkgColor": "#FF8921"
+    "noteBorderColor": "#e50000"
+    "noteTextColor": "#000000"
+    "activationBkgColor": "#EBCB00"
+    "activationBorderColor": "#000000"
+---
+sequenceDiagram
+    autonumber
+    box white
+    participant Client
+    participant Router as AdminRoutes
+    participant AC as AdminController
+    participant IC as ImbarcazioneController
+    participant IS as ImbarcazioneService
+    participant IDAO as ImbarcazioneDAO
+    participant Model as Imbarcazione (Sequelize Model)
+    end
+
+    Client->>Router: GET /imbarcazioni/segnalazioni/all
+    Router->>AC: getAllImbarcazioniWithSegnalazioni(req, res)
+    AC->>IC: getAllImbarcazioniWithSegnalazioni()
+    IC->>IS: getAllImbarcazioniWithSegnalazioni()
+    IS->>IDAO: getAll()
+    IDAO-->>IS: imbarcazioni[]
+
+    alt nessuna imbarcazione trovata
+        IS-->>IC: throw IMBARCAZIONI_NOT_FOUND
+        IC-->>AC: propaga errore
+        AC-->>Client: AppError.send(res) / INTERNAL_ERROR
+    else imbarcazioni trovate
+        IS->>IS: getImbarcazioniWithSegnalazioni(imbarcazioni)
+        loop per ogni imbarcazione
+            IS->>Model: imbarcazione.getSegnalazioni({joinTableAttributes: []})
+            Model-->>IS: segnalazioni[]
+            alt segnalazioni.length === 0
+                IS->>IS: salta imbarcazione (continue)
+            else segnalazioni presenti
+                IS->>IS: result.push({imbarcazione, segnalazioni})
+            end
+        end
+        IS-->>IC: result[]
+        IC-->>AC: imbarcazioni_segnalazioni
+        AC-->>Client: 200 SuccessFactory(IMBARCAZIONI_SEGNALAZIONI_FOUND, imbarcazioni_segnalazioni)
+    end
+```
