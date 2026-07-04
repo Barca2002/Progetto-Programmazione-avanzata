@@ -22,7 +22,7 @@ export class ImbarcazioneService {
   private readonly logspostamentiDAO = new LogSpostamentiDAO();
 
   // Usata dall'adminController tramite imbarcazioneController.
-  async createImbarcazione(data: ImbarcazioneCreationData) {
+  public async createImbarcazione(data: ImbarcazioneCreationData) {
     if (!data.mmsi){
       throw ErrorFactory.getError(AppErrorEnum.MISSING_MMSI);
     }
@@ -49,7 +49,7 @@ export class ImbarcazioneService {
     }
   }
 
-  async getImbarcazioneByMmsi(mmsi: number) {
+  public async getImbarcazioneByMmsi(mmsi: number) {
     if (Number.isNaN(mmsi) || mmsi <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
     }
@@ -60,7 +60,7 @@ export class ImbarcazioneService {
     return imbarcazione;
   }
 
-  async getAllImbarcazioniWithGeofenceareas() {
+  public async getAllImbarcazioniWithGeofenceareas() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
     if (!imbarcazioni || imbarcazioni.length === 0){
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
@@ -68,7 +68,12 @@ export class ImbarcazioneService {
     return await this.generateImbarcazioniWithGeofenceareas(imbarcazioni);
   }
 
-  async getUserImbarcazioniWithGeofenceareas(user_id: number) {
+  /**
+   * Funzione che controlla l'id utente che gli è stato passato e tramite esso prende tutte le sue imbarcazioni. Poi restituisce tutte le imbarcazioni con le geofence aree autorizzate, generate dalla funzione chiamata nel return.
+   * @param user_id numero che rappresenta l'id dell'utente.
+   * @returns lista d'imbarcazioni con le relative geofence aree autorizzate.
+   */
+  public async getUserImbarcazioniWithGeofenceareas(user_id: number) {
     if (Number.isNaN(user_id) || user_id <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_USERID);
     }
@@ -80,15 +85,25 @@ export class ImbarcazioneService {
     return await this.generateImbarcazioniWithGeofenceareas(my_imbarcazioni);
   }
 
-  // Usata dalle funzioni precedenti (sia user che admin) per generare il json con le imbarcazioni e le corrispondenti geoaree associate.
-  async generateImbarcazioniWithGeofenceareas(imbarcazioni: Imbarcazione[]){
+  /**
+   * Funzione che, in base alle imbarcazioni passate come argomento, restituisce per oguna una lista di geofence aree autorizzate. Sono tolti alcuni attributi non necessari delle geofence aree.
+   * @param imbarcazioni lista di oggetti Imbarcazione.
+   * @returns lista di imbarcazioni con le relative geofence aree in formato JSON.
+   */
+  public async generateImbarcazioniWithGeofenceareas(imbarcazioni: Imbarcazione[]){
     const result = [];
 
     for (const imbarcazione of imbarcazioni) {
-      const associazioni = await imbarcazione.getGeofenceareas({joinTableAttributes: []}); // Togliamo gli attributi della molti a molti dalle associazioni.
-      const associazioniFiltered = []; // Togliamo gli attributi non necessari.
+      const associazioni = await imbarcazione.getGeofenceareas({joinTableAttributes: []});
+      const associazioniFiltered = [];
       for (const associazione of associazioni){
-        associazioniFiltered.push({ geoarea_id: associazione.geoarea_id, name: associazione.name, coordinates: associazione.area.coordinates, max_speed: associazione.max_speed ?? "Nessun limite di velocità", ultima_violazione_valida_id: associazione.ultima_violazione_valida_id, created_at: associazione.created_at });
+        associazioniFiltered.push({ 
+          geoarea_id: associazione.geoarea_id,
+          name: associazione.name, 
+          coordinates: associazione.area.coordinates, 
+          max_speed: associazione.max_speed ?? "Nessun limite di velocità",
+          ultima_violazione_valida_id: associazione.ultima_violazione_valida_id,
+          created_at: associazione.created_at });
       }
       result.push({ imbarcazione: imbarcazione.toJSON(), geofenceareas: associazioniFiltered });
     }
@@ -101,7 +116,7 @@ export class ImbarcazioneService {
    * @param geoarea_id numero che rappresenta l'id della geofence area.
    * @returns lista di imbarcazioni ed il relativo stato rispetto alla geofence area specificata in formato JSON.
    */
-  async generateImbarcazioniStatus(imbarcazioni: Imbarcazione[], geoarea_id: number) {
+  public async generateImbarcazioniStatus(imbarcazioni: Imbarcazione[], geoarea_id: number) {
     const results = [];
 
     for (const imbarcazione of imbarcazioni) {
@@ -129,7 +144,7 @@ export class ImbarcazioneService {
    * @param geoarea_id numero che rappresenta l'id della geofence area.
    * @returns insieme di imbarcazioni con il relativo stato in una geoarea, con tempo di permanenza se dentro di essa.
    */
-  async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
+  public async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
     }
@@ -147,7 +162,7 @@ export class ImbarcazioneService {
   }
 
   //FUNZIONE USATA DA ADMINCONTROLLER PER TORNARE LO STATO DI TUTTE LE IMBARCAZIONI IN UNA GEOAREA
-  async getAllImbarcazioniStatus(geoarea_id: number) {
+  public async getAllImbarcazioniStatus(geoarea_id: number) {
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
 
@@ -159,7 +174,7 @@ export class ImbarcazioneService {
   }
 
 
-  async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string, end_date: string): Promise<FeatureCollection> {
+  public async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string, end_date: string): Promise<FeatureCollection> {
     const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
     if (!imbarcazione)
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
@@ -196,7 +211,7 @@ export class ImbarcazioneService {
     };
   }
 
-  async getAllImbarcazioniWithSegnalazioni() {
+  public async getAllImbarcazioniWithSegnalazioni() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
 
     if(!imbarcazioni || imbarcazioni.length === 0){
@@ -206,7 +221,12 @@ export class ImbarcazioneService {
     return await this.getImbarcazioniWithSegnalazioni(imbarcazioni);
   }
 
-  async getUserImbarcazioniWithSegnalazioni(user_id: number) {
+  /**
+   * Funzione che prende tutte le imbarcazioni di un utente, se le trova restituisce anche le loro segnalazioni.
+   * @param user_id numero che rappresenta l'id dell'utente.
+   * @returns lista d'imbarcazioni con le relative segnalazioni in formato JSON.
+   */
+  public async getUserImbarcazioniWithSegnalazioni(user_id: number) {
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
 
     if(!my_imbarcazioni || my_imbarcazioni.length === 0){
@@ -216,14 +236,18 @@ export class ImbarcazioneService {
     return await this.getImbarcazioniWithSegnalazioni(my_imbarcazioni);
   }
 
-  // Ritorna una lista di imbarcazioni con le relative segnalazioni. Se un'imbarcazione non ha segnalazioni, non viene inclusa nel risultato.
-  async getImbarcazioniWithSegnalazioni(imbarcazioni: Imbarcazione[]) {
+  /**
+   * Funzione che ritorna tutte le imbarcazioni di un utente con le relative segnalazioni. Se un'imbarcazione non ha segnalazioni, non viene inclusa nel risultato.
+   * @param imbarcazioni lista di oggetti Imbarcazione.
+   * @returns lista di imbarcazioni con le relative segnalazioni in formato JSON.
+   */
+  public async getImbarcazioniWithSegnalazioni(imbarcazioni: Imbarcazione[]) {
     const result = [];
     for (const imbarcazione of imbarcazioni) {
       const segnalazioni = await imbarcazione.getSegnalazioni({joinTableAttributes: []
-      }); // Togliamo gli attributi della tabella molti a molti.
+      });
       if (segnalazioni.length === 0) {
-        continue; // Se non ci sono segnalazioni per questa imbarcazione, saltiamo l'iterazione.
+        continue;
       }
       // Togliamo il campo created_at anche dall'imbarcazione.
       result.push({ imbarcazione: imbarcazione, segnalazioni });
@@ -231,7 +255,7 @@ export class ImbarcazioneService {
     return result;
   }
 
-  async unlinkGeoareaImbarcazione(unlink: UnlinkDataBody) {
+  public async unlinkGeoareaImbarcazione(unlink: UnlinkDataBody) {
     try {
       //Controllo che l'imbarcazione esista
       const imbarcazione = await this.imbarcazioneDAO.get(unlink.mmsi);
@@ -259,7 +283,7 @@ export class ImbarcazioneService {
     }
   }
 
-  async linkGeoareasToImbarcazioni(links: LinkDataBody[]){
+  public async linkGeoareasToImbarcazioni(links: LinkDataBody[]){
     // La transazione è necessaria perché si può linkare un imbarcazione a più geoaree più volte. 
     const t = await DatabaseConnection.getInstance().transaction();
     try {
@@ -297,7 +321,7 @@ export class ImbarcazioneService {
     }
   }
 
-  async checkOwnershipImbarcazione(user_id: number, mmsi: number): Promise<boolean> {
+  public async checkOwnershipImbarcazione(user_id: number, mmsi: number): Promise<boolean> {
     // Controlliamo se l'user_id dell'imbarcazione e l'user_id dell'utente sono uguali, verificando quindi se l'imbarcazione è di proprietà dell'utente.
     const imbarcazione = await this.getImbarcazioneByMmsi(mmsi);
     if (imbarcazione?.user_id !== user_id) {

@@ -22,7 +22,7 @@ export class UserController {
   private readonly imbarcazioneController = new ImbarcazioneController();
 
   /**
-   * Controlla se il token JWT è valido, poi effettua il controllo ed il salvataggio dei dati inviati. Successivamente scala i token per la richiesta e controlla se generare le violazioni. Infine, controlla se generare una segnalazione per la geofence area corrispondente ai dati inviati (se applicabile).
+   * Funzione che controlla se il token JWT è valido, poi effettua il controllo ed il salvataggio dei dati inviati. Successivamente scala i token per la richiesta e controlla se generare le violazioni. Infine, controlla se generare una segnalazione per la geofence area corrispondente ai dati inviati (se applicabile).
    * @param req oggetto contenente il body della richiesta con tutti i dati necessari come l'mmsi della barca, longitudine e latitudine, etc.
    * @param res oggetto AppSuccess con i dati inviati dall'utente.
    */
@@ -52,7 +52,7 @@ export class UserController {
   }
 
   /**
-   * Retsituisce lo stato delle proprie imbarcazioni in una certa geofence area, cioè se si trova dentro o fuori da essa. All'inizio si effettua il controllo del token e tramite esso si prende l'id dell'utente dal token JWT decodificato.
+   * Funzione che restituisce lo stato delle proprie imbarcazioni in una certa geofence area, cioè se si trova dentro o fuori da essa. All'inizio si effettua il controllo del token e tramite esso si prende l'id dell'utente dal token JWT decodificato.
    * @param req oggetto che contiene il body della richiesta.
    * @param res oggetto che contiene lo stato delle imbarcazioni.
    */
@@ -71,7 +71,11 @@ export class UserController {
     }
   }
 
-
+  /**
+   * Funzione che ritorna tutte le imbarcazioni dell'utente loggato e le segnalazioni che ha generato. Inoltre toglie alcuni campi come l'id utente dell'imbarcazione, l'id della segnalazione e l'id della geofence area associata.
+   * @param req oggetto che contiene il body della richiesta.
+   * @param res oggetto che contiene le imbarcazioni e le segnalazioni associate in formato JSON.
+   */
   public async getMyImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
       const user_id = checkToken(req).user_id;
@@ -99,12 +103,16 @@ export class UserController {
     SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, { tokens: user.tokens }).send(res);
   }
 
-  // Funzione usata dalla rotta utente per ritornare se tutte le imbarcazioni dell'utente loggato sono nella geoarea inserita nella richiesta.
+  /**
+   * Funzione che ritorna tutte le imbarcazioni dell'utente loggato e le geofence aree associate. Inoltre toglie alcuni campi come l'id dell'utente, della geofence area e dell'ultima violazione valida associata alla geoarea.
+   * @param req oggetto che contiene il body della richiesta.
+   * @param res oggetto che contiene le imbarcazioni e le geofence aree associate in formato JSON.
+   */
   public async getMyImbarcazioniWithGeofenceareas(req: Request, res: Response) {
     try {
       const user_id = checkToken(req).user_id;
       const imbarcazioni = await this.imbarcazioneController.getUserImbarcazioniWithGeofenceareas(user_id);
-      // Togliamo il campo ultima_violazione_valida_id, user_id e geoarea_id
+  
       const imbarcazioniFiltered = imbarcazioni.map(item => ({
         ...item,
         imbarcazione: (({ user_id, ...rest }) => rest)(item.imbarcazione),
