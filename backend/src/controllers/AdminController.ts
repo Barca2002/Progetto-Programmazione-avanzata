@@ -87,14 +87,17 @@ export class AdminController {
     }
   }
 
+  /**
+   * Funzione per creare un'imbarcazione, prendendo i valori necessari per la creazione dal body: mmsi, name, type, descr, max_capacity e user_id, segnalando un errore in mancanza di uno di essi
+   * @param req 
+   * @param res 
+   */
   public async createImbarcazione(req: Request, res: Response) {
     try {
       const { mmsi, name, type, descr, max_capacity, user_id } = req.body as ImbarcazioneCreationData;
-
       if (!user_id || !mmsi || !name || !type || !descr || !max_capacity) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
-
       const nuovaImbarcazione = await this.imbarcazioneController.createImbarcazione({ mmsi, name, type, descr, max_capacity, user_id });
       SuccessFactory.getSuccess(AppSuccessEnum.IMBARCAZIONE_CREATED, nuovaImbarcazione).send(res);
     } catch (err) {

@@ -100,7 +100,7 @@ export class AuthService{
   }
 
   /**
-   * Regsitra un utente controllando se le credenziali fornite sono già state usate. Se non sono già usate, crea l'hash della password e restituisce le informazioni all'AuthController. Di default l'utente creato non è admin per ovvi motivi di sicurezza.
+   * Registra un utente controllando se le credenziali fornite sono già state usate. Se non sono già usate, crea l'hash della password e restituisce le informazioni all'AuthController. Di default l'utente creato non è admin per ovvi motivi di sicurezza.
    * @param email stringa contenente l'email.
    * @param username stringa contenente l'username.
    * @param password stringa contenente la password.

@@ -53,6 +53,11 @@ export class ImbarcazioneController {
     return await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(data.mmsi, data.start_date, end_date);
   }
 
+  /**
+   * Funzione che ritorna l'imbarcazione creata 
+   * @param data: contiene i dati necessari per la creazione dell'imbarcazione
+   * @returns: oggetto imbarcazione
+   */
   public async createImbarcazione(data: ImbarcazioneCreationData) {
       return await this.imbarcazioneService.createImbarcazione(data);
   }
