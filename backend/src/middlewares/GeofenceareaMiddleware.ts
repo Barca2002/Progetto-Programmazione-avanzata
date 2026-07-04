@@ -10,7 +10,9 @@ import { MIN_NAME_LENGTH, MAX_NAME_LENGTH, MAX_SPEED_ALLOWED, MAX_POINTS } from 
 
 export const checkCreation = [checkGeoJsonFormat, checkCoordinates];
 
-// Per controllare la longitudine e latitudine delle posizioni, usiamo questo schema. ctx è il contesto e value è il dato che stiamo validando. superRefine(), a differenza di refine() che restituisce solo un booleano, permette di creare errori custom e fare validazione avanzata.
+/**
+ * Definizione dello schema di validazione della richiesta di creazione di una geofence area. Usato in geofenceAreaSchema
+ */
 const PositionSchema = z.array(z.number()).superRefine((value, ctx) => {
     const [lon, lat] = value;
     if (value.length !== 2) {
@@ -74,9 +76,11 @@ const PositionSchema = z.array(z.number()).superRefine((value, ctx) => {
     }
 });
 
-// Definizione dello schema di validazione per il formato GeoJSON. strict() va messo us ogni z.object, altrimenti si possono inserire campi aggiuntivi nei vari pezzi del body della richiesta.
+/**
+ * Definizione dello schema di validazione per il formato GeoJSON della richiesta d'invio dei dati di posizione.
+ */
 const geofenceAreaSchema = z.object({
-    type: z.string().refine(v => v === "FeatureCollection", { message: "INVALID_TYPE_FEATURECOLLECTION" }), // Non usiamo z.literal() perché sennò, in caso di parametro mancante, l'errore generato è invalid_value e non invalid_type, quindi non potevamo gestirlo con lo switch nella validazione.
+    type: z.string().refine(v => v === "FeatureCollection", { message: "INVALID_TYPE_FEATURECOLLECTION" }),
     features: z.array(
         z.object({
             type: z.string().refine(v => v === "Feature", { message: "INVALID_TYPE_FEATURE" }),
@@ -86,8 +90,6 @@ const geofenceAreaSchema = z.object({
             }).strict(),
             geometry: z.object({
                 type: z.string().refine(v => v === "Polygon", { message: "INVALID_TYPE_FEATURE_GEOMETRY" }),
-                // Le coordinate sono: [[[long, lat], [long, lat], ...]]
-                // Controlliamo anche che i numeri decimali non superino il massimo consentito
                 coordinates: z.array(
                     z.array(PositionSchema)
                 )
@@ -96,6 +98,13 @@ const geofenceAreaSchema = z.object({
     ),
 }).strict();
 
+/**
+ * Funzione per mappare gli errori dei campi della richiesta con gli errori definiti nell'enum. Distingue se il campo è mancante o se il formato è errato. Inoltre, sono stati usate degli errori customizzati per controlli aggiuntivi. 
+ * @param campo stringa che rappresenta il campo del body della richiesta da validare.
+ * @param issue oggetto di Zod che rappresenta il problema del campo. Permette di distinguere se è missing o di tipo errato/invalido.
+ * @param reqBody oggetto che rappresenta il body della richiesta. Serve per vedere se il campo è mancante o di tipo errato.
+ * @returns restituisce un errore di AppErrorEnum in base al campo, se è mancante o invalido.
+ */
 export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, reqBody: any): AppErrorName {
 
     if (issue.code === "unrecognized_keys") {
@@ -105,7 +114,6 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
     const missing = isMissingIssueGeoJSON(issue, reqBody);
     const pathString = issue.path.join(".");
 
-    // Controllo basato sui messaggi custom impostati in PositionSchema, serve per le coordinate.
     if (issue.code === "custom") {
         const customErrorMap: Record<string, AppErrorName> = {
             "2_VALUES_ONLY": AppErrorEnum.INVALID_POSITION_VALUES,
@@ -163,7 +171,6 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
 
     const entry = errorMap[pathString];
     
-    // Se il path riscontrato non è registrato nella mappa, restituiamo un errore generico
     if (!entry) {
         return missing ? AppErrorEnum.MISSING_DATA : AppErrorEnum.INCORRECT_DATA;
     }
@@ -171,47 +178,53 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
     return missing ? entry.missing : entry.invalid;
 }
 
+/**
+ * Funzione che effettua la validazione del formato GeoJSON.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function checkGeoJsonFormat(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, geofenceAreaSchema, mapGeofenceAreaErrors, next);
 }
 
+/**
+ * Funzione che effettua la validazione delle coordinate. I vincoli sono:
+ * Le coordinate devono contenere almeno 4 punti (per creare un triangolo servono 3 punti più l'ultimo che si sovrappone al primo)
+ * L'ultimo punto ed il primo devono essere uguali per chiudere il poligono.
+ * Le linee del poligono non possono intersecarsi.
+ * La funzione kinks restituisce il numero di punti di autointersezione di un poligono.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 function checkCoordinates(req: Request, res: Response, next: NextFunction) {
-    // Le coordinate deve essere un array di Position, cioè coppie di latitudine e longitudine. Lo standard impone questo tipo.
+    
     const coordinates = req.body?.features?.[0]?.geometry?.coordinates as Position[][];
-    const punti = coordinates?.[0]; // Prendiamo l'array di punti
+    const punti = coordinates?.[0];
     if (!coordinates || !punti) {
         return next(ErrorFactory.getError(AppErrorEnum.MISSING_COORDINATES));
     }
-    // Bisogna controllare 3 cose principali:
-    // - Le coordinate devono contenere almeno 4 punti (per creare un triangolo
-    //   servono 3 punti + l'ultimo che si sovrappone al primo).
-    // - L'ultimo punto ed il primo devono essere uguali per chiudere il poligono
-    // - Le linee del poligono non possono intersecarsi.
-
-    // Controllo che coordinates sia un array e che i punti siano un array (cioè coordinates[0])
-    if (!Array.isArray(coordinates) || !Array.isArray(coordinates[0])) {
+    if (!Array.isArray(coordinates) || !Array.isArray(punti)) {
         return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA));
     }
-
-    // Ci devono essere minimo 4 punti e massimo MAX_POINTS punti per definire una geofence area.    
     if (punti.length < 4) {
         return next(ErrorFactory.getError(AppErrorEnum.TOO_LITTLE_POINTS));
     }
     if (punti.length > MAX_POINTS) {
         return next(ErrorFactory.getError(AppErrorEnum.TOO_MANY_POINTS));
     }
-    // Controllo che il primo e l'ultimo punto coincidono per chiudere l'area. la posizione 0 indica la longitudine, la posizione 1 indica la latitudine.
+
     const primoPunto = punti[0];
     const ultimoPunto = punti.at(-1);
     if (!primoPunto || !ultimoPunto || primoPunto[0] !== ultimoPunto[0] || primoPunto[1] !== ultimoPunto[1]) {
         return next(ErrorFactory.getError(AppErrorEnum.INCORRECT_COORDS));
     }
-    // Con turf controlliamo se ci sono punti di sovrapposizione nel poligono
-    // Definito dalle coordinare.
+
     const polygon = turf.polygon(coordinates);
-    const kinks = turf.kinks(polygon);
-    // kinks contiene il numero di punti di autointersezione, quindi se ce ne sta uno o più, allora il poligono ha dei tratti che s'intersecano
-    if (kinks.features.length > 0) {
+    const autointersezioni = turf.kinks(polygon);
+    
+    if (autointersezioni.features.length > 0) {
         return next(ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON));
     }
 

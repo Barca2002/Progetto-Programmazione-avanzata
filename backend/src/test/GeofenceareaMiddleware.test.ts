@@ -8,7 +8,6 @@ const res = {} as any;
 const next = jest.fn();
 const getError = () => next.mock.calls[0][0] as AppError;
 
-// Siccome il body viene modificato, meglio metterlo in una funzione, cos' ad ogni chiamata viene creata una nuova copia, senza creare problemi per i vari test.
 const validBody = () => ({
   type: "FeatureCollection",
   features: [
@@ -30,9 +29,6 @@ const validBody = () => ({
   ],
 });
 
-// --------------------------------------------------
-// checkGeoJsonFormat
-// --------------------------------------------------
 
 describe("checkGeoJsonFormat", () => {
   beforeEach(() => jest.resetAllMocks());

@@ -17,10 +17,6 @@ const validBody = {
   stato: "IN NAVIGAZIONE",
 };
 
-// --------------------------------------------------
-// checkDatiInviati
-// --------------------------------------------------
-
 describe("checkDatiInviati", () => {
   beforeEach(() => jest.resetAllMocks());
 
@@ -33,7 +29,7 @@ describe("checkDatiInviati", () => {
   });
 
   test("mmsi mancante -> MISSING_MMSI", () => {
-    const bodyIncompleto = {...validBody}
+    const bodyIncompleto = { ...validBody }
     delete (bodyIncompleto as any)["mmsi"];
     checkDatiInviati(
       mockReq(bodyIncompleto),
@@ -46,7 +42,7 @@ describe("checkDatiInviati", () => {
 
   test("mmsi non valido -> INVALID_MMSI", () => {
     checkDatiInviati(
-      mockReq({...validBody, mmsi: 12345}),
+      mockReq({ ...validBody, mmsi: 12345 }),
       res,
       next
     );
@@ -55,7 +51,7 @@ describe("checkDatiInviati", () => {
   });
 
   test("latitudine mancante -> MISSING_LATITUDINE", () => {
-    const bodyIncompleto = {...validBody}
+    const bodyIncompleto = { ...validBody }
     delete (bodyIncompleto as any)["latitudine"];
     checkDatiInviati(
       mockReq(bodyIncompleto),
@@ -68,7 +64,7 @@ describe("checkDatiInviati", () => {
 
   test("latitudine fuori range -> INVALID_LATITUDINE", () => {
     checkDatiInviati(
-      mockReq({...validBody, latitudine: 91}),
+      mockReq({ ...validBody, latitudine: 91 }),
       res,
       next
     );
@@ -77,7 +73,7 @@ describe("checkDatiInviati", () => {
   });
 
   test("longitudine mancante -> MISSING_LONGITUDINE", () => {
-    const bodyIncompleto = {...validBody}
+    const bodyIncompleto = { ...validBody }
     delete (bodyIncompleto as any)["longitudine"];
     checkDatiInviati(
       mockReq(bodyIncompleto),
@@ -90,7 +86,7 @@ describe("checkDatiInviati", () => {
 
   test("longitudine fuori range -> INVALID_LONGITUDINE", () => {
     checkDatiInviati(
-      mockReq({...validBody, longitudine: 181}),
+      mockReq({ ...validBody, longitudine: 181 }),
       res,
       next
     );
@@ -99,7 +95,7 @@ describe("checkDatiInviati", () => {
   });
 
   test("velocita mancante -> MISSING_VELOCITA_KMH", () => {
-    const bodyIncompleto = {...validBody}
+    const bodyIncompleto = { ...validBody }
     delete (bodyIncompleto as any)["velocita_kmh"];
     checkDatiInviati(
       mockReq(bodyIncompleto),
@@ -112,7 +108,7 @@ describe("checkDatiInviati", () => {
 
   test("velocita troppo alta -> INVALID_VELOCITA", () => {
     checkDatiInviati(
-      mockReq({...validBody, velocita_kmh: MAX_SPEED_ALLOWED + 1}),
+      mockReq({ ...validBody, velocita_kmh: MAX_SPEED_ALLOWED + 1 }),
       res,
       next
     );
@@ -121,7 +117,7 @@ describe("checkDatiInviati", () => {
   });
 
   test("stato non valido -> MISSING_STATO", () => {
-    const bodyIncompleto = {...validBody}
+    const bodyIncompleto = { ...validBody }
     delete (bodyIncompleto as any)["stato"];
     checkDatiInviati(
       mockReq(bodyIncompleto),
@@ -134,7 +130,7 @@ describe("checkDatiInviati", () => {
 
   test("stato non valido -> INVALID_STATO", () => {
     checkDatiInviati(
-      mockReq({...validBody, stato: "FERMO"}),
+      mockReq({ ...validBody, stato: "FERMO" }),
       res,
       next
     );

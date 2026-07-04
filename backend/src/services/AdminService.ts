@@ -11,6 +11,11 @@ export class AdminService {
   private readonly adminDAO = new AdminDAO();
   private readonly authService = new AuthService();
 
+  /**
+   * Funzione che crea un utente in base al parametro data.
+   * @param data oggetto che implementa l'interfaccioa UserCreationData, quindi che contiene i dati necessari per la creazioni.
+   * @returns oggetto User.
+   */
   public async createUtente(data: UserCreationData) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {

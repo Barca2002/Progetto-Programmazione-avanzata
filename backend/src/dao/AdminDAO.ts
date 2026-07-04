@@ -2,12 +2,14 @@ import { User, UserCreationData } from '../models/UserModel.js';
 import { Transaction } from 'sequelize';
 import { InterfacciaDAO } from './InterfacciaDAO.js';
 
-/*
-* I DAO devono solo occuparsi effettuare operazioni basilari (CRUD) con i dati,
-* quindi le eccezioni/errori devono essere gestiti nei service o controllers.
-*/
 
 export class AdminDAO implements InterfacciaDAO<User> {
+  /**
+   * Funzione che crea un utente nel database.
+   * @param data oggetto che implementa l'interfaccioa UserCreationData, quindi che contiene i dati necessari per la creazioni.
+   * @param t oggetto Transaction che rappresenta una transazione nel database.
+   * @returns oggetto User.
+   */
   public async create(data: UserCreationData, t: Transaction): Promise<User> {
     return await User.create(data, { transaction: t });
   }
