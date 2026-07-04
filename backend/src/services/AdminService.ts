@@ -113,7 +113,6 @@ export class AdminService {
       if (user.tokens <= 0) {
         throw ErrorFactory.getError(AppErrorEnum.TOKEN_SPEND_ERROR);
       }
-      // Aggiornamento del saldo dei token dell'utente
       const result = await user.update({ tokens: tokenAmount }, { transaction: t });
       await t.commit();
       return SuccessFactory.getSuccess(AppSuccessEnum.TOKEN_BALANCE_UPDATED, result.tokens);

@@ -29,7 +29,6 @@ export const datiInviatiSchema = z.object({
 
 function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
-    console.log(issue)
     
     const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
         mmsi: {

@@ -39,7 +39,6 @@ export class ViolazioneService {
             if (err instanceof AppError) {
                 throw err;
             }
-            console.log(err);
             throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);
         }
     }
@@ -51,7 +50,6 @@ export class ViolazioneService {
 
         // Siccome possiamo avere posizioni che non sono in una geoarea, non c'è nessuna violazione da creare
         if (!current_area) {
-            console.log("l'area è nulla");
             return;
         }
         // Teniamo traccia se una violazione è già stata registrata per evitare di contarne due nel conteggio per generare uan segnalazione.

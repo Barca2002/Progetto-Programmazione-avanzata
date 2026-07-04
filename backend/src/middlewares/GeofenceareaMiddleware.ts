@@ -98,7 +98,6 @@ const geofenceAreaSchema = z.object({
 
 export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, reqBody: any): AppErrorName {
 
-    console.log(issue);
     if (issue.code === "unrecognized_keys") {
         return AppErrorEnum.INVALID_PARAMS;
     }

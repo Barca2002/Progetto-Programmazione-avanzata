@@ -55,7 +55,6 @@ export class UserController {
     try {
       const user_id = checkToken(req).user_id;
       const geoarea_id = Number(req.params.geoarea_id);
-      //console.log(geoarea_id, Number.isInteger(geoarea_id));
       const my_imbarcazioni_status = await this.imbarcazioneService.getMyImbarcazioniStatus(user_id, geoarea_id);
       SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, my_imbarcazioni_status).send(res);
     } catch (err) {

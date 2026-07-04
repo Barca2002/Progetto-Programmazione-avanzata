@@ -201,7 +201,6 @@ export class AdminController {
       if (err instanceof AppError) {
         err.send(res);
       } else {
-        console.log(err);
         ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
       }
     }
