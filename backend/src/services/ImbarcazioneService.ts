@@ -61,10 +61,14 @@ export class ImbarcazioneService {
     return imbarcazione;
   }
 
+  /**
+   * Funzione che torna tutte le imbarcazioni con le geofence aree associate controllando se sono presenti effettivamente, le imbarcazioni
+   * @returns lista di tutte le imbarcazioni con le proprie geofence aree associate 
+   */
   public async getAllImbarcazioniWithGeofenceareas() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
     if (!imbarcazioni || imbarcazioni.length === 0) {
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONI_NOT_FOUND);
     }
     return await this.generateImbarcazioniWithGeofenceareas(imbarcazioni);
   }
@@ -87,7 +91,7 @@ export class ImbarcazioneService {
   }
 
   /**
-   * Funzione che, in base alle imbarcazioni passate come argomento, restituisce per oguna una lista di geofence aree autorizzate. Sono tolti alcuni attributi non necessari delle geofence aree.
+   * Funzione che, in base alle imbarcazioni passate come argomento, restituisce per ognuna una lista di geofence aree autorizzate. Sono tolti alcuni attributi non necessari delle geofence aree.
    * @param imbarcazioni lista di oggetti Imbarcazione.
    * @returns lista di imbarcazioni con le relative geofence aree in formato JSON.
    */

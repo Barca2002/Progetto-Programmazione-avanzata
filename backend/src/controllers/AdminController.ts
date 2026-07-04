@@ -239,6 +239,11 @@ export class AdminController {
     }
   };
 
+  /**
+   * Funzione che torna tutte le imbarcazioni con le proprie geofence aree associate
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
+   */
   public async getAllImbarcazioniWithGeofenceareas(req: Request, res: Response): Promise<void> {
     try {
       const imbarcazioni = await this.imbarcazioneController.getAllImbarcazioniWithGeofenceareas();

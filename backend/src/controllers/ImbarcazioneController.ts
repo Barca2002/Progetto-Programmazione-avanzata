@@ -7,7 +7,10 @@ export class ImbarcazioneController {
   public readonly imbarcazioneService = new ImbarcazioneService();
   public readonly geofenceareaService = new GeofenceareaService();
 
-  // Funzione che ritorna all'adminController tutte le imbarcazioni che sono in una geoarea.
+  /**
+   * Funzione che torna tutte le imbarcazioni con le proprie geofence aree associate
+   * @returns lista di imbarcazioni con le proprie geofence aree associate
+   */
   public async getAllImbarcazioniWithGeofenceareas() {
     return await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
   }
