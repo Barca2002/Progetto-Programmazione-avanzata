@@ -137,7 +137,7 @@ export class AdminController {
       }
       const unlink: UnlinkDataBody = {mmsi: mmsi, geoarea_id: geoarea_id}
       await this.imbarcazioneController.unlinkGeoareaToImbarcazioni(unlink);
-      SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, { mmsi: mmsi, geoarea_id: geoarea_id }).send(res);
+      SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, unlink).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

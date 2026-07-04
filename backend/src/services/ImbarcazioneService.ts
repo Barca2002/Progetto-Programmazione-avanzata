@@ -210,7 +210,7 @@ export class ImbarcazioneService {
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
 
     if(!my_imbarcazioni || my_imbarcazioni.length === 0){
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONI_NOT_FOUND)
     }
 
     return await this.getImbarcazioniWithSegnalazioni(my_imbarcazioni);
