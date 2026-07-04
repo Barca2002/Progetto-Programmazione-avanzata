@@ -17,6 +17,11 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
     return await Violazione.findAll();
   }
 
+  /**
+   * Ritorna l'ultima violazione valida di una geofence area.
+   * @param geoarea_id numero che rappresenta l'id della geofence area.
+   * @returns oggetto Violazione o null.
+   */
   public async getUltimaViolazioneValida(geoarea_id: number): Promise<Violazione | null> {
     const geoarea = await Geofencearea.findByPk(geoarea_id);
     return await Violazione.findOne({ where: { id: geoarea?.ultima_violazione_valida_id } })

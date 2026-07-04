@@ -16,6 +16,11 @@ export class SegnalazioneService {
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaDAO = new GeofenceareaDAO();
 
+    /**
+     * Funzione che aggiunge imbarcazioni ad una segnalazione tramite un insieme di violazioni. I duplicati vengono scartati.
+     * @param segnalazione oggetto Segnalazione.
+     * @param violazioni lista di oggetti Violazione.
+     */
     public async addImbarcazioniToSegnalazione(segnalazione: Segnalazione, violazioni: Violazione[]) {
         if (!await this.segnalazioneDao.get(segnalazione.id)) {
             throw ErrorFactory.getError(AppErrorEnum.SEGNALAZIONE_NOT_FOUND)
@@ -26,16 +31,19 @@ export class SegnalazioneService {
             for (const violazione of violazioni) {
                 imbarcazioniMmsi.add(violazione.mmsi);
             }
-            // Sfruttiamo l'associazione con segnalazione e imbarcazione per aggiungere tutti le imbarcazioni tramite mmsi. ignoreDuplicates è sicurezza ridondante contro i duplicati.
             await segnalazione.addImbarcazioni([...imbarcazioniMmsi], { ignoreDuplicates: true, transaction: t });
             await t.commit();
         } catch (error) {
             await t.rollback()
             throw ErrorFactory.getError(AppErrorEnum.ADD_IMBARCAZIONI_TO_SEGNALAZIONE_ERROR);
         }
-
     }
 
+    /**
+     * Funzione che crea una segnalazione in base ai dati passati. Controlla se la geofence area associata esiste.
+     * @param data oggetto che implementa l'interfaccia ViolazioneCreationData, quindi che contiene tutti i dati necessari per creare una violazione.
+     * @param violazioni lista di violazioni.
+     */
     public async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]) {
         const t = await DatabaseConnection.getInstance().transaction();
         try {
@@ -45,7 +53,7 @@ export class SegnalazioneService {
             }
             const newSegnalazione = await this.segnalazioneDao.create(data, t);
             await t.commit();
-            // Vogliamo gli mmsi univoci, perché non possiamo inserire duplicati nella tabella imbarcazioni_segnalazioni.
+
             await this.addImbarcazioniToSegnalazione(newSegnalazione, violazioni);
             await t.commit();
         } catch (err) {
@@ -57,21 +65,26 @@ export class SegnalazioneService {
         }
     }
 
-    // Funzione per controllare se generare o no una segnalazione per una geoarea.
+    /**
+     * Funzione che controlla se generare una segnalazione in base ai dati inviati dall'utente e alle violazioni precedenti di una geofence area. Inoltre si controlla se le violazioni precedenti ed attuali sono valide. Cioè ci devono essere almeno 6 violazioni valide in una finestra temporale di 2 giorni dall'ultima valida. Le violazioni che arrivano dopo l'ultima valida devono discostare di più di 1 ora per diventare valide.
+     * Il numero d'imbarcazioni che fanno parte della segnalazione può aumentare man mano che arrivano altri dati.
+     * Se il numero di violazioni valide diventa 5 o meno, la segnalazione va in stato ritirata.
+     * Se l'imbarcazione è fuori da una geofence area, non si genera una segnalazione.
+     * @param data oggetto che implementa l'interfaccia ViolazioneCreationData, quindi che contiene tutti i dati necessari per creare una violazione.
+     * @returns void.
+     */
     public async checkIfSegnalazione(data: DatiinviatiCreationData) {
         const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         if (!current_geoarea) {
-            // Possono esserci posizioni fuori dalle geoaree, quindi in tal caso non si controlla neanche se generare una segnalazione perché non si entra in nessuna geoarea.
             return;
         }
-        // Prendo l'ultima violazione valida della geoarea corrente.
+
         let ultimaViolazioneValida = await this.violazioneDAO.getUltimaViolazioneValida(current_geoarea.geoarea_id);
 
         if (!ultimaViolazioneValida) {
-            // C'è il caso in cui non è stata mai commessa una violazione per una geoarea, quindi in tal caso si ritorna e basta, non si controlla per niente se geneare la segnalazione.
             return;
         }
-        // Prendo le violazioni della geoarea che sono vecchie al massimo 2 giorni dall'ultima violazione valida perché le altre non servono. Potrebbe contenere nuove violazioni non valide (potrebbe avere n violazioni che sono arrivate prima di 1 ora dall'ultima violazioen valida).
+
         const violazioniRecenti = await this.violazioneDAO.getRecentByGeoarea(current_geoarea.geoarea_id);
         const ultimaViolazione = violazioniRecenti![0];
 
@@ -79,10 +92,8 @@ export class SegnalazioneService {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
 
-        // Se l'ultima violazione è avvenuta al massimo 1 ora dopo l'ultima violazione valida, non deve essere contata. Di conseguenza anche tutte le violazioni avvenute prima di essa.
         const ultimaViolazioneIsValid = (ultimaViolazione!.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 60 * 60 * 1000;
 
-        // Se l'ultima violazione è valida, allora aggiorniamo quella nella geofence area.
         if (ultimaViolazioneIsValid) {
             const t = await DatabaseConnection.getInstance().transaction();
             await this.geofenceareaDAO.update(current_geoarea.geoarea_id, { ultima_violazione_valida_id: ultimaViolazione.id }, t);
@@ -90,19 +101,14 @@ export class SegnalazioneService {
             ultimaViolazioneValida = ultimaViolazione;
         }
 
-        // Se non ci sono violazioni recenti (cioè entro 2 giorni) o sono < di 5 non bisogna generare una segnalazione, ma controllare se l'ultima deve essere ritirata.
         if (!violazioniRecenti || violazioniRecenti?.length <= 5) {
             await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
             return;
         }
 
-        // --- CONTROLLO VALIDITA' VIOLAZIONI RECENTI ----
-        // Per definire la finestra temporale bisogna decidere qual'è la violazione di partenza (l'ultima trovata o l'ultima valida salvata).
-        // Definizione finestra di 2 giorni. Dal inizioFinestra andiamo indietro di 2 giorni.
         const inizioFinestra = new Date(ultimaViolazioneValida.created_at).getTime();
         const fineFinestra = inizioFinestra - 2 * 24 * 60 * 60 * 1000;
 
-        // Filtriamo le violazioni in base al vincolo temporale.
         let violazioniValide: Violazione[] = [];
         for (const v of violazioniRecenti) {
             const t = new Date(v.created_at).getTime();
@@ -111,29 +117,31 @@ export class SegnalazioneService {
             }
         }
 
-        // Se ci sono più di 5 violazioni, emettiamo una segnalazione per quella geoarea (se già non c'è).
         if (violazioniValide.length > 5) {
-            // Se già c'è una segnalazione in corso, non serve ricrearla, ma solo aggiungere le nuove imbarcazioni che hanno generato le violazioni valide.
             const lastSegnalazione = await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id);
             if (lastSegnalazione) {
-                    await this.addImbarcazioniToSegnalazione(lastSegnalazione, violazioniValide);
-                    return;
-                }
-            // Se non c'è una segnalazione in corso, la creiamo.
+                await this.addImbarcazioniToSegnalazione(lastSegnalazione, violazioniValide);
+                return;
+            }
+
             const newSegnalazione: SegnalazioneCreationData = { geoarea_id: current_geoarea.geoarea_id, stato: "IN CORSO" };
             await this.createSegnalazione(newSegnalazione, violazioniValide);
         } else {
             await this.checkRientroSegnalazione(current_geoarea.geoarea_id);
         }
     }
-    // Funzione chiamata da checkIfSegnalazione per controllare se impostare lo stato della segnalazione a RIENTRATA.
+
+    /**
+     * Funzione che controlla se far passare in stato rientrata una segnalazione. Se nella geofence area specificata non ci sono segnalazioni in corso, non fa nulla.
+     * @param geoarea_id numero che rappresenta l'id di una geofence area
+     * @returns void.
+     */
     public async checkRientroSegnalazione(geoarea_id: number) {
         const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
         if (!lastSegnalazioneInCorso) {
-            // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".
             return;
         }
-        // Se c'è almeno una violazione (ovviamente meno di 6), setta lo stato della segnalazione associata a quella geoarea a RIENTRATA.
+
         const t = await DatabaseConnection.getInstance().transaction();
         try {
             await this.segnalazioneDao.update(lastSegnalazioneInCorso.id, { stato: "RIENTRATA" }, t);

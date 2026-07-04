@@ -12,11 +12,18 @@ export class ViolazioneService {
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaService = new GeofenceareaService();
     private readonly imbarcazioneService = new ImbarcazioneService();
-    //Il codice viene eseguito solo quando si chiama this.geofence_imbarcazioni dentro un metodo.
+    /**
+     * Per evitare di creare un Model intero per rappresentare la molti a molti, possiamo usare questo getter che usa Sequelize per restituire la tabella.
+     */
     private get geofence_imbarcazioni() {
         return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
     }
 
+    /**
+     * Funzione che crea una violazione in base ai dati passati. Il tipo di violazione può essere solo per eccesso di velocità o per accesso non autorizzato ad una geofence area.
+     * @param data oggetto che implementa l'interfaccia ViolazioneCreationData, quindi che contiene tutti i dati necessari per creare una violazione.
+     * @returns oggetto Violazione.
+     */
     public async createViolazione(data: ViolazioneCreationData) {
         const t = await DatabaseConnection.getInstance().transaction();
         try {
@@ -43,26 +50,27 @@ export class ViolazioneService {
         }
     }
 
-    // Controlla se generare una violazione per eccesso di velocità o accesso ad una geoarea non autorizzata.
-    public async checkIfViolazione(data: DatiinviatiCreationData ){
+    /**
+     * Funzione che controlla se l'imbarcazione ha superato il limite di velocità della geofence area o se non ha l'autorizzazione per accedervi. In caso positivo, chiama la funzione per la generazione della violazione. In caso di doppia violazione, nel conteggio per le segnalazioni viene contata solo una. Se l'imbarcazione è fuori da una geofence area, non si genera nessuna violazione.
+     * @param data oggetto che implementa l'interfaccia ViolazioneCreationData, quindi che contiene tutti i dati necessari per creare una violazione.
+     * @returns void.
+     */
+    public async checkIfViolazione(data: DatiinviatiCreationData) {
         const current_area = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
 
-        // Siccome possiamo avere posizioni che non sono in una geoarea, non c'è nessuna violazione da creare
         if (!current_area) {
             return;
         }
-        // Teniamo traccia se una violazione è già stata registrata per evitare di contarne due nel conteggio per generare uan segnalazione.
+
         let violazioneGiaRegistrata = false;
         if (data.velocita_kmh > current_area.max_speed) {
-            // Creiamo la violazione per eccesso di velocità
             const dataViolazione: ViolazioneCreationData = { mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ECCESSO VELOCITA', conta_in_segnalazione: true };
             await this.createViolazione(dataViolazione);
             violazioneGiaRegistrata = true;
         }
-        // .some() controlla se almeno un elemento soddisfa la condizione definita.
+
         if (!allowedGeoareas.some(g => g.geoarea_id === current_area.geoarea_id)) {
-            // Creiamo la violazione per accesso ad una area non autorizzata. Se è già stata registrata la violazione per eccesso di velocità, il campo contaInSegnalazione sarà false, altrimenti sarà true e quindi conterà.
             const dataViolazione: ViolazioneCreationData = { mmsi: data.mmsi, geoarea_id: current_area.geoarea_id, tipo: 'ACCESSO AREA NON AUTORIZZATA', conta_in_segnalazione: !violazioneGiaRegistrata };
             await this.createViolazione(dataViolazione);
         }
