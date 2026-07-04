@@ -17,8 +17,12 @@ export class DatiInviatiService {
   private readonly imbarcazioniService = new ImbarcazioneService();
   private readonly logspostamentoService = new LogSpostamentiService();
 
-  //Torna l'ultimo dato inviato per quella imbarcazione. Può restituire null, perché serve nella funzione di sendData dell'utente. Se non c'è last dato vuole dire che è la prima volta che manda un dato.
-  public async findLastDatoInviatoByMmsi(mmsi: number): Promise<Datiinviati | null> {
+  /**
+   * Restituisce l'ultimo dato di posizione inviato di un'imbarcazione.
+   * @param mmsi numero che rappresenta il codice mmsi di un'imbarcazione.
+   * @returns oggetto Datiinviati, il quale contiene la posizione inviata da un utente.
+   */
+  public async findLastDatoInviatoByMmsi(mmsi: number): Promise<Datiinviati> {
     const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(mmsi);
     if (!last_dato) {
       throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
@@ -26,33 +30,30 @@ export class DatiInviatiService {
     return last_dato;
   }
 
+  /**
+   * Controlla che l'imbarcazione passati nei dati esista e sia di prorpietà dell'utente che invia i dati. Poi si effettuano dei controlli se l'utente è autorizzato ad accedere alla geofence area corrente e la geofence area dell'ultimo dato inviato. Se vi è l'autorizzazione, si registrerà uno spostamento in uscita o in entrata. Se è il primo invio di dati, si registrerà solamente un'entrata (se la posizione inviata è in una geofence area e si ha l'autorizzazione). Se la geofence area della posizione corrente e dell'ultimo dato inviato sono uguali, non si registra nessuno spostamento, perché è solo un movimento interno ad essa.
+   * @param data oggetto contenente tutti i dati necessari per l'invio della propria posizione.
+   * @param user_id numero che rappresenta l'id dell'utente.
+   */
   public async sendData(data: DatiinviatiCreationData, user_id: number): Promise<void> {
     const imbarcazione = await this.imbarcazioneDAO.get(data.mmsi);
     if (!imbarcazione) {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     }
-    // Passiamo l'user_id estratto dal token JWT per controllare se è il proprietario della barca.
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
 
-    // Prendiamo la geoarea corrispondente alla posizione inviata.
     const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
     const currentAreaIsAllowed: boolean = current_geoarea ? await imbarcazione.hasGeofencearea(current_geoarea.geoarea_id) : false;
 
-    // Prendiamo l'ultimo spostamento/dato inviato per determinare la posizione precedente.
     const lastDatoInviato = await this.datiinviatiDAO.getLastDatoByMmsi(data.mmsi);
-
-    // Prendiamo la geoarea associata all'ultimo dato inviato (se esiste un dato precedente, altrimenti è nullo).
     const last_dato_geoarea = lastDatoInviato
       ? await this.geofenceareaService.getGeoareaByPosition(lastDatoInviato.longitudine, lastDatoInviato.latitudine)
       : null;
 
-    // Se non c'è un'ultima geoarea (sia perché non c'è un dato precedente, sia perché il dato precedente non era in nessuna area), non può essere permessa.
     const lastAreaIsAllowed = last_dato_geoarea
       ? (await imbarcazione.hasGeofencearea(last_dato_geoarea.geoarea_id))
       : false;
 
-    // Se le due geoaree coincidono (stessa area, sia essa nulla o la stessa geoarea), non c'è nessun ingresso/uscita da registrare:
-    // è solo un movimento interno alla stessa area, oppure il dato è fuori da ogni area sia ora che prima. Il caso se entrambe le aree sono nulle, cioè siamo fuori dalle geoarea sia ora che prima, è gestito perché undefined === undefined è true.
     const sameArea = current_geoarea?.geoarea_id === last_dato_geoarea?.geoarea_id;
 
     const spostamentiDaLoggare:LogSpostamentiCreationData[] = [];
