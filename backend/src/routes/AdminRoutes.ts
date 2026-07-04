@@ -55,25 +55,30 @@ adminRouter.post("/imbarcazioni/get/positions", validateDateFormat, async functi
 });
 
 /**
- * Rotta per tornare lo stato di tutte le imbarcazioni DA FINIRE
+ * Rotta per tornare lo stato (DENTRO o FUORI) di tutte le imbarcazioni rispetto ad una geofence area, di cui viene passato l'id come parametro nella rotta, tornando anche, solo nel caso di stato = DENTRO, il tempo di permanenza nella geofence area
  */
 adminRouter.get("/imbarcazioni/status/geoareaid/:geoareaid", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniStatusByGeoarea(req, res);
 });
 
-
+/**
+ * Rotta per tornare tutte le imbarcazioni con segnalazioni, specificando per ognuna il rispettivo stato, se RIENTRATA o IN CORSO
+ */
 adminRouter.post("/imbarcazioni/segnalazioni/get/all", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniWithSegnalazioni(req, res);
 });
 
-// GET tutte le imbarcazioni con le geofence associate
+
+/**
+ * Rotta per tornare tutte le imbarcazioni e le geofence areas rispettivamente associate
+ */
 adminRouter.post("/imbarcazioni/geoaree/get/all", async function(req: Request, res: Response) {
     await adminController.getAllImbarcazioniWithGeofenceareas(req, res);
 });
 
-// --------- ROTTE GEOFENCE AREA ------------------
-
-// CREATE area (solo admin).
+/**
+ * Rotta per la creazione di una geofence area, inserendo nel body la struttura in formato GeoJson della geofence area, inserendo nel campo "properties" il nome dell'area obbligatoriamente e opzionalmente la max_speed
+ */
 adminRouter.post("/geoarea/create", checkCreation, async function(req: Request, res: Response) {
   await adminController.createGeofencearea(req, res);
 });
