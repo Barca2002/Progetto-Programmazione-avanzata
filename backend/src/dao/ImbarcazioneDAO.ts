@@ -24,6 +24,10 @@ public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imb
     return await Imbarcazione.findByPk(mmsi);
   }
 
+  /**
+   * Funzione che ritorna tutte le imbarcazioni
+   * @returns vettore di imbarcazioni
+   */
   public async getAll(): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll();
   }

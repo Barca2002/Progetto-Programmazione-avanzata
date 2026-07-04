@@ -40,10 +40,12 @@ export class ImbarcazioneController {
     return await this.imbarcazioneService.unlinkGeoareaImbarcazione(unlink);
   }
 
-  // Funzione chiamata dall'adminController per ottenere tutte le imbarcazioni con le relative segnalazioni.
+  /**
+   * Funzione che torna un vettore di imbarcazioni con le segnalazioni associate
+   * @returns imbarcazioni con segnalazioni
+   */
   public async getAllImbarcazioniWithSegnalazioni() {
-    const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllImbarcazioniWithSegnalazioni();
-    return imbarcazioni_segnalazioni;
+    return await this.imbarcazioneService.getAllImbarcazioniWithSegnalazioni();
   }
 
   /**
@@ -52,8 +54,7 @@ export class ImbarcazioneController {
    * @returns lista di imbarcazione con le relative segnalazioni in formato JSON.
    */
   public async getUserImbarcazioniWithSegnalazioni(user_id: number) {
-    const my_imbarcazioni_segnalazioni = await this.imbarcazioneService.getUserImbarcazioniWithSegnalazioni(user_id);
-    return my_imbarcazioni_segnalazioni;
+    return await this.imbarcazioneService.getUserImbarcazioniWithSegnalazioni(user_id);
   }
 
   /**
