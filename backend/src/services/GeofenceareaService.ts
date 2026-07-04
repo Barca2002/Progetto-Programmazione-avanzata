@@ -46,6 +46,11 @@ export class GeofenceareaService {
     return area;
   };
 
+  /**
+   * Ritorna un oggetto Geofencearea in base all'id fornito.
+   * @param id numero che rappresenta l'id della geofence area.
+   * @returns oggetto Geofence area
+   */
   public async getAreaById(id: number) {
     if (Number.isNaN(id) || id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID);

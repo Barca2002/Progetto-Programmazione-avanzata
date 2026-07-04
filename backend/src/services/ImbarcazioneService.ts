@@ -10,6 +10,7 @@ import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
+import { LogSpostamentiDAO } from '../dao/LogSpostamentiDAO.js';
 
 
 export class ImbarcazioneService {
@@ -18,6 +19,7 @@ export class ImbarcazioneService {
   private readonly geofenceareaDAO = new GeofenceareaDAO();
   private readonly geofenceareaService = new GeofenceareaService();
   private readonly datiinviatiDAO = new DatiinviatiDAO();
+  private readonly logspostamentiDAO = new LogSpostamentiDAO();
 
   // Usata dall'adminController tramite imbarcazioneController.
   async createImbarcazione(data: ImbarcazioneCreationData) {
@@ -93,42 +95,40 @@ export class ImbarcazioneService {
     return result;
   }
 
+  /**
+   * Restituisce lo stato delle imbarcazioni in base all'id della geofence area. Si prende l'ultimo spostamento di ogni barca e si controlla se è in uscita, allora l'imbarcazione sarà fuori, altrimenti è dentro e si calcola il tempo di permanenza.
+   * @param imbarcazioni lista di oggetti Imbarcazione. 
+   * @param geoarea_id numero che rappresenta l'id della geofence area.
+   * @returns lista di imbarcazioni ed il relativo stato rispetto alla geofence area specificata in formato JSON.
+   */
   async generateImbarcazioniStatus(imbarcazioni: Imbarcazione[], geoarea_id: number) {
     const results = [];
 
     for (const imbarcazione of imbarcazioni) {
-      //Prendi l'ultimo dato inviato, associato all'imbarcazione
-      const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(imbarcazione.mmsi);
-      if (!last_dato) {
+      const last_spostamento = await this.logspostamentiDAO.getLastByMmsiAndGeoarea(imbarcazione.mmsi, geoarea_id);
+
+      if(!last_spostamento || last_spostamento.spostamento === 'USCITA'){
         results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
-        continue; //Se non c'è continuo comunque dicendo che è fuori
+        continue;
       }
 
-      //Prendo la geoarea associata all'ultimo dato
-      const geoarea_last_dato = await this.geofenceareaService.getGeoareaByPosition(last_dato.longitudine, last_dato.latitudine);
+      const diff = Date.now() - last_spostamento.created_at.getTime();
+      
+      const giorni = Math.floor(diff / 86400000);
+      const ore = Math.floor((diff % 86400000) / 3600000);
+      const minuti = Math.floor((diff % 3600000) / 60000);
 
-      // Siccome l'utente può inviare posizioni anche che non siano di geoaree, dico comunque che è fuori
-      if (!geoarea_last_dato) {
-        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
-        continue; //Se non c'è continuo comunque dicendo che è fuori
-      }
-
-      //Se l'id della geoarea associato all'ultimo invio di dati per quell'imbarcazione è uguale a quello inserito nel body, vuol dire che è dentro quella geoarea
-      if (geoarea_last_dato.geoarea_id === geoarea_id) {
-        const diff = Date.now() - last_dato.created_at;
-        const giorni = Math.floor(diff / 86400000);
-        const ore = Math.floor((diff % 86400000) / 3600000);
-        const minuti = Math.floor((diff % 3600000) / 60000);
-        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'DENTRO', permanenza: `${giorni}g ${ore}h ${minuti}m` });
-      } else {
-        results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'FUORI' });
-      }
+      results.push({ mmsi: imbarcazione.mmsi, name: imbarcazione.name, stato: 'DENTRO', permanenza: `${giorni}g ${ore}h ${minuti}m` });
     }
-
     return results;
   }
 
-  //FUNZIONE USATA DA USERCONTROLLER PER TORNARE LO STATO DELLE PROPRIE IMBARCAZIONI
+  /**
+   * Retsituisce lo stato delle proprie imbarcazioni in una certa geofence area, cioè se si trova dentro o fuori da essa. Si controlla se la geofence area esiste 
+   * @param user_id numero che rappresenta l'id dell'utente.
+   * @param geoarea_id numero che rappresenta l'id della geofence area.
+   * @returns insieme di imbarcazioni con il relativo stato in una geoarea, con tempo di permanenza se dentro di essa.
+   */
   async getMyImbarcazioniStatus(user_id: number, geoarea_id: number) {
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0){
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
@@ -138,8 +138,10 @@ export class ImbarcazioneService {
 
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
 
-    if (!my_imbarcazioni || my_imbarcazioni.length === 0)
-      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    if (!my_imbarcazioni || my_imbarcazioni.length === 0){
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONI_NOT_FOUND);
+    }
+      
 
     return this.generateImbarcazioniStatus(my_imbarcazioni, geoarea_id);
   }

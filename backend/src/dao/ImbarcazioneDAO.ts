@@ -28,6 +28,11 @@ export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
     });
   }
 
+  /**
+   * Restituisce tutte le imbarcazioni in base all'id utente.
+   * @param user_id numero che rappresenta l'id dell'utente.
+   * @returns lista d'imbarcazioni.
+   */
   async getAllByUserId(user_id: number): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll({
       where: { user_id: user_id }

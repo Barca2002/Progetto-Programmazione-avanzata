@@ -154,7 +154,7 @@ export const ERROR_LIST = {
     IMBARCAZIONE_NOT_FOUND:
         { statusCode: 404, message: "Imbarcazione non trovata." },
     IMBARCAZIONI_NOT_FOUND:
-        { statusCode: 404, message: "Imbarcazioni non trovate." },
+        { statusCode: 404, message: "Nessuna imbarcazione trovata." },
     INVALID_MMSI:
         { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:

@@ -51,6 +51,11 @@ export class UserController {
     return true;
   }
 
+  /**
+   * Retsituisce lo stato delle proprie imbarcazioni in una certa geofence area, cioè se si trova dentro o fuori da essa. All'inizio si effettua il controllo del token e tramite esso si prende l'id dell'utente dal token JWT decodificato.
+   * @param req oggetto che contiene il body della richiesta.
+   * @param res oggetto che contiene lo stato delle imbarcazioni.
+   */
   public async getMyImbarcazioniStatus(req: Request, res: Response) {
     try {
       const user_id = checkToken(req).user_id;
