@@ -3,6 +3,12 @@ import { ErrorFactory } from "../factory/ErrorFactory.js";
 import { AppErrorEnum, AppErrorName } from "./StatusMessages.js";
 import * as z from "zod";
 
+/**
+ * Funzione che prende il campo che ha generato un errore dal path di un issue di Zod e controlla se l'errore è perché il campo manca.
+ * @param issue oggetto di Zod che rappresenta un errore nella validazione.
+ * @param reqBody body della richiesta.
+ * @returns valore booleano.
+ */
 export function isMissingIssue(issue: z.core.$ZodIssue, reqBody: any) {
     const campo = issue.path[0];
     if (!campo) {
@@ -11,6 +17,12 @@ export function isMissingIssue(issue: z.core.$ZodIssue, reqBody: any) {
     return reqBody[campo] === undefined;
 }
 
+/**
+ * Funzione che prende il campo che ha generato un errore dal path di un issue di Zod e controlla se l'errore è perché il campo manca. Siccome questa funzione può prendere un path più lungo di 1, scorre i parametri del body in base al path e vede se sono nulli.
+ * @param issue oggetto di Zod che rappresenta un errore nella validazione.
+ * @param reqBody body della richiesta.
+ * @returns valore booleano.
+ */
 export function isMissingIssueGeoJSON(issue: z.core.$ZodIssue, reqBody: any) {
     const path = issue.path;
     
@@ -18,36 +30,36 @@ export function isMissingIssueGeoJSON(issue: z.core.$ZodIssue, reqBody: any) {
         throw ErrorFactory.getError(AppErrorEnum.VALIDATION_ERROR);
     }
 
-    let current = reqBody;
+    let currentParam = reqBody;
 
     for (let i = 0; i < path.length - 1; i++) {
-        const key = path[i]!; 
+        const attr = path[i]!; 
         
-        if (current === undefined || current === null) {
+        if (currentParam === undefined || currentParam === null) {
             return true;
         }
-        current = current[key];
+        currentParam = currentParam[attr];
     }
 
-    if (current === undefined || current === null) {
+    if (currentParam === undefined || currentParam === null) {
         return true;
     }
 
-    const lastKey = path.at(-1)!;
-    return current[lastKey] === undefined;
+    const lastAttr = path.at(-1)!;
+    return currentParam[lastAttr] === undefined;
 }
 
 /**
- * ErrorMapper è un tipo che rappresenta una funzione che prende campo, issue e body, restituendo un errore custom AppErrorName. Permette di prendere le mappe di errori definite nei vari middleware.
+ * ErrorMapper è un tipo che rappresenta una funzione che prende come parametri campo di tipo string, issue di Zod e un body di una richiesta, restituendo un errore custom AppErrorName. Permette di prendere le mappe di errori definite nei vari middleware.
  */
 type ErrorMapper = (campo: string, issue: z.core.$ZodIssue, body: any) => AppErrorName;
 
 /**
- * Funzione helper che esegue la validazione del body di una richiesta su uno schema ed una mappa di errori.
- * @param body 
- * @param schema 
- * @param errorMapper 
- * @param next 
+ * Funzione helper che esegue la validazione del body di una richiesta su uno schema ed una mappa di errori. Se il path del campo che dà errore è nullo, vuol dire che è stato fornito un parametro aggiuntivo e genera l'errore INVALID_PARAMS.
+ * @param body oggetto contenente il doby della richiesta.
+ * @param schema oggetto ZodSchema che contiene lo schema per validare.
+ * @param errorMapper tipo custom per prendere mappe di errori.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
  * @returns 
  */
 export function validateBody(body: any, schema: z.ZodSchema, errorMapper: ErrorMapper, next: NextFunction) {
