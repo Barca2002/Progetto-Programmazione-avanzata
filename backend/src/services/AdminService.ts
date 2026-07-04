@@ -25,6 +25,11 @@ export class AdminService {
     }
   };
 
+  /**
+   * Funzione per trovare un utente tramite la sua e-mail, restituendo un errore nel caso di utente non trovato 
+   * @param email 
+   * @returns 
+   */
   public async findByEmail(email: string) {
     const utente = await this.adminDAO.getByEmail(email);
     if (!utente)
@@ -32,8 +37,12 @@ export class AdminService {
     return utente;
   };
 
+  /**
+   * Funzione che controlla prima se esiste un utente con quell'id e nel caso lo segnala e in seguito restituisce l'utente
+   * @param id 
+   * @returns 
+   */
   public async getUtenteById(id: number) {
-    // Controllo se l'id è corretto
     this.authService.checkUserId(id);
     const utente = await this.adminDAO.get(id);
     if (!utente) {
@@ -88,7 +97,6 @@ export class AdminService {
   };
 
   public async deleteUtente(id: number) {
-    // Controllo se l'id è corretto
     this.authService.checkUserId(id);
     const t = await DatabaseConnection.getInstance().transaction();
     try {
@@ -103,6 +111,12 @@ export class AdminService {
     }
   };
 
+  /**
+   * Funzione per aggiornare il credito residuo di un utente passando l'email e il nuovo credito residuo, controllando che l'utente con quella e-mail esista
+   * @param email 
+   * @param tokenAmount 
+   * @returns 
+   */
   public async updateTokenBalance(email: string, tokenAmount: number) {
     const t = await DatabaseConnection.getInstance().transaction();
     try {

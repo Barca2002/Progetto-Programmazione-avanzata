@@ -21,7 +21,11 @@ export class AdminController {
   private readonly imbarcazioneController = new ImbarcazioneController();
   private readonly geofenceareaController = new GeofenceAreaController();
 
-
+  /**
+   * Funzione per aggiornare il credito di un utente tramite l'inserimento della sue e-mail e di quanto aggiornare il suo credito, restituendo il nuovo credito residuo
+   * @param req 
+   * @param res 
+   */
   public async updateTokenBalance(req: Request, res: Response) {
     try {
       const { email, newTokenAmount: tokenAmount } = req.body as UpdateTokenBody;
@@ -36,11 +40,16 @@ export class AdminController {
     }
   }
 
+  /**
+   * Funzione per visualizzare il credito residuo di un utente tramite il suo id inserito nei parametri della richiesta, restituendo l'utente, in caso tutti i controlli siano stati passati.
+   * @param req 
+   * @param res 
+   */
   public async getTokenBalance(req: Request, res: Response) {
     try {
       const utente = await this.adminService.getUtenteById(Number(req.params.id));
-
-      res.json({ id: utente.user_id, email: utente.email, tokens: utente.tokens });
+      const utente_data = { id: utente.user_id, email: utente.email, tokens: utente.tokens };
+      SuccessFactory.getSuccess(AppSuccessEnum.GET_TOKEN_BALANCE_SUCCESS, utente_data).send(res);
     } catch (err) {
       if (err instanceof AppError) {
         err.send(res);

@@ -275,6 +275,8 @@ export const SUCCESS_LIST = {
         { statusCode: 200, message: "Dati sullo status inviati con successo." },
     TOKEN_BALANCE_UPDATED:
         { statusCode: 200, message: "Saldo token aggiornato correttamente." },
+    GET_TOKEN_BALANCE_SUCCESS:
+        { statusCode: 200, message: "Utente con credito residuo mostrato correttamente" },
     LOG_SPOSTAMENTI_FOUND:
         { statusCode: 200, message: "Log spostamenti trovati correttamente" },
     POSIZIONI_FOUND:

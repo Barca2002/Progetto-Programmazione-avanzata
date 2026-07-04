@@ -12,6 +12,11 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return await User.create(data, { transaction: t });
   }
 
+  /**
+   * Funzione che torna un utente con lo user_id passato come argomento o null nel caso non trovi l'utente
+   * @param user_id 
+   * @returns 
+   */
   async get(user_id: number): Promise<User | null> {
     return await User.findByPk(user_id);
   }
@@ -37,6 +42,11 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return user;
   }
 
+  /**
+   * Funzione che ritorna l'utente tramite l'email passata come argomento
+   * @param email 
+   * @returns 
+   */
   async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({ where: { email: email } });
   }

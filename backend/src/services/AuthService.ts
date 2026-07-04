@@ -76,7 +76,7 @@ export class AuthService{
     }
 
     /**
-     * Controlla se l'userid passato come argomento è valido, cioè è un numero 
+     * Controlla se lo userid passato come argomento è valido, cioè è un numero 
      * @param id numero che rappresenta l'id dell'utente.
      */
     public checkUserId (id: number){
