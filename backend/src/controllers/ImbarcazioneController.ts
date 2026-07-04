@@ -12,10 +12,14 @@ export class ImbarcazioneController {
     return await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
   }
 
-  // Funzione che ritorna all'utente tutte le proprie imbarcazioni che sono in una geoarea.
+  /**
+   * Funzione che, tramite l'id dell'utente, restituisce tutte le sue imbarcazioni con le relative geofence aree autorizzate. 
+   * @param user_id numero che rappresenta l'id dell'utente.
+   * @returns lista di imbarcazioni con le relative geofence aree autorizzate in formato JSON.
+   */
   public async getUserImbarcazioniWithGeofenceareas(user_id: number) {
-      const imbarcazioni = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
-      return imbarcazioni;
+      const imbarcazioniWithGeoaree = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
+      return imbarcazioniWithGeoaree;
   }
 
   // Si possono linkare più imbarcazioni a più geoaree in una sola richiesta.
@@ -33,7 +37,11 @@ export class ImbarcazioneController {
       return imbarcazioni_segnalazioni;
   }
 
-   // Funzione chiamata dall'userController per ottenere tutte le proprie imbarcazioni con le relative segnalazioni.
+   /**
+    * Funzione che restituisce tutte le imbarcazioni e le relative segnalazioni tramite id utente.
+    * @param user_id numero che rappresenta l'id dell'utente.
+    * @returns lista di imbarcazione con le relative segnalazioni in formato JSON.
+    */
   public async getUserImbarcazioniWithSegnalazioni(user_id: number) {
     const my_imbarcazioni_segnalazioni = await this.imbarcazioneService.getUserImbarcazioniWithSegnalazioni(user_id);
     return my_imbarcazioni_segnalazioni;

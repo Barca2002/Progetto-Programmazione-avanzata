@@ -16,7 +16,7 @@ export class SegnalazioneService {
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaDAO = new GeofenceareaDAO();
 
-    async addImbarcazioniToSegnalazione(segnalazione: Segnalazione, violazioni: Violazione[]) {
+    public async addImbarcazioniToSegnalazione(segnalazione: Segnalazione, violazioni: Violazione[]) {
         if (!await this.segnalazioneDao.get(segnalazione.id)) {
             throw ErrorFactory.getError(AppErrorEnum.SEGNALAZIONE_NOT_FOUND)
         }
@@ -36,7 +36,7 @@ export class SegnalazioneService {
 
     }
 
-    async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]) {
+    public async createSegnalazione(data: SegnalazioneCreationData, violazioni: Violazione[]) {
         const t = await DatabaseConnection.getInstance().transaction();
         try {
             const geoarea = await this.geofenceareaDAO.get(data.geoarea_id);
@@ -58,7 +58,7 @@ export class SegnalazioneService {
     }
 
     // Funzione per controllare se generare o no una segnalazione per una geoarea.
-    async checkIfSegnalazione(data: DatiinviatiCreationData) {
+    public async checkIfSegnalazione(data: DatiinviatiCreationData) {
         const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         if (!current_geoarea) {
             // Possono esserci posizioni fuori dalle geoaree, quindi in tal caso non si controlla neanche se generare una segnalazione perché non si entra in nessuna geoarea.
@@ -127,7 +127,7 @@ export class SegnalazioneService {
         }
     }
     // Funzione chiamata da checkIfSegnalazione per controllare se impostare lo stato della segnalazione a RIENTRATA.
-    async checkRientroSegnalazione(geoarea_id: number) {
+    public async checkRientroSegnalazione(geoarea_id: number) {
         const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
         if (!lastSegnalazioneInCorso) {
             // Se non ci sono segnalazioni in corso, non si può impostare lo stato in "RIENTRATA".

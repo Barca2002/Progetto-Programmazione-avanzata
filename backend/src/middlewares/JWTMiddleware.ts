@@ -14,8 +14,12 @@ const publicKey = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
     throw ErrorFactory.getError(AppErrorEnum.JWT_PUBLIC_DECODE_ERROR);
   }
 
-// funzione per controllare struttura del token, prende l'authorization header.
-export function checkToken (req: Request): TokenPayload {
+/**
+ * Funzione che prende l'intestazione della richiesta per controllare se il token JWT è valido. In caso positivo, lo decodifica e restituisce l'id dell'utente associato.
+ * @param req oggetto contente il body della richiesta.
+ * @returns stringa che rappresenta l'id dell'utente associato al token JWT.
+ */
+export function checkJWTtoken (req: Request): TokenPayload {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
@@ -26,7 +30,6 @@ export function checkToken (req: Request): TokenPayload {
   }
 
   const token = authHeader.split(' ')[1];
-
   if (!token) {
     throw ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_EMPTY);
   }
@@ -47,7 +50,7 @@ export function checkToken (req: Request): TokenPayload {
 export function checkUserRole (req: Request, res: Response, next: NextFunction): void {
   try {
     // Basta controllare il token
-    checkToken(req);
+    checkJWTtoken(req);
     next();
   } catch (err) {
     next(err);
@@ -57,7 +60,7 @@ export function checkUserRole (req: Request, res: Response, next: NextFunction):
 // Si controlla il campo is_admin nel token
 export function checkAdminRole (req: Request, res: Response, next: NextFunction): void {
   try {
-    const jwtdecoded = checkToken(req);
+    const jwtdecoded = checkJWTtoken(req);
     if (!jwtdecoded.is_admin) {
       return next(ErrorFactory.getError(AppErrorEnum.NOT_ADMIN));
     }

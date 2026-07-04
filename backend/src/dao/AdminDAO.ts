@@ -8,7 +8,7 @@ import { InterfacciaDAO } from './InterfacciaDAO.js';
 */
 
 export class AdminDAO implements InterfacciaDAO<User> {
-  async create(data: UserCreationData, t: Transaction): Promise<User> {
+  public async create(data: UserCreationData, t: Transaction): Promise<User> {
     return await User.create(data, { transaction: t });
   }
 
@@ -17,15 +17,15 @@ export class AdminDAO implements InterfacciaDAO<User> {
    * @param user_id 
    * @returns 
    */
-  async get(user_id: number): Promise<User | null> {
+  public async get(user_id: number): Promise<User | null> {
     return await User.findByPk(user_id);
   }
 
-  async getAll(): Promise<User[]> {
+  public async getAll(): Promise<User[]> {
     return await User.findAll();
   }
 
-  async update(user_id: number, new_data: Partial<UserCreationData>, t: Transaction): Promise<User | null> {
+  public async update(user_id: number, new_data: Partial<UserCreationData>, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
     if (!user) {
       return null;
@@ -33,7 +33,7 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return await user.update(new_data, { transaction: t });
   }
 
-  async delete(user_id: number, t: Transaction): Promise<User | null> {
+  public async delete(user_id: number, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
     if (!user) {
       return null;
@@ -47,11 +47,11 @@ export class AdminDAO implements InterfacciaDAO<User> {
    * @param email 
    * @returns 
    */
-  async getByEmail(email: string): Promise<User | null> {
+  public async getByEmail(email: string): Promise<User | null> {
     return await User.findOne({ where: { email: email } });
   }
 
-  async getByUsername(username: string): Promise<User | null> {
+  public async getByUsername(username: string): Promise<User | null> {
     return await User.findOne({ where: { username: username } });
   }
 
