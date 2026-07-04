@@ -57,7 +57,8 @@ export class ViolazioneService {
      */
     public async checkIfViolazione(data: DatiinviatiCreationData) {
         const current_area = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
-        const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
+        const imbarcazione = await this.imbarcazioneService.getImbarcazioneByMmsi(data.mmsi);
+        const allowedGeoareas = await imbarcazione.getGeofenceareas();
 
         if (!current_area) {
             return;

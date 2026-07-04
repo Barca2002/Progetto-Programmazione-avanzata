@@ -6,12 +6,11 @@ services:
     ports:
       - '${DB_PORT}:5432'
     environment:
-      POSTGRES_DB: ${DB_NAME} # Questo crea anche il database in Postgres
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       TZ: Europe/Rome
     volumes: 
-    # Questo volume contiene una cartella speciale di DOcker, la quale viene controllata all'avvio ed esegue gli script all'interno (in ordine alfabetico), in questo caso gli script d'inizializzazione e popolazione del db. È montato in modalità read-only (ro) per evitare che il container possa modificare i file.
       - ./backend/src/db:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]

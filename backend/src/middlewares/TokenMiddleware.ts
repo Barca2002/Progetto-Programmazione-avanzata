@@ -6,11 +6,9 @@ import { AdminService } from "../services/AdminService.js"
 import { emailSchema } from "./AuthMiddleware.js";
 import * as z from "zod";
 import { isMissingIssue, validateBody } from "../utils/HelperFunctions.js";
+import { MIN_TOKEN_BALANCE, MAX_RECHARGE } from "../utils/GlobalConstants.js";
 
 const adminService = new AdminService();
-
-const MIN_TOKEN_BALANCE = 0.025;
-const MAX_RECHARGE = 100;
 
 /**
  * Definizione dello schema di validazione della richiesta di ricarica del saldo dei token di un utente.

@@ -14,9 +14,6 @@ const getPositionsSchema = z.object({
     end_date: z.string().regex(dateFormatRegex).superRefine((value, ctx) => {
         const parsedDate = new Date(value.split(/[-/]/).reverse().join('-'));
         const oggi = new Date();
-        console.log("Data parsed ", parsedDate);
-        console.log("oggi ", oggi);
-        console.log(parsedDate <= oggi)
 
         if (Number.isNaN(parsedDate.getTime())) {
             ctx.addIssue({
@@ -45,7 +42,7 @@ const getPositionsSchema = z.object({
  */
 function mapErroriDate(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
-    console.log(issue);
+
     const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
         start_date: {
             missing: AppErrorEnum.MISSING_START_DATE,
