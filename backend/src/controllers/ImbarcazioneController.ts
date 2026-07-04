@@ -1,6 +1,6 @@
 import { ImbarcazioneService } from "../services/ImbarcazioneService.js";
 import { GeofenceareaService } from "../services/GeofenceareaService.js";
-import { GetPointsAsGeoJsonBody, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
+import { GetPositionsInDateRange, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 export class ImbarcazioneController {
@@ -8,7 +8,7 @@ export class ImbarcazioneController {
   public readonly geofenceareaService = new GeofenceareaService();
 
   // Funzione che ritorna all'adminController tutte le imbarcazioni che sono in una geoarea.
-  public async getAllImbarcazioniWithGeofenceareas(){
+  public async getAllImbarcazioniWithGeofenceareas() {
     return await this.imbarcazioneService.getAllImbarcazioniWithGeofenceareas();
   }
 
@@ -18,48 +18,60 @@ export class ImbarcazioneController {
    * @returns lista di imbarcazioni con le relative geofence aree autorizzate in formato JSON.
    */
   public async getUserImbarcazioniWithGeofenceareas(user_id: number) {
-      const imbarcazioniWithGeoaree = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
-      return imbarcazioniWithGeoaree;
+    const imbarcazioniWithGeoaree = await this.imbarcazioneService.getUserImbarcazioniWithGeofenceareas(user_id);
+    return imbarcazioniWithGeoaree;
   }
 
-  // Si possono linkare più imbarcazioni a più geoaree in una sola richiesta.
+  /**
+   * Funzione che associa delle imbarcazioni a delle geoaree
+   * @param links vettore che contiene i link fra le imbarcazioni e le geofence aree
+   * @returns 
+   */
   public async linkGeoareasToImbarcazioni(links: LinkDataBody[]): Promise<void> {
-      return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
+    return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
   }
 
-  public async unlinkGeoareaToImbarcazioni(unlink: UnlinkDataBody){
-      return await this.imbarcazioneService.unlinkGeoareaImbarcazione(unlink);
+  /**
+   * Funzione che dissocia una geofence area da un'imbarcazione
+   * @param unlink oggetto che contiene i dati per dissociare una geofence area da un'imbarcazione
+   * @returns 
+   */
+  public async unlinkGeoareaToImbarcazioni(unlink: UnlinkDataBody) {
+    return await this.imbarcazioneService.unlinkGeoareaImbarcazione(unlink);
   }
 
   // Funzione chiamata dall'adminController per ottenere tutte le imbarcazioni con le relative segnalazioni.
   public async getAllImbarcazioniWithSegnalazioni() {
-      const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllImbarcazioniWithSegnalazioni();
-      return imbarcazioni_segnalazioni;
+    const imbarcazioni_segnalazioni = await this.imbarcazioneService.getAllImbarcazioniWithSegnalazioni();
+    return imbarcazioni_segnalazioni;
   }
 
-   /**
-    * Funzione che restituisce tutte le imbarcazioni e le relative segnalazioni tramite id utente.
-    * @param user_id numero che rappresenta l'id dell'utente.
-    * @returns lista di imbarcazione con le relative segnalazioni in formato JSON.
-    */
+  /**
+   * Funzione che restituisce tutte le imbarcazioni e le relative segnalazioni tramite id utente.
+   * @param user_id numero che rappresenta l'id dell'utente.
+   * @returns lista di imbarcazione con le relative segnalazioni in formato JSON.
+   */
   public async getUserImbarcazioniWithSegnalazioni(user_id: number) {
     const my_imbarcazioni_segnalazioni = await this.imbarcazioneService.getUserImbarcazioniWithSegnalazioni(user_id);
     return my_imbarcazioni_segnalazioni;
   }
 
-  // Funzione chiamata dall'adminController per ottenere tutte le posizioni in formato GeoJson di un'imbarcazione.
-  public async getPointsAsGeoJson(data: GetPointsAsGeoJsonBody): Promise<FeatureCollection<Geometry, GeoJsonProperties>> {
-    const end_date = data.end_date ?? new Date().toLocaleDateString('it-IT');
-    return await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(data.mmsi, data.start_date, end_date);
+  /**
+   * Funzione che recupera le posizioni registrate di un'imbarcazione in un determinato intervallo di date e le restituisce in formato GeoJSON
+   * @param data oggetto contenente mmsi dell'imbarcazione, data di inizio e data di fine dell'intervallo di ricerca
+   * @returns oggetto GeoJSON (FeatureCollection) con le posizioni dell'imbarcazione come geometrie
+ */
+  public async getPointsAsGeoJson(data: GetPositionsInDateRange): Promise<FeatureCollection<Geometry, GeoJsonProperties>> {
+    return await this.imbarcazioneService.getPosizioniImbarcazioneAsGeoJson(data.mmsi, data.start_date, data.end_date);
   }
 
   /**
    * Funzione che ritorna l'imbarcazione creata 
-   * @param data: contiene i dati necessari per la creazione dell'imbarcazione
-   * @returns: oggetto imbarcazione
+   * @param data contiene i dati necessari per la creazione dell'imbarcazione
+   * @returns oggetto imbarcazione
    */
   public async createImbarcazione(data: ImbarcazioneCreationData) {
-      return await this.imbarcazioneService.createImbarcazione(data);
+    return await this.imbarcazioneService.createImbarcazione(data);
   }
 
 }

@@ -14,7 +14,7 @@ export class DatiinviatiDAO implements InterfacciaDAO<Datiinviati> {
     return await Datiinviati.findAll({ where: { mmsi: mmsi } });
   }
 
-  public async get(user_id: number, _item_id2?: number): Promise<Datiinviati | null> {
+  public async get(user_id: number): Promise<Datiinviati | null> {
     return await Datiinviati.findByPk(user_id);
   }
 

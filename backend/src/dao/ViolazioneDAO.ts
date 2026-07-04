@@ -9,7 +9,7 @@ export class ViolazioneDAO implements InterfacciaDAO<Violazione> {
     return await Violazione.create(data, {transaction: t});
   }
 
-  public async get(violazione_id: number, _item_id2?: number): Promise<Violazione | null> {
+  public async get(violazione_id: number): Promise<Violazione | null> {
     return await Violazione.findByPk(violazione_id);
   }
 

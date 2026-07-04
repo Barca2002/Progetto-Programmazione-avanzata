@@ -12,7 +12,7 @@ import { CreateGeofenceAreaBody, GeofenceareaCreationData } from "../models/Geof
 import { GeofenceAreaController } from "./GeofenceareaController.js";
 import { ViolazioneCreationData } from "../models/ViolazioneModel.js";
 import { UpdateTokenBody } from "../models/UserModel.js";
-import { GetPointsAsGeoJsonBody, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
+import { GetPositionsInDateRange, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from "../models/ImbarcazioneModel.js";
 
 export class AdminController {
   private readonly adminService = new AdminService();
@@ -23,8 +23,8 @@ export class AdminController {
 
   /**
    * Funzione per aggiornare il credito di un utente tramite l'inserimento della sue e-mail e di quanto aggiornare il suo credito, restituendo il nuovo credito residuo
-   * @param req 
-   * @param res 
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
    */
   public async updateTokenBalance(req: Request, res: Response) {
     try {
@@ -42,8 +42,8 @@ export class AdminController {
 
   /**
    * Funzione per visualizzare il credito residuo di un utente tramite il suo id inserito nei parametri della richiesta, restituendo l'utente, in caso tutti i controlli siano stati passati.
-   * @param req 
-   * @param res 
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
    */
   public async getTokenBalance(req: Request, res: Response) {
     try {
@@ -59,6 +59,11 @@ export class AdminController {
     }
   }
 
+  /**
+   * 
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
+   */
   public async getAllImbarcazioniStatusByGeoarea(req: Request, res: Response) {
     try {
       const geoarea_id = Number(req.params.geoareaid);
@@ -89,8 +94,8 @@ export class AdminController {
 
   /**
    * Funzione per creare un'imbarcazione, prendendo i valori necessari per la creazione dal body: mmsi, name, type, descr, max_capacity e user_id, segnalando un errore in mancanza di uno di essi
-   * @param req 
-   * @param res 
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
    */
   public async createImbarcazione(req: Request, res: Response) {
     try {
@@ -122,6 +127,11 @@ export class AdminController {
     }
   }
 
+  /**
+   * Funzione che prende dal body i link fra imbarcazioni e geoaree richieste e controlla che siano stati inseriti e che l'oggetto sia un array
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
+   */
   public async linkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
     try {
       const links = req.body as LinkDataBody[];
@@ -140,6 +150,11 @@ export class AdminController {
     }
   }
 
+  /**
+   * Funzione che dissocia una geoarea da un'imbarcazione, controllando se l'mmsi e l'id della geofence area esistano
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
+   */
   public async unlinkGeoareaFromImbarcazione(req: Request, res: Response): Promise<void> {
     try {
       const { mmsi, geoarea_id } = req.body as UnlinkDataBody;
@@ -159,18 +174,19 @@ export class AdminController {
     }
   }
 
+  /**
+   * Funzione che ritorna tutte le posizioni di un'imbarcazione che sono comprese fra una data di inizio e una data di fine, che, se non inserita, si considera come data fine quando viene mandata la richiesta 
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
+   */
   public async getPositionsInDateRange(req: Request, res: Response): Promise<void> {
     try {
-      // Se si inserisce la data di fine si usa quella, altrimenti prendo la data al momento della richiesta
-      const { mmsi, start_date, end_date } = req.body as GetPointsAsGeoJsonBody;
-
+      const { mmsi, start_date, end_date  } = req.body as Partial<GetPositionsInDateRange>;
       if (!mmsi || !start_date) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
       const data = {mmsi, start_date, end_date: end_date ?? new Date().toLocaleDateString("it-IT")};
-
       const posizioni = await this.imbarcazioneController.getPointsAsGeoJson(data);
-
       SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni).send(res);
     } catch (err) {
       if (err instanceof AppError) {
