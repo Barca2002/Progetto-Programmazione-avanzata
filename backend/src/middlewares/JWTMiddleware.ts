@@ -14,7 +14,11 @@ const publicKey = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
     throw ErrorFactory.getError(AppErrorEnum.JWT_PUBLIC_DECODE_ERROR);
   }
 
-// funzione per controllare struttura del token, prende l'authorization header.
+/**
+ * Funzione che prende l'intestazione della richiesta per controllare se il token JWT è valido. In caso positivo, lo decodifica e restituisce l'id dell'utente associato.
+ * @param req oggetto contente il body della richiesta.
+ * @returns stringa che rappresenta l'id dell'utente associato al token JWT.
+ */
 export function checkToken (req: Request): TokenPayload {
   const authHeader = req.headers['authorization'];
 
@@ -26,7 +30,6 @@ export function checkToken (req: Request): TokenPayload {
   }
 
   const token = authHeader.split(' ')[1];
-
   if (!token) {
     throw ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_EMPTY);
   }

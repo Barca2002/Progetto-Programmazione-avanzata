@@ -17,7 +17,7 @@ export class ViolazioneService {
         return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
     }
 
-    async createViolazione(data: ViolazioneCreationData) {
+    public async createViolazione(data: ViolazioneCreationData) {
         const t = await DatabaseConnection.getInstance().transaction();
         try {
             const geoarea = await this.geofenceareaService.getAreaById(data.geoarea_id);
@@ -44,7 +44,7 @@ export class ViolazioneService {
     }
 
     // Controlla se generare una violazione per eccesso di velocità o accesso ad una geoarea non autorizzata.
-    async checkIfViolazione(data: DatiinviatiCreationData ){
+    public async checkIfViolazione(data: DatiinviatiCreationData ){
         const current_area = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
         const allowedGeoareas = await this.geofence_imbarcazioni.findAll({ where: { mmsi: data.mmsi } }) as unknown as { geoarea_id: number; mmsi: number }[];
 
