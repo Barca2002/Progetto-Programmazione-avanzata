@@ -28,14 +28,12 @@ const loginBodySchema = z.object({
 }).strict(); 
 
 /**
- * Funzione per mappare gli errori dei campi della richiesta con gli errori definiti nell'enum.
- * DIstingue se il campo è mancante o se il formato è errato. 
- * @param campo stringa che rappresenta il campo del body della richiesta da validare. Si controlla se è mancante o di tipo errato/invalido.
+ * Funzione per mappare gli errori dei campi della richiesta con gli errori definiti nell'enum. Distingue se il campo è mancante o se il formato è errato. 
+ * @param campo stringa che rappresenta il campo del body della richiesta da validare.
  * @param issue oggetto di Zod che rappresenta il problema del campo. Permette di distinguere se è missing o di tipo errato/invalido.
  * @param reqBody oggetto che rappresenta il body della richiesta. Serve per vedere se il campo è mancante o di tipo errato.
  * @returns restituisce un errore di AppErrorEnum in base al campo, se è mancante o invalido.
  */
-
 function mapErroriRegister(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
 
@@ -61,14 +59,14 @@ function mapErroriRegister(campo: string, issue: z.core.$ZodIssue, reqBody: any)
 
     return missing ? entry.missing : entry.invalid;
 }
+
 /**
- * È uguale alla funzione precedente, soltanto che non bisogna validare il campo username, quindi ha un campo in meno.
+ * Mappa degli errori uguale alla precedente, soltanto che non bisogna validare il campo username, quindi ha un campo in meno.
  * @param campo stringa che rappresenta il campo del body della richiesta da validare. Si controlla se è mancante o di tipo errato/invalido.
  * @param issue oggetto di Zod che rappresenta il problema del campo. Permette di distinguere se è missing o di tipo errato/invalido.
  * @param reqBody oggetto che rappresenta il body della richiesta. Serve per vedere se il campo è mancante o di tipo errato.
  * @returns restituisce un errore di AppErrorEnum in base al campo, se è mancante o invalido.
  */
-
 function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
 
@@ -84,7 +82,7 @@ function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     };
 
     const entry = map[campo];
-    // Se il campo non è nella mappa di errori, ritorniamo l'errore generico INCORRECT_DATA.
+
     if (!entry){
         return AppErrorEnum.INCORRECT_DATA;
     }
@@ -92,15 +90,23 @@ function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     return missing ? entry.missing : entry.invalid;
 }
 
-/**
- * Sfruttiamo l'helper function per effettuare la validazione di uno schema con 
- * una certa mappa di errori. 
- */
 
+/**
+ * Funzione che effettua la validazione della richiesta di registrazione.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function validateRegisterBody(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, registerBodySchema, mapErroriRegister, next);
 }
 
+/**
+ * Funzione che effettua la validazione della richiesta di registrazione.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function validateLoginBody(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, loginBodySchema, mapErroriLogin, next);
 }

@@ -8,7 +8,6 @@ const JWT_PUBLIC_KEY = process.env.JWT_PUBLIC_KEY;
   if (!JWT_PUBLIC_KEY){
       throw ErrorFactory.getError(AppErrorEnum.JWT_SECRET_MISSING);
   }
-// Decodifica della chiave pubblica da base64 al formato normale (formato PEM).
 const publicKey = Buffer.from(JWT_PUBLIC_KEY, 'base64').toString('utf8');
   if(!publicKey){
     throw ErrorFactory.getError(AppErrorEnum.JWT_PUBLIC_DECODE_ERROR);
@@ -46,18 +45,29 @@ export function checkJWTtoken (req: Request): TokenPayload {
   }
 };
 
-// Controlliamo il token, ma non ci interessa il campo is admin
+/**
+ * Funzione che controlla se l'utente che invia la richiesta è un utente normale.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function checkUserRole (req: Request, res: Response, next: NextFunction): void {
   try {
-    // Basta controllare il token
-    checkJWTtoken(req);
+    const jwtdecoded = checkJWTtoken(req);
+    if (jwtdecoded.is_admin) {
+      return next(ErrorFactory.getError(AppErrorEnum.NOT_USER));
+    }
     next();
   } catch (err) {
     next(err);
   }
 };
-
-// Si controlla il campo is_admin nel token
+/**
+ * Funzione che controlla se l'utente che invia la richiesta è un utente admin.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function checkAdminRole (req: Request, res: Response, next: NextFunction): void {
   try {
     const jwtdecoded = checkJWTtoken(req);
@@ -70,6 +80,11 @@ export function checkAdminRole (req: Request, res: Response, next: NextFunction)
   }
 };
 
+/**
+ * Funzione che verifica un token JWT e restituisce il payload.
+ * @param token stringa che contiene un JWT token firmato.
+ * @returns oggetto TokenPayload che contiene il payload del JWT token.
+ */
 export function decodeJwt(token: string): TokenPayload {
   const decodedToken = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
   if(!decodedToken){

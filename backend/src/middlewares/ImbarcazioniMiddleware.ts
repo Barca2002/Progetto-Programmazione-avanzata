@@ -4,7 +4,9 @@ import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
 import * as z from 'zod';
 import { isMissingIssue, validateBody } from "../utils/HelperFunctions.js";
 
-// Per controllare che l'mmsi sia un numero a 9 cifre, imponiamo che deve essere in questo intervallo.
+/**
+ * Definizione degli schemi di validazione per la richiesta di creazione di un'imbarcazione, la richiesta di autorizzazione e rimozione di quest'ultima di una geofence area ad un'imbarcazione.
+ */
 export const mmsiSchema = z.number().min(100000000).max(999999999);
 const nameSchema = z.string().max(100);
 const typeSchema = z.string().max(50);
@@ -50,6 +52,13 @@ export function checkUnlinkBody(req: Request, res: Response, next: NextFunction)
     next();
 }
 
+/**
+ * Funzione per mappare gli errori dei campi della richiesta con gli errori definiti nell'enum. Distingue se il campo è mancante o se il formato è errato. 
+ * @param campo stringa che rappresenta il campo del body della richiesta da validare.
+ * @param issue oggetto di Zod che rappresenta il problema del campo. Permette di distinguere se è missing o di tipo errato/invalido.
+ * @param reqBody oggetto che rappresenta il body della richiesta. Serve per vedere se il campo è mancante o di tipo errato.
+ * @returns restituisce un errore di AppErrorEnum in base al campo, se è mancante o invalido.
+ */
 function mapErroriCreazioneImbarcazione(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
 
@@ -88,6 +97,12 @@ function mapErroriCreazioneImbarcazione(campo: string, issue: z.core.$ZodIssue, 
     return missing ? entry.missing : entry.invalid;
 }
 
+/**
+ * Funzione che effettua la validazione della richiesta di creazione di un'imbarcazione.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function validateImbarcazioneCreationBody(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, imbarcazioneCreationSchema, mapErroriCreazioneImbarcazione, next);
 }

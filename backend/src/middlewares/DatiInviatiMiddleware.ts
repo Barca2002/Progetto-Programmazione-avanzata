@@ -4,29 +4,35 @@ import { hasMaxDecimals } from '../utils/DecimalChecker.js';
 import { z } from 'zod';
 import { isMissingIssue, validateBody } from '../utils/HelperFunctions.js';
 
+/**
+ * Definizione dello schema di validazione della richiesta d'invio dei dati di posizione.
+ */
 export const datiInviatiSchema = z.object({
-    // L'mmsi deve essere di 9 cifre
     mmsi: z.number()
         .int()
         .refine((val) => val.toString().length === 9),
-    // La latitudine deve avere al massimo MAX_DECIMALS cifre dopo la virgola
     latitudine: z.number()
         .min(-90)
         .max(90)
         .refine(hasMaxDecimals),
-    // Stessa cosa per la longitudine
     longitudine: z.number()
         .min(-180)
         .max(180)
         .refine(hasMaxDecimals),
-    // Il limite massimo di velocità registrabile è di 200 km/h. Deve essere un numero intero positivo. Siccome javascript non distingue tra, per esempio, 10 e 10.0, tecnicamente si possono mettere tanti 0 dopo la virgola, ma il numero sarà comunque considerato intero.
     velocita_kmh: z.number().
         int()
         .positive()
         .max(200),
     stato: z.enum(['IN NAVIGAZIONE', 'IN PESCA', 'STAZIONARIO'])
-}).strict(); // Modalità strict, altrimenti si possono aggiungere campi a piacere
+}).strict();
 
+/**
+ * Funzione per mappare gli errori dei campi della richiesta con gli errori definiti nell'enum. Distingue se il campo è mancante o se il formato è errato. 
+ * @param campo stringa che rappresenta il campo del body della richiesta da validare.
+ * @param issue oggetto di Zod che rappresenta il problema del campo. Permette di distinguere se è missing o di tipo errato/invalido.
+ * @param reqBody oggetto che rappresenta il body della richiesta. Serve per vedere se il campo è mancante o di tipo errato.
+ * @returns restituisce un errore di AppErrorEnum in base al campo, se è mancante o invalido.
+ */
 function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
     
@@ -63,6 +69,12 @@ function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: a
     return missing ? entry.missing : entry.invalid;
 }
 
+/**
+ * Funzione che effettua la validazione della richiesta d'invio dei dati di posizione.
+ * @param req oggetto che contiene il body della richiesta.
+ * @param res oggetto che contiene la risposta alla richiesta.
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
+ */
 export function checkDatiInviati(req: Request, res: Response, next: NextFunction) {
     validateBody(req.body, datiInviatiSchema, mapErroriDatiInviati, next)
 }

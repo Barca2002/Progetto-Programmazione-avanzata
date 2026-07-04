@@ -159,6 +159,8 @@ export const ERROR_LIST = {
         { statusCode: 400, message: "Il MMSI deve essere un numero di esattamente 9 cifre." },
     NOT_ADMIN:
         { statusCode: 401, message: "Accesso riservato agli amministratori." },
+    NOT_USER:
+        { statusCode: 401, message: "Accesso riservato agli utenti normali." },
     INVALID_LATITUDINE_RANGE:
         { statusCode: 400, message: `La latitudine deve essere un numero compreso tra -90 e 90.` },
     INVALID_LONGITUDINE_RANGE:
