@@ -189,6 +189,10 @@ public async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string,
     throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
   const parsed_start_date = new Date(start_date.split(/[-/]/).reverse().join('-'));
   const parsed_end_date = new Date(end_date.split(/[-/]/).reverse().join('-'));
+  if (parsed_start_date > parsed_end_date){
+    throw ErrorFactory.getError(AppErrorEnum.INVALID_DATE_RANGE);
+  }
+      
   const dati = await this.imbarcazioneDAO.getPositionsByMmsiAndDateRange(mmsi, parsed_start_date, parsed_end_date);
 
   return {

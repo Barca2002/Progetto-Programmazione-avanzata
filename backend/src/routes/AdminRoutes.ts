@@ -50,7 +50,7 @@ adminRouter.post("/imbarcazione/geoarea/unlink", checkUnlinkBody, async function
 /**
  * Rotta per la ricerca delle posizioni di un'imbarcazione in un intervallo di date, restituite in formato GeoJSON. Riceve nel body della richiesta l'mmsi dell'imbarcazione e le date di inizio (start_date, obbligatoria) e fine (end_date, opzionale) dell'intervallo; se end_date non è specificata, viene utilizzata la data corrente.
  */
-adminRouter.post("/imbarcazioni/get/positions", validateDateFormat, async function(req: Request, res: Response) {
+adminRouter.post("/imbarcazioni/get/positions/date", validateDateFormat, async function(req: Request, res: Response) {
     await adminController.getPositionsInDateRange(req, res);
 });
 
