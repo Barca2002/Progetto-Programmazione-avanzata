@@ -1,10 +1,12 @@
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 import { Position } from 'geojson';
 
-
+/**
+ * Interfaccia che implementa lo standard GeoJSON per le coordinate.
+ */
 interface GeoJsonPolygon {
   type: 'Polygon';
-  coordinates: Position[][]; // Lo standard GeoJSON per i Polygon vuole per forza il Position[][]
+  coordinates: Position[][];
 }
 
 export interface GeofenceareaAllData {
@@ -16,7 +18,7 @@ export interface GeofenceareaAllData {
   created_at: Date;
 }
 
-export interface GeofenceareaCreationData extends Omit<Optional<GeofenceareaAllData, 'max_speed' | 'ultima_violazione_valida_id'>, 'geoarea_id' | 'created_at'> {}
+export interface GeofenceareaCreationData extends Omit<Optional<GeofenceareaAllData, 'max_speed' | 'ultima_violazione_valida_id'>, 'geoarea_id' | 'created_at'> { }
 
 export interface CreateGeofenceAreaBody {
   features: [
@@ -54,7 +56,6 @@ export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreatio
         unique: 'geoarea_name_key'
       },
       area: {
-        // Sequelize mappa GEOMETRY('POLYGON', 4326) sul tipo PostGIS geometry(Polygon,4326)
         type: DataTypes.GEOMETRY('POLYGON', 4326),
         allowNull: false
       },
@@ -67,9 +68,9 @@ export class Geofencearea extends Model<GeofenceareaAllData, GeofenceareaCreatio
         allowNull: true,
       },
       created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW, // Qui va bene solo la data, perché DataTypes.NOW ritorna la data e l'ora, senza i millisecondi.
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       }
     }, {
       sequelize,

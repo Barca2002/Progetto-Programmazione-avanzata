@@ -7,7 +7,7 @@ export interface LogSpostamentiAllData {
   created_at: Date;
 }
 
-export interface LogSpostamentiCreationData extends Omit<LogSpostamentiAllData, 'id' | 'created_at'> {}
+export interface LogSpostamentiCreationData extends Omit<LogSpostamentiAllData, 'id' | 'created_at'> { }
 export class LogSpostamenti extends Model {
   declare id: number;
   declare mmsi: number;
@@ -37,9 +37,9 @@ export class LogSpostamenti extends Model {
         allowNull: false
       },
       created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
       }
     }, {
       sequelize,

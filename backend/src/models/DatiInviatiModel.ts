@@ -10,7 +10,7 @@ export interface DatiinviatiAllData {
   stato: string;
 }
 
-export interface DatiinviatiCreationData extends Omit<DatiinviatiAllData, 'id' | 'created_at'> {}
+export interface DatiinviatiCreationData extends Omit<DatiinviatiAllData, 'id' | 'created_at'> { }
 
 export class Datiinviati extends Model<DatiinviatiAllData, DatiinviatiCreationData> implements DatiinviatiAllData {
   declare id: number;
@@ -48,7 +48,7 @@ export class Datiinviati extends Model<DatiinviatiAllData, DatiinviatiCreationDa
       created_at: {
         type: DataTypes.BIGINT,
         allowNull: false,
-        defaultValue: () => Date.now() //formato linux epoch, bisogna metterlo come funzione altrimenti il timestamp viene generato solo all'inizializzazione del Model e quindi ad ogni inserimento esso sarà sempre lo stesso
+        defaultValue: () => Date.now()
       },
       stato: {
         type: DataTypes.ENUM("IN NAVIGAZIONE", "IN PESCA", "STAZIONARIA"),

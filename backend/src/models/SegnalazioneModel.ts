@@ -8,7 +8,7 @@ export interface SegnalazioneAllData {
     created_at: Date;
 }
 
-export interface SegnalazioneCreationData extends Omit<SegnalazioneAllData, 'id' | 'created_at'> {}
+export interface SegnalazioneCreationData extends Omit<SegnalazioneAllData, 'id' | 'created_at'> { }
 
 
 export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreationData> implements SegnalazioneAllData {
@@ -22,32 +22,32 @@ export class Segnalazione extends Model<SegnalazioneAllData, SegnalazioneCreatio
     declare removeImbarcazione: BelongsToManyRemoveAssociationMixin<Imbarcazione, number>;
 
 
-  static inizializzaModel(sequelize: Sequelize): typeof Segnalazione {
-    return Segnalazione.init({
-        id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        geoarea_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        stato: {
-            type: DataTypes.ENUM('IN CORSO', 'RIENTRATA'),
-            allowNull: false
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
-        }
+    static inizializzaModel(sequelize: Sequelize): typeof Segnalazione {
+        return Segnalazione.init({
+            id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                primaryKey: true,
+                autoIncrement: true
+            },
+            geoarea_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false
+            },
+            stato: {
+                type: DataTypes.ENUM('IN CORSO', 'RIENTRATA'),
+                allowNull: false
+            },
+            created_at: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: DataTypes.NOW
+            }
         }, {
-        sequelize,
-        tableName: 'segnalazioni',
-        freezeTableName: true,
-        timestamps: false
+            sequelize,
+            tableName: 'segnalazioni',
+            freezeTableName: true,
+            timestamps: false
         });
     }
 }
