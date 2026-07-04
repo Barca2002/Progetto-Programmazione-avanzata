@@ -6,7 +6,7 @@
 | [Obiettivo del progetto](#obiettivo-del-progetto) | Obiettivo principale del progetto e breve spiegazione delle funzionalità. |
 | [Tecnologie usate per lo sviluppo](#-tecnologie-usate-per-lo-sviluppo)| Lista di tecnologie e framework utilizzati per il developement.
 | [Entità coinvolte](#-entità-coinvolte)| Lista di tecnologie e framework utilizzati per il developement.
-| [Diagramma dei casi d'Uso](#diagramma-dei-casi-duso) | Spiegazione. |
+| [Diagramma dei casi d'Uso](#diagramma-dei-casi-duso) | Spiegazione funzionalità offerte dall'applicazione tramite diagrammi dei casi d'uso. |
 | [Rotte e diagrammi di sequenza](#rotte-e-diagrammi-di-sequenza) | Panoramica delle rotte più importanti con diagrammi di sequenza. |
 | [Design Pattern implementati](#) | Pattern architetturali scelti durante lo sviluppo e le motivazioni. |
 | [Installazione ed avvio dell'applicazione](#) | Esecuzione dell'applicazione con Docker. |
@@ -138,7 +138,18 @@ Il campo `spostamento` può assumere i seguenti valori:
 
 Il log degli spostamenti viene utilizzato per ricostruire la permanenza delle imbarcazioni all'interno delle geofence aree e per determinare il tempo trascorso al loro interno.
 
-## Rotte e diagrammi di sequenza
+## 📝Diagramma dei casi d'uso
+Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato, Utente autenticato, Admin. L'admin non ha accesso alle funzionalità dell'utente autenticato.
+
+<img src="./immagini/Diagramma_casi_d_uso.svg">
+
+## 🗺️Rotte e diagrammi di sequenza
+### Elenco delle rotte
+| Rotta | Metodo HTTP | Ruolo | Parametri | Descrizione |
+| :--- | :--- | :---: | :--- | :--- |
+| `/` | **GET** | - | - | Healthcheck |
+| `/login` | **POST** | - | {email, password} | Effettua il login e restituisce il token JWT associato all'utente |
+| `/register` | **POST** | - | {username, email, password} | Crea un nuovo utente  |
 
 ### Rotta /register
 
