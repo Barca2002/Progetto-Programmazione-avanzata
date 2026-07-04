@@ -9,7 +9,6 @@ import { Imbarcazione, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } 
 import { FeatureCollection } from 'geojson';
 import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
-import { DatiinviatiDAO } from '../dao/DatiInviatiDAO.js';
 import { LogSpostamentiDAO } from '../dao/LogSpostamentiDAO.js';
 
 
@@ -18,10 +17,13 @@ export class ImbarcazioneService {
   private readonly adminDAO = new AdminDAO();
   private readonly geofenceareaDAO = new GeofenceareaDAO();
   private readonly geofenceareaService = new GeofenceareaService();
-  private readonly datiinviatiDAO = new DatiinviatiDAO();
   private readonly logspostamentiDAO = new LogSpostamentiDAO();
 
-  // Usata dall'adminController tramite imbarcazioneController.
+  /**
+   * 
+   * @param data: 
+   * @returns 
+   */
   public async createImbarcazione(data: ImbarcazioneCreationData) {
     if (!data.mmsi){
       throw ErrorFactory.getError(AppErrorEnum.MISSING_MMSI);
