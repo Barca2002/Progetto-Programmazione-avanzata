@@ -1,9 +1,6 @@
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 import { Position } from 'geojson';
 
-/**
- * Interfaccia che implementa lo standard GeoJSON per le coordinate.
- */
 interface GeoJsonPolygon {
   type: 'Polygon';
   coordinates: Position[][];

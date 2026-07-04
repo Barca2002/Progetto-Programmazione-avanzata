@@ -5,5 +5,4 @@ export interface InterfacciaDAO<T>{
     get(id: number): Promise<T | null>;
     getAll(): Promise<T[]>; 
     update(id: number, new_data: Partial<T>, t?: Transaction): Promise<T | null>;
-    //delete(id: number, t?: Transaction): Promise<T | null>;
 }

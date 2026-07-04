@@ -23,10 +23,21 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return await User.findByPk(user_id);
   }
 
+  /**
+   * Funzione che restituisce tutti gli utenti presenti nel database
+   * @returns array di oggetti User
+   */
   public async getAll(): Promise<User[]> {
     return await User.findAll();
   }
 
+  /**
+   * Funzione che aggiorna i dati di uno user tramite il suo id, attraverso una transazione, oppure restituisce null se lo user non esiste
+   * @param user_id identificatore univoco dello user da aggiornare
+   * @param new_data oggetto con i campi da aggiornare (parziale rispetto a tutti i campi dello user)
+   * @param t oggetto Transaction di Sequelize che rappresenta la transazione SQL attiva
+   * @returns oggetto User aggiornato, oppure null se lo user non esiste
+   */
   public async update(user_id: number, new_data: Partial<UserCreationData>, t: Transaction): Promise<User | null> {
     const user = await User.findByPk(user_id);
     if (!user) {
@@ -44,6 +55,11 @@ export class AdminDAO implements InterfacciaDAO<User> {
     return await User.findOne({ where: { email: email } });
   }
 
+  /**
+   * Funzione che restituisce uno user cercandolo per username, oppure null se non ne esiste uno con quello username
+   * @param username stringa con lo username dello user che si vuole trovare
+   * @returns oggetto User trovato, oppure null se non esiste
+   */
   public async getByUsername(username: string): Promise<User | null> {
     return await User.findOne({ where: { username: username } });
   }

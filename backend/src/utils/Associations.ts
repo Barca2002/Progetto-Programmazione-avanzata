@@ -8,7 +8,6 @@ import { Datiinviati } from '../models/DatiInviatiModel.js';
 
 export function inizializzaAssociazioni(): void {
 
-    // GEOAREA CON IMBARCAZIONE (N:N)
     Imbarcazione.belongsToMany(Geofencearea, {
         through: 'geofence_imbarcazioni',
         timestamps: false,
@@ -25,7 +24,6 @@ export function inizializzaAssociazioni(): void {
         as: 'Imbarcazioni'
     });
 
-    // IMBARCAZIONE CON USER (1:N)
     User.hasMany(Imbarcazione, {
         foreignKey: 'user_id',
         as: 'Imbarcazioni'
@@ -36,7 +34,6 @@ export function inizializzaAssociazioni(): void {
         as: 'Proprietario'
     });
 
-    // IMBARCAZIONE E GEOAREA CON LOG_SPOSTAMENTI (1:N)
     Imbarcazione.hasMany(LogSpostamenti, {
         foreignKey: 'mmsi',
         as: 'Spostamenti'
@@ -57,7 +54,6 @@ export function inizializzaAssociazioni(): void {
         as: 'Geofencearea'
     });
 
-    // IMBARCAZIONE CON SEGNALAZIONE (N:N)
     Imbarcazione.belongsToMany(Segnalazione, {
         through: 'imbarcazioni_segnalazioni',
         timestamps: false,
@@ -75,7 +71,6 @@ export function inizializzaAssociazioni(): void {
         as: 'Imbarcazioni'
     });
 
-    // IMBARCAZIONE E GEOAREA CON VIOLAZIONE (1:N)
     Imbarcazione.hasMany(Violazione, {
         foreignKey: 'mmsi',
         as: 'Violazioni'
@@ -96,7 +91,6 @@ export function inizializzaAssociazioni(): void {
         as: 'Geofencearea'
     });
 
-    // IMBARCAZIONE CON DATI INVIATI (1:N)
     Imbarcazione.hasMany(Datiinviati, {
         foreignKey: 'mmsi',
         as: 'ImbarcazioneDati'

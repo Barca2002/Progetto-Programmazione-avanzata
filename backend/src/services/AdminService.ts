@@ -13,7 +13,7 @@ export class AdminService {
 
   /**
    * Funzione che crea un utente in base al parametro data.
-   * @param data oggetto che implementa l'interfaccioa UserCreationData, quindi che contiene i dati necessari per la creazioni.
+   * @param data oggetto che implementa l'interfaccia UserCreationData, quindi che contiene i dati necessari per la creazioni.
    * @returns oggetto User.
    */
   public async createUtente(data: UserCreationData) {
@@ -61,29 +61,22 @@ export class AdminService {
     if (!data || inputFields.length === 0) {
       throw ErrorFactory.getError(AppErrorEnum.MISSING_DATA);
     }
-    // Il saldo dei token e la data di creazione non possono essere modificati tramite questa funzione, quindi se vengono passati come parametri, viene lanciato un errore.
     if (data.tokens) {
       throw ErrorFactory.getError(AppErrorEnum.TOKEN_EDIT_NOT_ALLOWED);
     }
     if (data.created_at) {
       throw ErrorFactory.getError(AppErrorEnum.CREATEDAT_EDIT_NOT_ALLOWED);
     }
-
-    // Controllo se l'id è corretto
     this.authService.checkUserId(id);
-    // Controllo se l'username ed email inseriti già esistono
     if (data.username && await this.adminDAO.getByUsername(data.username)) {
       throw ErrorFactory.getError(AppErrorEnum.USERNAME_ALREADY_EXISTS);
     }
     if (data.email && await this.adminDAO.getByEmail(data.email)) {
       throw ErrorFactory.getError(AppErrorEnum.EMAIL_ALREADY_EXISTS);
     }
-    // Se si vuole modificare la password, viene hashata prima della modifica.
     if (data.password) {
       data.password = await this.authService.hashPassword(data.password);
     }
-    // Iniziamo la transazione e se va a buon fine ritorna l'user aggiornato,
-    // altrimenti si fa il rollback.
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       const result = await this.adminDAO.update(id, data, t);

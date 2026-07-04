@@ -2,15 +2,9 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
 
-// ----------------------------------------------------
-// Per eseguire lo script, usare npm run generate-keys
-// Le chiavi vengono appese nel file .env
-// ----------------------------------------------------
-
 function generateCryptoKeys(): void {
   console.log('[Script] Generazione della coppia di chiavi RSA.');
 
-  // Genera la coppia di chiavi asimmetriche, lunghezza 4096
   const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
     modulusLength: 4096,
     publicKeyEncoding: {
@@ -23,14 +17,11 @@ function generateCryptoKeys(): void {
     },
   });
 
-  // Converte le chiavi in stringhe Base64 per il file .env, evitando problemi di a capo
   const privateKeyBase64 = Buffer.from(privateKey).toString('base64');
   const publicKeyBase64 = Buffer.from(publicKey).toString('base64');
 
-  // Identifica il path del file .env nella root del progetto
   const envPath = path.join(process.cwd(), '.env');
 
-  // Costruisce il blocco di testo da appendere
   const envBlock = `
 # --- JWT RSA KEYS GENERATED AT ${new Date().toISOString()} ---
 JWT_PRIVATE_KEY="${privateKeyBase64}"
@@ -38,9 +29,8 @@ JWT_PUBLIC_KEY="${publicKeyBase64}"
 `;
 
   try {
-    // Appende il blocco al file .env (lo crea se non esiste)
     fs.appendFileSync(envPath, envBlock, 'utf8');
-    
+
     console.log('[Success] Chiavi generate e salvate nel file .env con successo!');
     console.log('[Script] JWT_PRIVATE_KEY (Da tenere SEGRETA - Usata per firmare)');
     console.log('[Script] JWT_PUBLIC_KEY (Può essere pubblica - Usata per verificare)');

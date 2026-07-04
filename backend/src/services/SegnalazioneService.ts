@@ -92,7 +92,7 @@ export class SegnalazioneService {
             throw ErrorFactory.getError(AppErrorEnum.VIOLAZIONE_NOT_FOUND);
         }
 
-        const ultimaViolazioneIsValid = (ultimaViolazione!.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 60 * 60 * 1000;
+        const ultimaViolazioneIsValid = (ultimaViolazione.created_at.getTime() - ultimaViolazioneValida.created_at.getTime()) > 60 * 60 * 1000;
 
         if (ultimaViolazioneIsValid) {
             const t = await DatabaseConnection.getInstance().transaction();
@@ -118,7 +118,7 @@ export class SegnalazioneService {
         }
 
         if (violazioniValide.length > 5) {
-            const lastSegnalazione = await this.segnalazioneDao.findLastInCorsoByGeoarea(current_geoarea.geoarea_id);
+            const lastSegnalazione = await this.segnalazioneDao.getLastInCorsoByGeoarea(current_geoarea.geoarea_id);
             if (lastSegnalazione) {
                 await this.addImbarcazioniToSegnalazione(lastSegnalazione, violazioniValide);
                 return;
@@ -137,7 +137,7 @@ export class SegnalazioneService {
      * @returns void.
      */
     public async checkRientroSegnalazione(geoarea_id: number) {
-        const lastSegnalazioneInCorso = await this.segnalazioneDao.findLastInCorsoByGeoarea(geoarea_id);
+        const lastSegnalazioneInCorso = await this.segnalazioneDao.getLastInCorsoByGeoarea(geoarea_id);
         if (!lastSegnalazioneInCorso) {
             return;
         }

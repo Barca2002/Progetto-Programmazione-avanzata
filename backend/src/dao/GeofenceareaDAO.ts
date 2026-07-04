@@ -22,6 +22,10 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
     return await Geofencearea.findByPk(geoarea_id);
   }
 
+  /**
+   * Funzione che restituisce tutte le geofence aree presenti
+   * @returns array di oggetti Geofencearea
+   */
   public async getAll(): Promise<Geofencearea[]> {
     return await Geofencearea.findAll();
   }
@@ -35,6 +39,13 @@ export class GeofenceareaDAO implements InterfacciaDAO<Geofencearea> {
     return await Geofencearea.findOne({ where: { name } });
   }
 
+  /**
+   * Funzione che aggiorna i dati di una geofence area tramite il suo id, attraverso una transazione
+   * @param geoarea_id identificatore univoco della geofence area da aggiornare
+   * @param new_data oggetto con i campi da aggiornare (parziale rispetto a tutti i campi della geofence area)
+   * @param t oggetto Transaction di Sequelize che rappresenta la transazione SQL attiva
+   * @returns oggetto Geofencearea aggiornato
+   */
   public async update(geoarea_id: number, new_data: Partial<GeofenceareaCreationData>, t: Transaction): Promise<Geofencearea | null> {
     const geoarea = await Geofencearea.findByPk(geoarea_id);
     return await geoarea!.update(new_data, { transaction: t });

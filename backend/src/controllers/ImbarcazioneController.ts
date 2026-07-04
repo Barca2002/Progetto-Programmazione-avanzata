@@ -28,7 +28,7 @@ export class ImbarcazioneController {
   /**
    * Funzione che associa delle imbarcazioni a delle geoaree
    * @param links vettore che contiene i link fra le imbarcazioni e le geofence aree
-   * @returns 
+   * @returns void
    */
   public async linkGeoareasToImbarcazioni(links: LinkDataBody[]): Promise<void> {
     return await this.imbarcazioneService.linkGeoareasToImbarcazioni(links);
@@ -37,7 +37,7 @@ export class ImbarcazioneController {
   /**
    * Funzione che dissocia una geofence area da un'imbarcazione
    * @param unlink oggetto che contiene i dati per dissociare una geofence area da un'imbarcazione
-   * @returns 
+   * @returns void
    */
   public async unlinkGeoareaToImbarcazioni(unlink: UnlinkDataBody) {
     return await this.imbarcazioneService.unlinkGeoareaImbarcazione(unlink);
@@ -77,5 +77,4 @@ export class ImbarcazioneController {
   public async createImbarcazione(data: ImbarcazioneCreationData) {
     return await this.imbarcazioneService.createImbarcazione(data);
   }
-
 }

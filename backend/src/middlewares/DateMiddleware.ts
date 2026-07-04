@@ -18,7 +18,7 @@ const getPositionsSchema = z.object({
         console.log("oggi ", oggi);
         console.log(parsedDate <= oggi)
 
-        if (isNaN(parsedDate.getTime())) {
+        if (Number.isNaN(parsedDate.getTime())) {
             ctx.addIssue({
                 code: "custom",
                 message: "INVALID_DATE",
@@ -31,7 +31,6 @@ const getPositionsSchema = z.object({
                 code: "custom",
                 message: "MAX_END_DATE",
             });
-            return;
         }
     }
     ).optional()

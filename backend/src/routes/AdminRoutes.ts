@@ -9,7 +9,6 @@ import { validateDateFormat } from "../middlewares/DateMiddleware.js";
 export const adminRouter = Router();
 const adminController = new AdminController();
 
-// Applichiamo i middleware definiti qui in tutte le rotte.
 adminRouter.use(checkAdminRole);
 
 /**

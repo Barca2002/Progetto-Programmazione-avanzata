@@ -10,9 +10,6 @@ import { MIN_NAME_LENGTH, MAX_NAME_LENGTH, MAX_SPEED_ALLOWED, MAX_POINTS } from 
 
 export const checkCreation = [checkGeoJsonFormat, checkCoordinates];
 
-/**
- * Definizione dello schema di validazione della richiesta di creazione di una geofence area. Usato in geofenceAreaSchema
- */
 const PositionSchema = z.array(z.number()).superRefine((value, ctx) => {
     const [lon, lat] = value;
     if (value.length !== 2) {
@@ -76,9 +73,6 @@ const PositionSchema = z.array(z.number()).superRefine((value, ctx) => {
     }
 });
 
-/**
- * Definizione dello schema di validazione per il formato GeoJSON della richiesta d'invio dei dati di posizione.
- */
 const geofenceAreaSchema = z.object({
     type: z.string().refine(v => v === "FeatureCollection", { message: "INVALID_TYPE_FEATURECOLLECTION" }),
     features: z.array(
@@ -110,7 +104,7 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
     if (issue.code === "unrecognized_keys") {
         return AppErrorEnum.INVALID_PARAMS;
     }
-   
+
     const missing = isMissingIssueGeoJSON(issue, reqBody);
     const pathString = issue.path.join(".");
 
@@ -170,7 +164,7 @@ export function mapGeofenceAreaErrors(campo: string, issue: z.core.$ZodIssue, re
     };
 
     const entry = errorMap[pathString];
-    
+
     if (!entry) {
         return missing ? AppErrorEnum.MISSING_DATA : AppErrorEnum.INCORRECT_DATA;
     }
@@ -199,7 +193,7 @@ export function checkGeoJsonFormat(req: Request, res: Response, next: NextFuncti
  * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
  */
 function checkCoordinates(req: Request, res: Response, next: NextFunction) {
-    
+
     const coordinates = req.body?.features?.[0]?.geometry?.coordinates as Position[][];
     const punti = coordinates?.[0];
     if (!coordinates || !punti) {
@@ -223,7 +217,7 @@ function checkCoordinates(req: Request, res: Response, next: NextFunction) {
 
     const polygon = turf.polygon(coordinates);
     const autointersezioni = turf.kinks(polygon);
-    
+
     if (autointersezioni.features.length > 0) {
         return next(ErrorFactory.getError(AppErrorEnum.OVERLAPPING_POLYGON));
     }

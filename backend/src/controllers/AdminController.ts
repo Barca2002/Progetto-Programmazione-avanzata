@@ -122,7 +122,6 @@ export class AdminController {
   public async linkGeoareasToImbarcazioni(req: Request, res: Response): Promise<void> {
     try {
       const links = req.body as LinkDataBody[];
-
       if (!links || !Array.isArray(links)) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }

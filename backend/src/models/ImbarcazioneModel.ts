@@ -39,10 +39,6 @@ export class Imbarcazione extends Model<ImbarcazioneAllData, ImbarcazioneCreatio
   declare user_id: number;
   declare created_at: Date;
 
-  /**
-   *  Metodi Mixin generati dall'associazione belongsToMany con Geofencearea. Mixin è una tecnica per aggiungere (mescolare) metodi ad una classe senza usare l'ereditarietà.
-   * Questi metodi non aggiungono comportamento, ma dicono solo a TS che Sequelize popolerà questi metodi a runtime. Permettono di lavorare con le molti a molti/uno a molti.
-   *  */
   declare getGeofenceareas: BelongsToManyGetAssociationsMixin<Geofencearea>;
   declare hasGeofencearea: BelongsToManyHasAssociationMixin<Geofencearea, number>;
   declare hasGeofenceareas: BelongsToManyHasAssociationsMixin<Geofencearea, number>;

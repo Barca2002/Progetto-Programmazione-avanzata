@@ -5,15 +5,15 @@ import { Datiinviati } from '../models/DatiInviatiModel.js';
 
 export class ImbarcazioneDAO implements InterfacciaDAO<Imbarcazione> {
 
- /**
- * Crea una nuova imbarcazione nel database attraverso una transazione, che nel caso di errore esegue un rollback e non permette la creazione
- * @param data oggetto che contiene i dati necessari per la creazione di un imbarcazione
- * @param t oggetto Transaction di Sequelize che rappresenta la transazione SQL attiva
- * @returns oggetto Imbarcazione
- */
-public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione> {
-  return await Imbarcazione.create(data, { transaction: t });
-}
+  /**
+  * Crea una nuova imbarcazione nel database attraverso una transazione, che nel caso di errore esegue un rollback e non permette la creazione
+  * @param data oggetto che contiene i dati necessari per la creazione di un imbarcazione
+  * @param t oggetto Transaction di Sequelize che rappresenta la transazione SQL attiva
+  * @returns oggetto Imbarcazione
+  */
+  public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imbarcazione> {
+    return await Imbarcazione.create(data, { transaction: t });
+  }
 
   /**
    * Funzione che torna l'imbarcazione con l'mmsi dato come parametro oppure null in caso di imbarcazione non trovata
@@ -30,12 +30,6 @@ public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imb
    */
   public async getAll(): Promise<Imbarcazione[]> {
     return await Imbarcazione.findAll();
-  }
-
-  public async getByUserId(user_id: number): Promise<Imbarcazione | null> {
-    return await Imbarcazione.findOne({
-      where: { user_id: user_id }
-    });
   }
 
   /**
@@ -76,6 +70,13 @@ public async create(data: ImbarcazioneCreationData, t: Transaction): Promise<Imb
     });
   }
 
+  /**
+   * Funzione che aggiorna i dati di un'imbarcazione tramite il suo mmsi, attraverso una transazione
+   * @param mmsi identificatore unico dell'imbarcazione da aggiornare
+   * @param new_data oggetto con i campi da aggiornare (parziale rispetto a tutti i campi dell'imbarcazione)
+   * @param t oggetto Transaction di Sequelize che rappresenta la transazione SQL attiva
+   * @returns oggetto Imbarcazione
+   */
   public async update(mmsi: number, new_data: Partial<ImbarcazioneCreationData>, t: Transaction): Promise<Imbarcazione | null> {
     const imbarcazione = await Imbarcazione.findByPk(mmsi);
     return await imbarcazione!.update(new_data, { transaction: t });

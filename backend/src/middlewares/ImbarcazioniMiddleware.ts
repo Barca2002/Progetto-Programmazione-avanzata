@@ -4,9 +4,6 @@ import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
 import * as z from 'zod';
 import { isMissingIssue, validateBody } from "../utils/HelperFunctions.js";
 
-/**
- * Definizione degli schemi di validazione per la richiesta di creazione di un'imbarcazione, la richiesta di autorizzazione e rimozione di quest'ultima di una geofence area ad un'imbarcazione.
- */
 export const mmsiSchema = z.number().min(100000000).max(999999999);
 const nameSchema = z.string().max(100);
 const typeSchema = z.string().max(50);
@@ -36,6 +33,12 @@ const unlinkImbarcazioneGeoareaSchema = z.object({
 }).strict();
 
 
+/**
+ * Funzione che valida il body della richiesta per l'associazione di imbarcazioni a geofence area, tramite lo schema Zod dedicato
+ * @param req oggetto che contiene il body della richiesta
+ * @param res oggetto della risposta alla richiesta
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline
+ */
 export function checkLinkBody(req: Request, res: Response, next: NextFunction) {
     const result = linkImbarcazioneGeoareaSchema.safeParse(req.body);
     if (!result.success) {
@@ -44,6 +47,12 @@ export function checkLinkBody(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
+/**
+ * Funzione che valida il body della richiesta per la rimozione dell'associazione tra imbarcazioni e geofence area, tramite lo schema Zod dedicato
+ * @param req oggetto che contiene il body della richiesta
+ * @param res oggetto della risposta alla richiesta
+ * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline
+ */
 export function checkUnlinkBody(req: Request, res: Response, next: NextFunction) {
     const result = unlinkImbarcazioneGeoareaSchema.safeParse(req.body);
     if (!result.success) {
@@ -90,7 +99,7 @@ function mapErroriCreazioneImbarcazione(campo: string, issue: z.core.$ZodIssue, 
     };
 
     const entry = map[campo];
-    if (!entry){
+    if (!entry) {
         return AppErrorEnum.INCORRECT_DATA;
     }
 

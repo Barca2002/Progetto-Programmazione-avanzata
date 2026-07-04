@@ -4,7 +4,7 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { ImbarcazioneDAO } from '../dao/ImbarcazioneDAO.js';
-import { Datiinviati, DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
+import { DatiinviatiCreationData } from '../models/DatiInviatiModel.js';
 import { ImbarcazioneService } from './ImbarcazioneService.js';
 import { LogSpostamentiService } from './LogSpostamentiService.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
@@ -18,20 +18,7 @@ export class DatiInviatiService {
   private readonly logspostamentoService = new LogSpostamentiService();
 
   /**
-   * Restituisce l'ultimo dato di posizione inviato di un'imbarcazione.
-   * @param mmsi numero che rappresenta il codice mmsi di un'imbarcazione.
-   * @returns oggetto Datiinviati, il quale contiene la posizione inviata da un utente.
-   */
-  public async findLastDatoInviatoByMmsi(mmsi: number): Promise<Datiinviati> {
-    const last_dato = await this.datiinviatiDAO.getLastDatoByMmsi(mmsi);
-    if (!last_dato) {
-      throw ErrorFactory.getError(AppErrorEnum.DATO_NOT_FOUND);
-    }
-    return last_dato;
-  }
-
-  /**
-   * Controlla che l'imbarcazione passati nei dati esista e sia di prorpietà dell'utente che invia i dati. Poi si effettuano dei controlli se l'utente è autorizzato ad accedere alla geofence area corrente e la geofence area dell'ultimo dato inviato. Se vi è l'autorizzazione, si registrerà uno spostamento in uscita o in entrata. Se è il primo invio di dati, si registrerà solamente un'entrata (se la posizione inviata è in una geofence area e si ha l'autorizzazione). Se la geofence area della posizione corrente e dell'ultimo dato inviato sono uguali, non si registra nessuno spostamento, perché è solo un movimento interno ad essa.
+   * Controlla che l'imbarcazione passati nei dati esista e sia di proprietà dell'utente che invia i dati. Poi si effettuano dei controlli se l'utente è autorizzato ad accedere alla geofence area corrente e la geofence area dell'ultimo dato inviato. Se vi è l'autorizzazione, si registrerà uno spostamento in uscita o in entrata. Se è il primo invio di dati, si registrerà solamente un'entrata (se la posizione inviata è in una geofence area e si ha l'autorizzazione). Se la geofence area della posizione corrente e dell'ultimo dato inviato sono uguali, non si registra nessuno spostamento, perché è solo un movimento interno ad essa.
    * @param data oggetto contenente tutti i dati necessari per l'invio della propria posizione.
    * @param user_id numero che rappresenta l'id dell'utente.
    */
@@ -41,23 +28,17 @@ export class DatiInviatiService {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     }
     await this.imbarcazioniService.checkOwnershipImbarcazione(user_id, data.mmsi);
-
     const current_geoarea = await this.geofenceareaService.getGeoareaByPosition(data.longitudine, data.latitudine);
     const currentAreaIsAllowed: boolean = current_geoarea ? await imbarcazione.hasGeofencearea(current_geoarea.geoarea_id) : false;
-
     const lastDatoInviato = await this.datiinviatiDAO.getLastDatoByMmsi(data.mmsi);
     const last_dato_geoarea = lastDatoInviato
       ? await this.geofenceareaService.getGeoareaByPosition(lastDatoInviato.longitudine, lastDatoInviato.latitudine)
       : null;
-
     const lastAreaIsAllowed = last_dato_geoarea
       ? (await imbarcazione.hasGeofencearea(last_dato_geoarea.geoarea_id))
       : false;
-
     const sameArea = current_geoarea?.geoarea_id === last_dato_geoarea?.geoarea_id;
-
     const spostamentiDaLoggare:LogSpostamentiCreationData[] = [];
-
     if (!sameArea) {
       if (last_dato_geoarea && lastAreaIsAllowed) {
         spostamentiDaLoggare.push({ mmsi: data.mmsi, geoarea_id: last_dato_geoarea.geoarea_id, spostamento: "USCITA" });
@@ -66,7 +47,6 @@ export class DatiInviatiService {
         spostamentiDaLoggare.push({ mmsi: data.mmsi, geoarea_id: current_geoarea.geoarea_id, spostamento: "ENTRATA" });
       }
     }
-
     const t = await DatabaseConnection.getInstance().transaction();
     try {
       for (const spostamento of spostamentiDaLoggare) {

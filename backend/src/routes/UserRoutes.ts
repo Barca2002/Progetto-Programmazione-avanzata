@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { UserController } from "../controllers/UserController.js";
 import { checkUserRole } from "../middlewares/JWTMiddleware.js";
-import { checktokenBalance } from "../middlewares/TokenMiddleware.js";
+import { checkTokenBalance } from "../middlewares/TokenMiddleware.js";
 import { checkDatiInviati } from "../middlewares/DatiInviatiMiddleware.js";
 
 /**
@@ -22,14 +22,14 @@ userRouter.use(checkUserRole);
  * Rotta per l'invio dei dati di posizione di un'imbarcazione propria. Ogni richiesta costa 0,025 token. I dati della richiesta sono validati dal middleware DatiInviatiMiddleware.ts. Poi si controlla in che geoarea corrisponde la posizione inviata, se non è in nessuna geofence area, si salva solo il dato inviato, altrimenti si procede con il controllo delle autorizzazioni ad esse per registrare uno spostamento in uscita, entrata o entrambi. Successivamente si controlla se generare una violazione e poi se generare una segnalazione in base al numero di violazioni in una certa finestra temporale.
  * 
  */
-userRouter.post("/imbarcazione/send/status", checktokenBalance, checkDatiInviati, async function(req: Request, res: Response) {
+userRouter.post("/imbarcazione/send/status", checkTokenBalance, checkDatiInviati, async function(req: Request, res: Response) {
     await userController.sendStatus(req, res);
 });
 
 /**
  * Rotta che ritorna se le proprie imbarcazioni sono dentro o fuori una certa geofence area. Se un'imbarcazione è dentro, si restituisce anche il tempo di permanenza dall'ultimo dato inviato.
  */
-userRouter.get("/imbarcazioni/get/my/status/geoareaid/:geoarea_id", checktokenBalance, checkUserRole, async function(req: Request, res: Response) {
+userRouter.get("/imbarcazioni/get/my/status/geoareaid/:geoarea_id", checkTokenBalance, checkUserRole, async function(req: Request, res: Response) {
     await userController.getMyImbarcazioniStatus(req, res);
 });
 

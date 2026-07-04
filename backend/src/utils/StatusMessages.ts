@@ -1,8 +1,5 @@
+import { MAX_EMAIL_LENGTH, MAX_DECIMALS, MAX_NAME_LENGTH, MAX_POINTS, MAX_SPEED_ALLOWED, MIN_NAME_LENGTH } from "./GlobalConstants.js";
 
-
-import { MAX_EMAIL_LENGTH } from "./GlobalConstants.js";
-import { MAX_DECIMALS, MAX_NAME_LENGTH, MAX_POINTS, MAX_SPEED_ALLOWED, MIN_NAME_LENGTH } from "./GlobalConstants.js";
-// Enumerativi degli errori e dei messaggi di successo dell'applicazione. Questi enum forniscono una struttura centralizzata per gestire i messaggi di errore e successo.
 export const ERROR_LIST = {
     DB_CONNECTION_ERROR:
         { statusCode: 500, message: "Errore interno del server. Non è possibile procedere con la richiesta." },
@@ -182,7 +179,7 @@ export const ERROR_LIST = {
     FIND_ERROR:
         { statusCode: 400, message: "Errore nell'aggiornamento." },
     TOO_MANY_POINTS:
-        { statusCode: 400, message: `Inviati troppi punti per la geofence area (max ${MAX_POINTS}).` }, // Usa string interpolation per inserire la variabile nell'errore
+        { statusCode: 400, message: `Inviati troppi punti per la geofence area (max ${MAX_POINTS}).` },
     TOO_LITTLE_POINTS:
         { statusCode: 400, message: "Inviati troppi pochi punti per la geofence area (min 4)." },
     INVALID_GEOJSON_FORMAT:
@@ -238,10 +235,9 @@ export const ERROR_LIST = {
 
 } as const;
 
-// Tipo derivato automaticamente dalle chiavi, evita duplicazioni e mantiene tutto in un unico posto. Così basta aggiungere una nuova voce in ERROR_CONFIG e viene mappato automaticamente. keyof estrae tutte le chiavi dell'oggetto ERROR_CONFIG, le unisce in una union ("a" | "b" | ...), poi li usa come tipo (per esempio INTERNAL_ERROR diventa un tipo). Questo garantisce che AppErrorName sia sempre aggiornato con le chiavi effettive dell'oggetto ERROR_CONFIG.
-export type AppErrorName = keyof typeof ERROR_LIST; // Equivale a "INTERNAL_ERROR" | "EMAIL_NOT_EXIST" | "INCORRECT_PASSWORD" | ...
+export type AppErrorName = keyof typeof ERROR_LIST;
 
-// La funzione fromEntries crea un oggetto mappando ogni nome di errore a se stesso, in modo da poter usare AppErrorNames.INVALID_EMAIL come un enum/oggetto invece di "INVALID_EMAIL" come stringa.
+
 export const AppErrorEnum = Object.fromEntries(
     Object.keys(ERROR_LIST).map(k => [k, k])
 ) as { [K in AppErrorName]: K };

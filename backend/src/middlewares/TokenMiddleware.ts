@@ -66,7 +66,7 @@ export function validateTokenAmount(req: Request, res: Response, next: NextFunct
  * @param res oggetto che contiene la risposta alla richiesta.
  * @param next oggetto NextFunction che può essere utilizzato per chiamare un'altra funzione definita in una pipeline.
  */
-export async function checktokenBalance(req: Request, res: Response, next: NextFunction) {
+export async function checkTokenBalance(req: Request, res: Response, next: NextFunction) {
   try {
     const jwtDecoded = checkJWTtoken(req);
     if (!jwtDecoded) {

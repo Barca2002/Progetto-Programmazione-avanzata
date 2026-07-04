@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 import { User, UserCreationData } from '../models/UserModel.js';
 
 export class AuthService {
-
     private readonly adminDao = new AdminDAO();
     private readonly privateKey: string;
     private readonly saltRounds = 12;
@@ -21,7 +20,7 @@ export class AuthService {
         }
         try {
             this.privateKey = Buffer.from(privateKeyBase64, 'base64').toString('utf8');
-        } catch (err) {
+        } catch {
             throw ErrorFactory.getError(AppErrorEnum.JWT_TOKEN_KEY_ERROR);
         }
     }
@@ -65,7 +64,7 @@ export class AuthService {
 
     /**
      * Genera un hash della password passata come argomento tramite l'algoritmo bcrypt.
-     * @param pwd stringa cotenente una password da hashare.
+     * @param pwd stringa contenente una password da hashare.
      * @returns stringa contenente l'hash della password.
      */
     public async hashPassword(pwd: string): Promise<string> {
@@ -100,7 +99,7 @@ export class AuthService {
     }
 
     /**
-     * Regsitra un utente controllando se le credenziali fornite sono già state usate. Se non sono già usate, crea l'hash della password e restituisce le informazioni all'AuthController. Di default l'utente creato non è admin per ovvi motivi di sicurezza.
+     * Registra un utente controllando se le credenziali fornite sono già state usate. Se non sono già usate, crea l'hash della password e restituisce le informazioni all'AuthController. Di default l'utente creato non è admin per ovvi motivi di sicurezza.
      * @param email stringa contenente l'email.
      * @param username stringa contenente l'username.
      * @param password stringa contenente la password.

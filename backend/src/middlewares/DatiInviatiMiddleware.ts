@@ -4,9 +4,6 @@ import { hasMaxDecimals } from '../utils/DecimalChecker.js';
 import { z } from 'zod';
 import { isMissingIssue, validateBody } from '../utils/HelperFunctions.js';
 
-/**
- * Definizione dello schema di validazione della richiesta d'invio dei dati di posizione.
- */
 export const datiInviatiSchema = z.object({
     mmsi: z.number()
         .int()
@@ -35,7 +32,7 @@ export const datiInviatiSchema = z.object({
  */
 function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
     const missing = isMissingIssue(issue, reqBody);
-    
+
     const map: Record<string, { missing: AppErrorName, invalid: AppErrorName }> = {
         mmsi: {
             missing: AppErrorEnum.MISSING_MMSI,
@@ -43,13 +40,13 @@ function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: a
         },
         longitudine: {
             missing: AppErrorEnum.MISSING_LONGITUDINE,
-            invalid: issue.code === "custom" ? 
-            AppErrorEnum.INVALID_LONGITUDINE_DECIMALS : AppErrorEnum.INVALID_LONGITUDINE,
+            invalid: issue.code === "custom" ?
+                AppErrorEnum.INVALID_LONGITUDINE_DECIMALS : AppErrorEnum.INVALID_LONGITUDINE,
         },
         latitudine: {
             missing: AppErrorEnum.MISSING_LATITUDINE,
-            invalid: issue.code === "custom" ? 
-            AppErrorEnum.INVALID_LATITUDINE_DECIMALS : AppErrorEnum.INVALID_LATITUDINE,
+            invalid: issue.code === "custom" ?
+                AppErrorEnum.INVALID_LATITUDINE_DECIMALS : AppErrorEnum.INVALID_LATITUDINE,
         },
         velocita_kmh: {
             missing: AppErrorEnum.MISSING_VELOCITA_KMH,
@@ -62,7 +59,7 @@ function mapErroriDatiInviati(campo: string, issue: z.core.$ZodIssue, reqBody: a
     };
 
     const entry = map[campo];
-    if (!entry){
+    if (!entry) {
         return AppErrorEnum.INCORRECT_DATA;
     }
 

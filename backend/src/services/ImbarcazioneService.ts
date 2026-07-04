@@ -50,6 +50,11 @@ export class ImbarcazioneService {
     }
   }
 
+  /**
+   * Funzione che restituisce un'imbarcazione tramite il suo mmsi, controllando che l'mmsi sia valido e che l'imbarcazione esista
+   * @param mmsi identificatore unico dell'imbarcazione
+   * @returns oggetto Imbarcazione trovato
+   */
   public async getImbarcazioneByMmsi(mmsi: number) {
     if (Number.isNaN(mmsi) || mmsi <= 0) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_MMSI);
@@ -144,7 +149,7 @@ export class ImbarcazioneService {
   }
 
   /**
-   * Retsituisce lo stato delle proprie imbarcazioni in una certa geofence area, cioè se si trova dentro o fuori da essa. Si controlla se la geofence area esiste 
+   * Restituisce lo stato delle proprie imbarcazioni in una certa geofence area, cioè se si trova dentro o fuori da essa. Si controlla se la geofence area esiste 
    * @param user_id numero che rappresenta l'id dell'utente.
    * @param geoarea_id numero che rappresenta l'id della geofence area.
    * @returns insieme di imbarcazioni con il relativo stato in una geoarea, con tempo di permanenza se dentro di essa.
@@ -153,7 +158,6 @@ export class ImbarcazioneService {
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0) {
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
     }
-    // Controllo se la geoarea esiste, se non esiste viene lanciata un'eccezione.
     await this.geofenceareaService.getAreaById(geoarea_id);
 
     const my_imbarcazioni = await this.imbarcazioneDAO.getAllByUserId(user_id);
@@ -174,11 +178,8 @@ export class ImbarcazioneService {
   public async getAllImbarcazioniStatus(geoarea_id: number) {
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
-
     await this.geofenceareaService.getAreaById(geoarea_id);
-
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
-
     return this.generateImbarcazioniStatus(imbarcazioni, geoarea_id);
   }
 
@@ -191,14 +192,14 @@ export class ImbarcazioneService {
  */
   public async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string, end_date: string): Promise<FeatureCollection> {
     const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-    if (!imbarcazione){
+    if (!imbarcazione) {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
     }
     const parsed_start_date = new Date(start_date.split(/[-/]/).reverse().join('-'));
     const parsed_end_date = new Date(end_date.split(/[-/]/).reverse().join('-'));
-  if (parsed_start_date > parsed_end_date){
-    throw ErrorFactory.getError(AppErrorEnum.INVALID_DATE_RANGE);
-  }
+    if (parsed_start_date > parsed_end_date) {
+      throw ErrorFactory.getError(AppErrorEnum.INVALID_DATE_RANGE);
+    }
     const dati = await this.imbarcazioneDAO.getPositionsByMmsiAndDateRange(mmsi, parsed_start_date, parsed_end_date);
 
     return {
@@ -257,7 +258,6 @@ export class ImbarcazioneService {
       if (segnalazioni.length === 0) {
         continue;
       }
-      // Togliamo il campo created_at anche dall'imbarcazione.
       result.push({ imbarcazione: imbarcazione, segnalazioni });
     }
     return result;
@@ -322,8 +322,13 @@ export class ImbarcazioneService {
     }
   }
 
+  /**
+   * Funzione che verifica se un'imbarcazione appartiene a uno specifico utente, controllando che l'user_id associato all'imbarcazione corrisponda a quello passato come parametro
+   * @param user_id identificatore univoco dello user
+   * @param mmsi identificatore unico dell'imbarcazione
+   * @returns true se l'imbarcazione appartiene all'utente
+   */
   public async checkOwnershipImbarcazione(user_id: number, mmsi: number): Promise<boolean> {
-    // Controlliamo se l'user_id dell'imbarcazione e l'user_id dell'utente sono uguali, verificando quindi se l'imbarcazione è di proprietà dell'utente.
     const imbarcazione = await this.getImbarcazioneByMmsi(mmsi);
     if (imbarcazione?.user_id !== user_id) {
       throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_OWNERSHIP_ERROR);

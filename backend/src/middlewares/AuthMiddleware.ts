@@ -1,16 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { AppErrorEnum, AppErrorName } from "../utils/StatusMessages.js";
 import * as z from "zod";
-import { isMissingIssue } from "../utils/HelperFunctions.js";
-import { validateBody } from "../utils/HelperFunctions.js";
+import { isMissingIssue, validateBody } from "../utils/HelperFunctions.js";
 import { MAX_EMAIL_LENGTH } from "../utils/GlobalConstants.js";
-/**
- * Definizione dello schema di validazione dell'email, della password e dell'username tramite Zod. 
- * I parametri della request devono essere solamente quelli in registerBodySchema.
- * L'email deve essere lunga al massimo MAX_EMAIL_LENGTH caratteri.
- * La password deve essere lunga tra 8 e 32 caratteri alfanumerici e deve comprendere almeno un numero. 
- * L'username deve essere lungo tra 4 e 50 caratteri, inoltre non ammette caratteri speciali.
- */
 
 export const emailSchema = z.email().max(MAX_EMAIL_LENGTH);
 const passwordSchema = z.string().min(8).max(32).regex(/^(?=.*[A-Za-z])(?=.*\d)\S+$/);
@@ -20,12 +12,12 @@ const registerBodySchema = z.object({
     username: usernameSchema,
     email: emailSchema,
     password: passwordSchema,
-}).strict(); 
+}).strict();
 
 const loginBodySchema = z.object({
     email: emailSchema,
     password: passwordSchema,
-}).strict(); 
+}).strict();
 
 /**
  * Funzione per mappare gli errori dei campi della richiesta con gli errori definiti nell'enum. Distingue se il campo è mancante o se il formato è errato. 
@@ -53,7 +45,7 @@ function mapErroriRegister(campo: string, issue: z.core.$ZodIssue, reqBody: any)
     };
 
     const entry = map[campo];
-    if (!entry){
+    if (!entry) {
         return AppErrorEnum.INCORRECT_DATA;
     }
 
@@ -83,7 +75,7 @@ function mapErroriLogin(campo: string, issue: z.core.$ZodIssue, reqBody: any) {
 
     const entry = map[campo];
 
-    if (!entry){
+    if (!entry) {
         return AppErrorEnum.INCORRECT_DATA;
     }
 

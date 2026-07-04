@@ -14,6 +14,17 @@ export interface UserCreationData extends Omit<Optional<UserAllData, 'is_admin'>
 
 export interface UserUpdateData extends Omit<Optional<UserAllData, 'is_admin' | 'tokens' | 'created_at'>, 'user_id'> { }
 
+export interface LoginBody {
+  email: string;
+  password: string;
+}
+
+export interface RegisterBody {
+  username: string;
+  email: string;
+  password: string;
+}
+
 export interface UpdateTokenBody {
   email: string;
   newTokenAmount: number;

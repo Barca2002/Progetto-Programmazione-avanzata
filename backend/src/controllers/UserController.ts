@@ -30,7 +30,6 @@ export class UserController {
     try {
       const data = req.body as DatiinviatiCreationData;
       const user_id = checkJWTtoken(req).user_id;
-      
       await this.datiinviatiService.sendData(data, user_id);
       await this.spendToken(user_id);
       await this.violazioneService.checkIfViolazione(data);
@@ -45,6 +44,11 @@ export class UserController {
     }
   };
 
+  /**
+   * Funzione che scala il costo di una richiesta (REQ_COST) dal saldo token dell'utente, recuperando prima l'utente tramite id e poi aggiornandone il saldo
+   * @param user_id identificatore univoco dello user
+   * @returns true se l'operazione di aggiornamento del saldo è andata a buon fine
+   */
   public async spendToken(user_id: number) {
     const user = await this.adminService.getUtenteById(user_id);
     await this.adminService.updateTokenBalance(user.email, user.tokens - REQ_COST);
@@ -83,7 +87,7 @@ export class UserController {
       const myImbarcazioniSegnalazioniFiltered = my_imbarcazioni_segnalazioni.map(item => ({
         ...item,
         imbarcazione: (({ user_id, ...rest }) => rest)(item.imbarcazione.toJSON()),
-        segnalazioni: item.segnalazioni.map(s => {const { id, geoarea_id, ...rest } = s.toJSON(); return rest})
+        segnalazioni: item.segnalazioni.map(s => { const { id, geoarea_id, ...rest } = s.toJSON(); return rest })
       }));
       SuccessFactory.getSuccess(AppSuccessEnum.REQUEST_SUCCESS, myImbarcazioniSegnalazioniFiltered).send(res);
     } catch (err) {
@@ -96,7 +100,7 @@ export class UserController {
   }
 
   /**
-   * Funzione che retituisce il saldo dei token dell'utente loggato. L'id dell'utente viene preso dal token JWT.
+   * Funzione che restituisce il saldo dei token dell'utente loggato. L'id dell'utente viene preso dal token JWT.
    * @param req oggetto che contiene il body della richiesta.
    * @param res oggetto che contiene la risposta alla richiesta.
    */
@@ -115,7 +119,7 @@ export class UserController {
     try {
       const user_id = checkJWTtoken(req).user_id;
       const imbarcazioni = await this.imbarcazioneController.getUserImbarcazioniWithGeofenceareas(user_id);
-  
+
       const imbarcazioniFiltered = imbarcazioni.map(item => ({
         ...item,
         imbarcazione: (({ user_id, ...rest }) => rest)(item.imbarcazione),

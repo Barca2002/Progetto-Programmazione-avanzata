@@ -6,9 +6,6 @@ import { AppErrorEnum } from '../utils/StatusMessages.js';
 dotenv.config();
 
 export class DatabaseConnection {
-  /**
-   * La connessione al db è implementata tramite il pattern singleton, così abbiamo una sola istanza per interagirvi.
-   */
     private static connDB: DatabaseConnection; 
     private readonly instance: Sequelize;
     

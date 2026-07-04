@@ -1,4 +1,5 @@
 import { DataTypes, Sequelize, Model } from 'sequelize';
+
 export interface LogSpostamentiAllData {
   id: number;
   mmsi: number;
