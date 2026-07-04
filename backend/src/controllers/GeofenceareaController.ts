@@ -8,19 +8,6 @@ import { GeofenceareaCreationData } from "../models/GeofenceareaModel.js";
 export class GeofenceAreaController {
   public readonly geofenceareaService = new GeofenceareaService();
 
-  public async getAree(req: Request, res: Response ){
-    try {
-      const aree = await this.geofenceareaService.getAree();
-      res.json(aree);
-    } catch (err) {
-      if (err instanceof AppError) {
-        err.send(res);
-      } else {
-        ErrorFactory.getError(AppErrorEnum.INTERNAL_ERROR).send(res);
-      }
-    }
-  }
-
   public async getAreaById(req: Request, res: Response ){
     try {
       const id = Number(req.params.id);
