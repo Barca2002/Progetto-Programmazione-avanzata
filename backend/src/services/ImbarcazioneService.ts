@@ -7,7 +7,6 @@ import { AppError } from '../models/AppErrorModel.js';
 import { DatabaseConnection } from '../singleton/DBConnection.js';
 import { Imbarcazione, ImbarcazioneCreationData, LinkDataBody, UnlinkDataBody } from '../models/ImbarcazioneModel.js';
 import { FeatureCollection } from 'geojson';
-import { Datiinviati } from '../models/DatiInviatiModel.js';
 import { GeofenceareaService } from './GeofenceareaService.js';
 import { LogSpostamentiDAO } from '../dao/LogSpostamentiDAO.js';
 
@@ -131,7 +130,6 @@ export class ImbarcazioneService {
       }
 
       const diff = Date.now() - last_spostamento.created_at.getTime();
-
       const giorni = Math.floor(diff / 86400000);
       const ore = Math.floor((diff % 86400000) / 3600000);
       const minuti = Math.floor((diff % 3600000) / 60000);
@@ -164,7 +162,11 @@ export class ImbarcazioneService {
     return this.generateImbarcazioniStatus(my_imbarcazioni, geoarea_id);
   }
 
-  //FUNZIONE USATA DA ADMINCONTROLLER PER TORNARE LO STATO DI TUTTE LE IMBARCAZIONI IN UNA GEOAREA
+  /**
+   * Funzione che restituisce lo stato (dentro/fuori dalla geofence area) di tutte le imbarcazioni rispetto a una specifica geoarea, controllando che l'id della geoarea sia valido e che la geoarea esista.
+   * @param geoarea_id identificatore numerico della geofence area rispetto a cui calcolare lo stato delle imbarcazioni
+   * @returns array/oggetto con lo stato di ogni imbarcazione rispetto alla geoarea indicata
+   */
   public async getAllImbarcazioniStatus(geoarea_id: number) {
     if (Number.isNaN(geoarea_id) || geoarea_id <= 0)
       throw ErrorFactory.getError(AppErrorEnum.INVALID_GEOAREA_ID)
@@ -183,27 +185,31 @@ export class ImbarcazioneService {
  * @param end_date stringa con data di fine ricerca (formato italiano gg-mm-aaaa o gg/mm/aaaa)
  * @returns oggetto GeoJson (FeatureCollection) con le posizioni dell'imbarcazione come punti
  */
-public async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string, end_date: string): Promise<FeatureCollection> {
-  const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
-  if (!imbarcazione)
-    throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
-  const parsed_start_date = new Date(start_date.split(/[-/]/).reverse().join('-'));
-  const parsed_end_date = new Date(end_date.split(/[-/]/).reverse().join('-'));
-  const dati = await this.imbarcazioneDAO.getPositionsByMmsiAndDateRange(mmsi, parsed_start_date, parsed_end_date);
+  public async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string, end_date: string): Promise<FeatureCollection> {
+    const imbarcazione = await this.imbarcazioneDAO.get(mmsi);
+    if (!imbarcazione)
+      throw ErrorFactory.getError(AppErrorEnum.IMBARCAZIONE_NOT_FOUND);
+    const parsed_start_date = new Date(start_date.split(/[-/]/).reverse().join('-'));
+    const parsed_end_date = new Date(end_date.split(/[-/]/).reverse().join('-'));
+    const dati = await this.imbarcazioneDAO.getPositionsByMmsiAndDateRange(mmsi, parsed_start_date, parsed_end_date);
 
-  return {
-    type: 'FeatureCollection',
-    features: dati.map(d => ({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [Number(d.longitudine), Number(d.latitudine)]
-      },
-      properties: {}
-    }))
-  };
-}
+    return {
+      type: 'FeatureCollection',
+      features: dati.map(d => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [Number(d.longitudine), Number(d.latitudine)]
+        },
+        properties: {}
+      }))
+    };
+  }
 
+  /**
+   * Funzione che ritorna tutte le imbarcazioni con le proprie segnalazioni associate
+   * @returns lista di tutte le imbarcazioni con le segnalazioni associate
+   */
   public async getAllImbarcazioniWithSegnalazioni() {
     const imbarcazioni = await this.imbarcazioneDAO.getAll();
 
@@ -299,9 +305,9 @@ public async getPosizioniImbarcazioneAsGeoJson(mmsi: number, start_date: string,
           await imbarcazione.addGeofencearea(geoarea_id, { transaction: t });
         }
       }
-      await t.commit(); 
+      await t.commit();
     } catch (err) {
-      await t.rollback(); 
+      await t.rollback();
       if (err instanceof AppError)
         throw err;
       throw ErrorFactory.getError(AppErrorEnum.CREATE_ERROR);

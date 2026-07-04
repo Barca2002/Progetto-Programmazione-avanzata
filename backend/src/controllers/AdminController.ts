@@ -60,10 +60,10 @@ export class AdminController {
   }
 
   /**
-   * 
-   * @param req oggetto che contiene il body della richiesta
-   * @param res oggetto della risposta alla richiesta
-   */
+ * Funzione che restituisce lo stato di tutte le imbarcazioni associate a una specifica geofence area, identificata tramite l'id passato come parametro nella richiesta.
+ * @param req oggetto che contiene il body della richiesta, in particolare l'id della geoarea nei parametri della route (geoareaid)
+ * @param res oggetto della risposta alla richiesta
+ */
   public async getAllImbarcazioniStatusByGeoarea(req: Request, res: Response) {
     try {
       const geoarea_id = Number(req.params.geoareaid);
@@ -114,6 +114,11 @@ export class AdminController {
     }
   };
 
+  /**
+   * Funzione che torna tutte le imbarcazioni con le segnalazioni
+   * @param req oggetto che contiene il body della richiesta
+   * @param res oggetto della risposta alla richiesta
+   */
   public async getAllImbarcazioniWithSegnalazioni(req: Request, res: Response) {
     try {
       const imbarcazioni_segnalazioni = await this.imbarcazioneController.getAllImbarcazioniWithSegnalazioni();
@@ -162,7 +167,7 @@ export class AdminController {
       if (!mmsi || !geoarea_id) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
-      const unlink: UnlinkDataBody = {mmsi: mmsi, geoarea_id: geoarea_id}
+      const unlink: UnlinkDataBody = { mmsi: mmsi, geoarea_id: geoarea_id }
       await this.imbarcazioneController.unlinkGeoareaToImbarcazioni(unlink);
       SuccessFactory.getSuccess(AppSuccessEnum.AREA_DELETED, unlink).send(res);
     } catch (err) {
@@ -181,11 +186,11 @@ export class AdminController {
    */
   public async getPositionsInDateRange(req: Request, res: Response): Promise<void> {
     try {
-      const { mmsi, start_date, end_date  } = req.body as Partial<GetPositionsInDateRange>;
+      const { mmsi, start_date, end_date } = req.body as Partial<GetPositionsInDateRange>;
       if (!mmsi || !start_date) {
         throw ErrorFactory.getError(AppErrorEnum.INCORRECT_DATA);
       }
-      const data = {mmsi, start_date, end_date: end_date ?? new Date().toLocaleDateString("it-IT")};
+      const data = { mmsi, start_date, end_date: end_date ?? new Date().toLocaleDateString("it-IT") };
       const posizioni = await this.imbarcazioneController.getPointsAsGeoJson(data);
       SuccessFactory.getSuccess(AppSuccessEnum.POSIZIONI_FOUND, posizioni).send(res);
     } catch (err) {
