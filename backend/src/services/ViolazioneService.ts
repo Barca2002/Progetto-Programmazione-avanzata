@@ -12,12 +12,6 @@ export class ViolazioneService {
     private readonly violazioneDAO = new ViolazioneDAO();
     private readonly geofenceareaService = new GeofenceareaService();
     private readonly imbarcazioneService = new ImbarcazioneService();
-    /**
-     * Per evitare di creare un Model intero per rappresentare la molti a molti, possiamo usare questo getter che usa Sequelize per restituire la tabella.
-     */
-    private get geofence_imbarcazioni() {
-        return DatabaseConnection.getInstance().model('geofence_imbarcazioni');
-    }
 
     /**
      * Funzione che crea una violazione in base ai dati passati. Il tipo di violazione può essere solo per eccesso di velocità o per accesso non autorizzato ad una geofence area.
