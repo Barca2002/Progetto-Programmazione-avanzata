@@ -231,11 +231,51 @@ Il pattern **Singleton** garantisce che una classe abbia solamente un'istanza in
 ### Factory pattern
 Il pattern **Factory** si occupa della creazione di oggetti, nascondendo la logica dietro un metodo/funzione. Un client chiede alla factory (solitamente una classe statica), di generare un oggetto, specificandone il tipo e poi sarà la factory a decidere internamente quale oggetto istanziare e restituire. Gli oggetti generati seguono un'interfaccia, per esempio l'ErrorFactory genererà sempre oggetti di tipo Error, quindi essi avranno attributi come statusCode, statusName e message. In base al tipo di errore che chiediamo, l'oggetto restituito avrà attributi differenti.
 
-### Installazione e avvio
+## 🔧Installazione e avvio
 Per installare ed avviare il progetto basta seguire questi semplici passi:
 
-1) Clone della repository
-
-```bash
-git clone 
+### 1) Clone della repository
+Aprire il terminale, spostarsi nella cartella in cui scaricare l'applicazione e digitare il seguente comando:
+```console
+git clone https://github.com/Barca2002/Progetto-Programmazione-avanzata.git
 ```
+
+### 2) Creazione variabili d'ambiente
+
+Creare un file `.env` dentro la root del progetto con il seguente contenuto:
+```env
+APP_PORT=3000
+TZ=Europe/Rome
+DB_NAME=db_app
+DB_HOST=db
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=prog_pa
+```
+### 3) Generazione della chiave privata e pubblica
+
+Procedere alla creazione della chiave privata e pubblica eseguendo il seguente comando dal termiale, posizionandosi nella root del progetto:
+
+```console
+npm run generate-keys
+```
+
+### 4) Avvio applicazione con Docker
+
+Infine avviare Docker Desktop ed eseguire il seguente comando:
+
+```console
+docker compose up --build
+```
+
+Attendere l'avvio completo dell'applicazione prima di effettuare richieste.
+
+## 🧪Testing
+
+L'applicazione è stata testata sfruttando il framework Jest. Sono stati testati 3 middleware: `AuthMiddleware.ts, DatiInviatiMiddleware.ts` e `GeofenceareaMiddleware.ts`. Questo ha permesso di testare i loro schemi di validazione creati tramite Zod. In seguito sono riportati i risultati:
+
+<img src="./immagini/test_jest.png">
+
+Nella cartella `./backend/src/test` è possibile consultare i file di test per vedere le richieste effettuate. 
+
+Infine, se si vuole effettuare ulteriori test, si può sfruttare <img src="./immagini/logos/Postman_log.svg" width="20" height="20" style="vertical-align: middle;"> <a href="https://www.postman.com/">Postman</a> importando i file `ProgettoPA.postman_environment.json` e `Collection_ProgettoPA.postman_collection.json` presenti nella cartella `./postman`.
