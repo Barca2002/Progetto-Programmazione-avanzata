@@ -268,6 +268,7 @@ DB_PASSWORD=prog_pa
 Per procedere alla creazione della chiave pubblica e privata, assicurarsi di aver installato Node.js e poi eseguire il seguente comando dal terminale, posizionandosi nella root del progetto:
 
 ```powershell
+cd ./Progetto-Programmazione-avanzata/
 node ./backend/src/utils/GenerateCryptoKeys.ts
 ```
 
