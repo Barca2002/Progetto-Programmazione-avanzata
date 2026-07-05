@@ -4,19 +4,19 @@
 | Sezione | Descrizione |
 |--------|-----------|
 | [Obiettivo del progetto](#obiettivo-del-progetto) | Obiettivo principale del progetto e breve spiegazione delle funzionalità. |
-| [Tecnologie usate per lo sviluppo](#-tecnologie-usate-per-lo-sviluppo)| Lista di tecnologie e framework utilizzati per il developement.
-| [Entità coinvolte](#-entità-coinvolte)| Lista di tecnologie e framework utilizzati per il developement.
+| [Tecnologie usate per lo sviluppo](#tecnologie-usate-per-lo-sviluppo)| Lista di tecnologie e framework utilizzati per il developement.
+| [Entità coinvolte](#entità-coinvolte)| Lista di tecnologie e framework utilizzati per il developement.
 | [Diagramma dei casi d'Uso](#diagramma-dei-casi-duso) | Spiegazione funzionalità offerte dall'applicazione tramite diagrammi dei casi d'uso. |
 | [Rotte e diagrammi di sequenza](#rotte-e-diagrammi-di-sequenza) | Panoramica delle rotte più importanti con diagrammi di sequenza. |
-| [Design Pattern implementati](#) | Pattern architetturali scelti durante lo sviluppo e le motivazioni. |
-| [Installazione ed avvio dell'applicazione](#) | Esecuzione dell'applicazione con Docker. |
+| [Design Pattern implementati](#design-pattern-implementati) | Pattern architetturali scelti durante lo sviluppo e le motivazioni. |
+| [Installazione ed avvio dell'applicazione](#installazione-e-avvio) | Esecuzione dell'applicazione con Docker. |
 | [Testing](#testing) | Testing tramite Postman e Jest. |
 | [Autori](#autori) | Autori del progetto. |
 
 ## 🎯Obiettivo del progetto
 L'obiettivo del progetto consiste nell'implementare un backend per la gestione di utenti, imbarcazioni e delle geofence aree, cioè dei perimetri virtuali associati ad aree geografiche del mondo reale.
 
-## 🏗️Tecnologie usate per lo sviluppo
+## 🔥Tecnologie usate per lo sviluppo
 Per lo sviluppo del progetto sono state utilizzate diverse tecnologie e librerie, ognuna con uno scopo ben preciso:
 
 - <img src="./immagini/logos/Typescript_logo_2020.svg" width="30" height="30" style="vertical-align: middle;"> `TypeScript`: linguaggio principale utilizzato per lo sviluppo del backend. Grazie alla tipizzazione statica consente di ridurre gli errori durante lo sviluppo e rende il codice più leggibile e manutenibile.
@@ -143,7 +143,7 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 
 <img src="./immagini/Diagramma_casi_d_uso.png">
 
-## 🗺️Rotte e diagrammi di sequenza
+## 🌏Rotte e diagrammi di sequenza
 ### Elenco delle rotte
 
 | Rotta | Metodo HTTP | Ruolo | Parametri | Descrizione |
@@ -151,21 +151,21 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 | `/` | **GET** | - | - | Healthcheck |
 | `/login` | **POST** | - | {email, password} | Effettua il login e restituisce il token JWT associato all'utente |
 | `/register` | **POST** | - | {username, email, password} | Crea un nuovo utente |
-| `user/imbarcazione/send/status` | **POST** | Utente | {mmsi, longitudine, latitudine, velocita_kmh, stato} | Invia i dati di posizione di una propria imbarcazione (costo 0,025 token); calcola l'appartenenza a geofence aree, registra spostamenti in entrata/uscita, violazioni e segnalazioni |
-| `user/imbarcazioni/get/my/status`<br>`/geoareaid/:geoarea_id` | **GET** | Utente | `geoarea_id`  | Restituisce lo stato (DENTRO/FUORI) delle proprie imbarcazioni rispetto a una geofence area, con tempo di permanenza se DENTRO |
-| `user/imbarcazioni/geoaree/get/my` | **POST** | Utente | - | Restituisce tutte le geofence aree autorizzate associate alle proprie imbarcazioni |
-| `user/imbarcazioni/segnalazioni`<br>`/get/my` | **POST** | Utente | - | Restituisce tutte le segnalazioni associate alle proprie imbarcazioni |
-| `user/get/tokenbalance` | **POST** | Utente | - | Restituisce il saldo dei token dell'utente |
-| `admin/update/tokenbalance` | **PATCH** | Admin | {email, amount} | Ricarica il saldo dei token di un utente identificato tramite email |
-| `/get/tokenbalance/:id` | **GET** | Admin | `id` | Restituisce il credito residuo di un utente tramite il suo id |
-| `/imbarcazione/create` | **POST** | Admin | {mmsi, name, type, descr, max_capacity, user_id} | Crea una nuova imbarcazione associata a un utente |
-| `/imbarcazioni/geoaree/link` | **POST** | Admin | {mmsi, geoarea_ids[]},{...} | Associa una o più imbarcazioni a una o più geofence aree in un'unica richiesta |
-| `/imbarcazione/geoarea/unlink` | **POST** | Admin | {mmsi, geoarea_id} | Dissocia un'imbarcazione da una geofence area associata |
-| `/imbarcazioni/get/positions`<br>`/date` | **POST** | Admin | {mmsi, start_date, end_date?} | Restituisce le posizioni di un'imbarcazione in un intervallo temporale, in formato GeoJSON (end_date opzionale, default data corrente) |
-| `/imbarcazioni/status/geoareaid`<br>`/:geoareaid` | **GET** | Admin | `geoareaid` | Restituisce lo stato (DENTRO/FUORI) di tutte le imbarcazioni rispetto a una geofence area, con tempo di permanenza se DENTRO |
-| `/imbarcazioni/segnalazioni`<br>`/get/all` | **POST** | Admin | - | Restituisce tutte le imbarcazioni con segnalazioni, indicando per ognuna se RIENTRATA o IN CORSO |
-| `/imbarcazioni/geoaree/get/all` | **POST** | Admin | - | Restituisce tutte le imbarcazioni con le rispettive geofence aree associate |
-| `/geoarea/create` | **POST** | Admin | GeoJSON con `properties.name` (obbligatorio) e `properties.max_speed` (opzionale) | Crea una nuova geofence area |
+| `/user/imbarcazione/send/status` | **POST** | Utente | {mmsi, longitudine, latitudine, velocita_kmh, stato} | Invia i dati di posizione di una propria imbarcazione (costo 0,025 token); calcola l'appartenenza a geofence aree, registra spostamenti in entrata/uscita, violazioni e segnalazioni |
+| `/user/imbarcazioni/get/my/status`<br>`/geoareaid/:geoarea_id` | **GET** | Utente | `geoarea_id`  | Restituisce lo stato (DENTRO/FUORI) delle proprie imbarcazioni rispetto a una geofence area, con tempo di permanenza se DENTRO |
+| `/user/imbarcazioni/geoaree/get/my` | **POST** | Utente | - | Restituisce tutte le geofence aree autorizzate associate alle proprie imbarcazioni |
+| `/user/imbarcazioni/segnalazioni`<br>`/get/my` | **POST** | Utente | - | Restituisce tutte le segnalazioni associate alle proprie imbarcazioni |
+| `/user/get/tokenbalance` | **POST** | Utente | - | Restituisce il saldo dei token dell'utente |
+| `/admin/update/tokenbalance` | **PATCH** | Admin | {email, amount} | Ricarica il saldo dei token di un utente identificato tramite email |
+| `/admin/get/tokenbalance/:id` | **GET** | Admin | `id` | Restituisce il credito residuo di un utente tramite il suo id |
+| `/admin/imbarcazione/create` | **POST** | Admin | {mmsi, name, type, descr, max_capacity, user_id} | Crea una nuova imbarcazione associata a un utente |
+| `/admin/imbarcazioni/geoaree/link` | **POST** | Admin | {mmsi, geoarea_ids[]},{...} | Associa una o più imbarcazioni a una o più geofence aree in un'unica richiesta |
+| `/admin/imbarcazione/geoarea/unlink` | **POST** | Admin | {mmsi, geoarea_id} | Dissocia un'imbarcazione da una geofence area associata |
+| `/admin/imbarcazioni/get/positions`<br>`/date` | **POST** | Admin | {mmsi, start_date, end_date?} | Restituisce le posizioni di un'imbarcazione in un intervallo temporale, in formato GeoJSON (end_date opzionale, default data corrente) |
+| `/admin/imbarcazioni/status/geoareaid`<br>`/:geoareaid` | **GET** | Admin | `geoareaid` | Restituisce lo stato (DENTRO/FUORI) di tutte le imbarcazioni rispetto a una geofence area, con tempo di permanenza se DENTRO |
+| `/admin/imbarcazioni/segnalazioni`<br>`/get/all` | **POST** | Admin | - | Restituisce tutte le imbarcazioni con segnalazioni, indicando per ognuna se RIENTRATA o IN CORSO |
+| `/admin/imbarcazioni/geoaree/get/all` | **POST** | Admin | - | Restituisce tutte le imbarcazioni con le rispettive geofence aree associate |
+| `/admin/geoarea/create` | **POST** | Admin | GeoJSON con `properties.name` (obbligatorio) e `properties.max_speed` (opzionale) | Crea una nuova geofence area |
 
 
 Dato il gran numero di messaggi di errore, essi sono stati sostituiti con dei messaggi generici tipo <<Errore...>>.
@@ -176,7 +176,7 @@ Permette la registrazione di un utente inviando un username e un'email che non s
 
 <img src="./immagini/Rotta auth_register.png">
 
-Possibili errori: MISSING_EMAIL, INVALID_EMAIL, MISSING_PASSWORD, INVALID_PASSWORD, INCORRECT_DATA, INTERNAL_ERROR, MISSING_DATA, EMAIL_ALREADY_EXISTS, USERNAME_ALREADY_EXISTS, CREATE_ERROR
+Possibili errori: `MISSING_EMAIL, INVALID_EMAIL, MISSING_PASSWORD, INVALID_PASSWORD, INCORRECT_DATA, INTERNAL_ERROR, MISSING_DATA, EMAIL_ALREADY_EXISTS, USERNAME_ALREADY_EXISTS, CREATE_ERROR`.
 
 ### Rotta /admin/imbarcazione/create
 
@@ -290,3 +290,7 @@ L'applicazione è stata testata sfruttando il framework Jest. Sono stati testati
 Nella cartella `./backend/src/test` è possibile consultare i file di test per vedere le richieste effettuate. 
 
 Infine, se si vogliono effettuare ulteriori test, si può sfruttare <img src="./immagini/logos/Postman_log.svg" width="20" height="20" style="vertical-align: middle;"> <a href="https://www.postman.com/">Postman</a> importando i file `ProgettoPA.postman_environment.json` e `Collection_ProgettoPA.postman_collection.json` presenti nella cartella `./postman`.
+
+## 🧑🏻‍💻Autori
+[OperatoreNabla](https://github.com/SpectreCoded)\
+[Barca2002](https://github.com/Barca2002)
