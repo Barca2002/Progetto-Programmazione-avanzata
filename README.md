@@ -151,8 +151,10 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 | `/login` | **POST** | - | {email, password} | Effettua il login e restituisce il token JWT associato all'utente |
 | `/register` | **POST** | - | {username, email, password} | Crea un nuovo utente  |
 
-### Rotta /register
 
+Dato il gran numero di messaggi di errore, essi sono stati sotituiti con dei messaggi generici tipo <<Errore...>>.
+
+### Rotta /register
 
 ### Rotta /admin/imbarcazione/create
 
@@ -160,15 +162,21 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 
 Data la complessità della rotta, il diagramma è stato diviso in due foto.
 
-<img src="./immagini/Diagramma rotta sendStatus 1.png">
-<img src="./immagini/Diagramma rotta sendStatus 2.png">
+<img src="./immagini/Rotta user_sendStatus 1.png">
+<img src="./immagini/Rotta user_sendStatus 2.png">
 
 ### Rotta /admin/imbarcazioni/get/positions/date
 
+<img src="./immagini/Rotta admin_get_positions_date.png">
+
 ### Rotta admin/imbarcazioni/geoaree/link
 
+<img src="./immagini/Rotta admin_imbarcazioni_geoaree_link.png">
 
 ### Rotta admin/imbarcazione/create
 
+<img src="./immagini/Rotta admin_imbarcazione_create.png">
 
 ### Rotta admin/imbarcazioni/segnalazioni/get/all
+
+<img src="./immagini/Rotta admin_imbarcazioni_segnalazioni_get_all.png">
