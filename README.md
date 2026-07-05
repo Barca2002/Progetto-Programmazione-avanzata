@@ -184,7 +184,7 @@ Permette di creare un'imbarcazione specificando il codice mmsi, il nome, il tipo
 
 <img src="./immagini/Rotta admin_imbarcazione_create.png">
 
-Possibili errori: NOT_ADMIN, MISSING_MMSI, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INVALID_MMSI, MISSING_NAME, INVALID_NAME, MISSING_TYPE_IMBARCAZIONE, INVALID_TYPE, MISSING_DESCR, INVALID_DESCR, MISSING_MAX_CAPACITY, INVALID_MAX_CAPACITY, MISSING_USER_ID, INVALID_USERID, INCORRECT_DATA, INTERNAL_ERROR, USER_NOT_FOUND, IMBARCAZIONE_ALREADY_EXISTS, CREATE_ERROR.
+Possibili errori: `NOT_ADMIN, MISSING_MMSI, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INVALID_MMSI, MISSING_NAME, INVALID_NAME, MISSING_TYPE_IMBARCAZIONE, INVALID_TYPE, MISSING_DESCR, INVALID_DESCR, MISSING_MAX_CAPACITY, INVALID_MAX_CAPACITY, MISSING_USER_ID, INVALID_USERID, INCORRECT_DATA, INTERNAL_ERROR, USER_NOT_FOUND, IMBARCAZIONE_ALREADY_EXISTS, CREATE_ERROR`.
 
 ### Rotta /user/sendStatus/
 
@@ -194,7 +194,7 @@ Data la complessità della rotta, il diagramma è stato diviso in due foto.
 <img src="./immagini/Rotta user_sendStatus 1.png">
 <img src="./immagini/Rotta user_sendStatus 2.png">
 
-Possibili errori: NOT_USER, MISSING_AUTH_HEADER, JWT_TOKEN_INVALID, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID,USER_NOT_FOUND, INSUFFICIENT_TOKEN_BALANCE, MISSING_MMSI, INVALID_MMSI, MISSING_LONGITUDINE, INVALID_LONGITUDINE_DECIMALS, INVALID_LONGITUDINE, MISSING_LATITUDINE, INVALID_LATITUDINE_DECIMALS, INVALID_LATITUDINE, MISSING_VELOCITA_KMH, INVALID_VELOCITA, MISSING_STATO, INVALID_STATO, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, IMBARCAZIONE_OWNERSHIP_ERROR, CREATE_ERROR.
+Possibili errori: `NOT_USER, MISSING_AUTH_HEADER, JWT_TOKEN_INVALID, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID,USER_NOT_FOUND, INSUFFICIENT_TOKEN_BALANCE, MISSING_MMSI, INVALID_MMSI, MISSING_LONGITUDINE, INVALID_LONGITUDINE_DECIMALS, INVALID_LONGITUDINE, MISSING_LATITUDINE, INVALID_LATITUDINE_DECIMALS, INVALID_LATITUDINE, MISSING_VELOCITA_KMH, INVALID_VELOCITA, MISSING_STATO, INVALID_STATO, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, IMBARCAZIONE_OWNERSHIP_ERROR, CREATE_ERROR`.
 
 ### Rotta /admin/imbarcazioni/get/positions/date
 
@@ -202,7 +202,7 @@ Permette ad un admin di ottenere tutte le posizioni di tutte le imbarcazioni in 
 
 <img src="./immagini/Rotta admin_get_positions_date.png">
 
-Possibili errori: NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, MISSING_START_DATE, INVALID_START_DATE, MISSING_END_DATE, MAX_END_DATE, INVALID_END_DATE, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, INVALID_DATE_RANGE.
+Possibili errori: `NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, MISSING_START_DATE, INVALID_START_DATE, MISSING_END_DATE, MAX_END_DATE, INVALID_END_DATE, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, INVALID_DATE_RANGE`.
 
 ### Rotta /admin/imbarcazioni/geoaree/link
 
@@ -210,7 +210,7 @@ Permette ad un admin di aggiungere una geofence area tra quelle autorizzate di u
 
 <img src="./immagini/Rotta admin_imbarcazioni_geoaree_link.png">
 
-Possibili errori: NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INVALID_PARAMS, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, GEOAREA_NOT_FOUND, INVALID_ASSOCIATION, CREATE_ERROR.
+Possibili errori: `NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INVALID_PARAMS, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, GEOAREA_NOT_FOUND, INVALID_ASSOCIATION, CREATE_ERROR`.
 
 ### Rotta /admin/imbarcazioni/segnalazioni/get/all
 
@@ -218,7 +218,7 @@ Permette ad un admin di ottenere tutte le imbarcazioni con le relative segnalazi
 
 <img src="./immagini/Rotta admin_imbarcazioni_segnalazioni_get_all.png">
 
-Possibili errori: NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INTERNAL_ERROR, IMBARCAZIONI_NOT_FOUND.
+Possibili errori: `NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INTERNAL_ERROR, IMBARCAZIONI_NOT_FOUND`.
 
 ## 🧠Design pattern implementati
 
@@ -247,7 +247,7 @@ Per installare ed avviare il progetto basta seguire questi semplici passi:
 
 ### 1) Clone della repository
 Aprire il terminale, spostarsi nella cartella in cui scaricare l'applicazione e digitare il seguente comando:
-```console
+```powershell
 git clone https://github.com/Barca2002/Progetto-Programmazione-avanzata.git
 ```
 
@@ -263,11 +263,11 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=prog_pa
 ```
-### 3) Generazione della chiave privata e pubblica
+### 3) Generazione della chiave pubblica e privtata
 
-Procedere alla creazione della chiave privata e pubblica eseguendo il seguente comando dal termiale, posizionandosi nella root del progetto:
+Procedere alla creazione della chiave pubblica e privata eseguendo il seguente comando dal terminale, posizionandosi nella root del progetto:
 
-```console
+```powershell
 npm run generate-keys
 ```
 
@@ -275,7 +275,7 @@ npm run generate-keys
 
 Infine avviare Docker Desktop ed eseguire il seguente comando:
 
-```console
+```powershell
 docker compose up --build
 ```
 
@@ -289,4 +289,4 @@ L'applicazione è stata testata sfruttando il framework Jest. Sono stati testati
 
 Nella cartella `./backend/src/test` è possibile consultare i file di test per vedere le richieste effettuate. 
 
-Infine, se si vuole effettuare ulteriori test, si può sfruttare <img src="./immagini/logos/Postman_log.svg" width="20" height="20" style="vertical-align: middle;"> <a href="https://www.postman.com/">Postman</a> importando i file `ProgettoPA.postman_environment.json` e `Collection_ProgettoPA.postman_collection.json` presenti nella cartella `./postman`.
+Infine, se si vogliono effettuare ulteriori test, si può sfruttare <img src="./immagini/logos/Postman_log.svg" width="20" height="20" style="vertical-align: middle;"> <a href="https://www.postman.com/">Postman</a> importando i file `ProgettoPA.postman_environment.json` e `Collection_ProgettoPA.postman_collection.json` presenti nella cartella `./postman`.
