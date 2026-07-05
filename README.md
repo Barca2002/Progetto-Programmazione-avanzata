@@ -230,7 +230,7 @@ Il pattern **DAO** fornisce un'astrazione per l'accesso ai dati del database. La
 
 ### Pattern M(V)C - Model View Controller (senza View)
 
-Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni e la logica dell'applicazione, la View si occupa di prendere l'input dell'utente e visualizzare i dati dinamicamente, il Controller permette ai due compoenenti precedenti di comunicare, fungendo da mediatore. Nella versione senza view, il Model e Controller comunicano tra loro senza interpellare componenti per il rendenring delle informazioni.
+Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni e la logica dell'applicazione, la View si occupa di prendere l'input dell'utente e visualizzare i dati dinamicamente, il Controller permette ai due componenti precedenti di comunicare, fungendo da mediatore. Nella versione senza view, il Model e Controller comunicano tra loro senza interpellare componenti per il rendering delle informazioni.
 
 
 ### Chain of Responsibility - CoR
