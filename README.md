@@ -172,10 +172,19 @@ Dato il gran numero di messaggi di errore, essi sono stati sotituiti con dei mes
 
 ### Rotta /register
 
+Permette la registrazione di un utente inviando un username e un'email che non sia già stata registrata ed una password.  
+
+<img src="./immagini/Rotta auth_register.png">
+
 ### Rotta /admin/imbarcazione/create
+
+Permette di creare un'imbarcazione specificando il codice mmsi, il nome, il tipo, la descrizione, la capacità massima di persone che può trasportare e l'id dell'utente a cui associarla.
+
+<img src="./immagini/Rotta admin_imbarcazione_create.png">
 
 ### Rotta /user/sendStatus/
 
+Permette agli utenti di inviare i dati di posizione delle proprie imbarcazioni, specificano un punto geografico tramite longitudine e langitudine, la velocità e lo stato in cui si trova (IN NAVIGAZIONE, IN PESCA, STAZIONARIA).
 Data la complessità della rotta, il diagramma è stato diviso in due foto.
 
 <img src="./immagini/Rotta user_sendStatus 1.png">
@@ -183,16 +192,31 @@ Data la complessità della rotta, il diagramma è stato diviso in due foto.
 
 ### Rotta /admin/imbarcazioni/get/positions/date
 
+Permette ad un admin di ottenere tutte le posizioni di tutte le imbarcazioni in un intervallo temporale specificato, tutto in formato GeoJSON. Se la data finale non è specificata, si considera la data odierna.
+
 <img src="./immagini/Rotta admin_get_positions_date.png">
 
 ### Rotta admin/imbarcazioni/geoaree/link
 
+Permette ad un admin di aggiungere una geofence area tra quelle autorizzate di un'imbarcazione.
+
 <img src="./immagini/Rotta admin_imbarcazioni_geoaree_link.png">
-
-### Rotta admin/imbarcazione/create
-
-<img src="./immagini/Rotta admin_imbarcazione_create.png">
 
 ### Rotta admin/imbarcazioni/segnalazioni/get/all
 
+Permette ad un admin di ottenere tutte le imbarcazioni con le relative segnalazioni, sia in corso che rientrate.
+
 <img src="./immagini/Rotta admin_imbarcazioni_segnalazioni_get_all.png">
+
+
+## 🧠Design pattern implementati
+
+### Pattern Service
+Il pattern Service è stato usato principalmente per separare la logica di business dalle operazioni dei controller. Essi principalmente implementano controlli sui dati prima che vengano restituiti ai controller e interagiscono con i DAO.
+
+### Pattern DAO - Data Access Object
+Il DAO Pattern fornisce un'astrazione per l'accesso ai dati del database. La maggior parte delle entità, rappresentate dai Model nel codice, s'interfacciano con i DAO per reperire i loro dati dal database. Essi implementano operazioni basilari come le CRUD o query con filtri semplici.
+
+### Pattern M(V)C - Model View Controller (senza View)
+
+Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni dell'applicazione, la View si occupa di prendere l'input dell'utente da un'interfaccia grafica. 
