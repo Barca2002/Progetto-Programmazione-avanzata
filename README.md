@@ -145,11 +145,27 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 
 ## 🗺️Rotte e diagrammi di sequenza
 ### Elenco delle rotte
+
 | Rotta | Metodo HTTP | Ruolo | Parametri | Descrizione |
 | :--- | :--- | :---: | :--- | :--- |
 | `/` | **GET** | - | - | Healthcheck |
 | `/login` | **POST** | - | {email, password} | Effettua il login e restituisce il token JWT associato all'utente |
-| `/register` | **POST** | - | {username, email, password} | Crea un nuovo utente  |
+| `/register` | **POST** | - | {username, email, password} | Crea un nuovo utente |
+| `user/imbarcazione/send/status` | **POST** | Utente | {mmsi, longitudine, latitudine, velocita_kmh, stato} | Invia i dati di posizione di una propria imbarcazione (costo 0,025 token); calcola l'appartenenza a geofence aree, registra spostamenti in entrata/uscita, violazioni e segnalazioni |
+| `user/imbarcazioni/get/my/status`<br>`/geoareaid/:geoarea_id` | **GET** | Utente | `geoarea_id`  | Restituisce lo stato (DENTRO/FUORI) delle proprie imbarcazioni rispetto a una geofence area, con tempo di permanenza se DENTRO |
+| `user/imbarcazioni/geoaree/get/my` | **POST** | Utente | - | Restituisce tutte le geofence aree autorizzate associate alle proprie imbarcazioni |
+| `user/imbarcazioni/segnalazioni`<br>`/get/my` | **POST** | Utente | - | Restituisce tutte le segnalazioni associate alle proprie imbarcazioni |
+| `user/get/tokenbalance` | **POST** | Utente | - | Restituisce il saldo dei token dell'utente |
+| `admin/update/tokenbalance` | **PATCH** | Admin | {email, amount} | Ricarica il saldo dei token di un utente identificato tramite email |
+| `/get/tokenbalance/:id` | **GET** | Admin | `id` | Restituisce il credito residuo di un utente tramite il suo id |
+| `/imbarcazione/create` | **POST** | Admin | {mmsi, name, type, descr, max_capacity, user_id} | Crea una nuova imbarcazione associata a un utente |
+| `/imbarcazioni/geoaree/link` | **POST** | Admin | {mmsi, geoarea_ids[]},{...} | Associa una o più imbarcazioni a una o più geofence aree in un'unica richiesta |
+| `/imbarcazione/geoarea/unlink` | **POST** | Admin | {mmsi, geoarea_id} | Dissocia un'imbarcazione da una geofence area associata |
+| `/imbarcazioni/get/positions`<br>`/date` | **POST** | Admin | {mmsi, start_date, end_date?} | Restituisce le posizioni di un'imbarcazione in un intervallo temporale, in formato GeoJSON (end_date opzionale, default data corrente) |
+| `/imbarcazioni/status/geoareaid`<br>`/:geoareaid` | **GET** | Admin | `geoareaid` | Restituisce lo stato (DENTRO/FUORI) di tutte le imbarcazioni rispetto a una geofence area, con tempo di permanenza se DENTRO |
+| `/imbarcazioni/segnalazioni`<br>`/get/all` | **POST** | Admin | - | Restituisce tutte le imbarcazioni con segnalazioni, indicando per ognuna se RIENTRATA o IN CORSO |
+| `/imbarcazioni/geoaree/get/all` | **POST** | Admin | - | Restituisce tutte le imbarcazioni con le rispettive geofence aree associate |
+| `/geoarea/create` | **POST** | Admin | GeoJSON con `properties.name` (obbligatorio) e `properties.max_speed` (opzionale) | Crea una nuova geofence area |
 
 
 Dato il gran numero di messaggi di errore, essi sono stati sotituiti con dei messaggi generici tipo <<Errore...>>.
