@@ -211,12 +211,31 @@ Permette ad un admin di ottenere tutte le imbarcazioni con le relative segnalazi
 
 ## 🧠Design pattern implementati
 
-### Pattern Service
-Il pattern Service è stato usato principalmente per separare la logica di business dalle operazioni dei controller. Essi principalmente implementano controlli sui dati prima che vengano restituiti ai controller e interagiscono con i DAO.
+### Pattern Service Layer
+Il pattern **Service Layer** è stato usato principalmente per separare la logica di business dalle operazioni dei controller e coordinare le operazioni. Essi si collocano in mezzo, quando un controller riceve una richiesta, delegano l'elaborazione ai Service. Essi implementano controlli sui dati e sulle regole di business prima che i risultati siano restituiti ai controller. Le operazioni basilari, come le get, find o create, sono "mascherate" dai Service, i quali ottengono i dati interagendo con i DAO e poi eseguono controlli per evitare stati pericolosi nell'applicazione.
 
 ### Pattern DAO - Data Access Object
-Il DAO Pattern fornisce un'astrazione per l'accesso ai dati del database. La maggior parte delle entità, rappresentate dai Model nel codice, s'interfacciano con i DAO per reperire i loro dati dal database. Essi implementano operazioni basilari come le CRUD o query con filtri semplici.
+Il pattern **DAO** fornisce un'astrazione per l'accesso ai dati del database. La maggior parte delle entità, rappresentate dai Model, s'interfacciano con i DAO per reperire i loro dati dal database. I DAO implementano operazioni basilari come le CRUD o query con filtri semplici. Nel nostro caso, ogni DAO  implementa un'interfaccia per le CRUD (eccetto l'operazione delete dato che non era necessaria).
 
 ### Pattern M(V)C - Model View Controller (senza View)
 
-Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni dell'applicazione, la View si occupa di prendere l'input dell'utente da un'interfaccia grafica. 
+Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni e la logica dell'applicazione, la View si occupa di prendere l'input dell'utente e visualizzare i dati dinamicamente, il Controller permette ai due compoenenti precedenti di comunicare, fungendo da mediatore. Nella versione senza view, il Model e Controller comunicano tra loro senza interpellare componenti per il rendenring delle informazioni.
+
+
+### Chain of Responsibility - CoR
+Il pattern **CoR** permette di passare una richiesta lungo una catena di gestori. In Express, solitamente si una una catena di middleware, i quali sono chiamati secondo un ordine sequenziale. Esso è utile per la validazione dell'input, se nella catena fallisce un controllo, si genera un errore, il quale interrompe la catena per effettuare un'azione di risposta. Questo permette di separare i compiti di ogni gestore, in modo da avere una separazione chiara dei compiti.
+
+### Singleton pattern
+Il pattern **Singleton** garantisce che una classe abbia solamente un'istanza in tutta l'applicazione. Spesso si vuole impedire che una classe abbia più istanze, in modo da garantire il controllo a risorse/metodi di una classe. Inoltre garantisce coerenza delle risorse condivise in caso di accessi multipli alla risorsa. Per esempio, se un modulo vuole accedere al database, esso vedrà sempre i dati aggiornati, senza aver bisogno di meccanismi di sincronizzazione perché c'è una sola connessione istanziata. Però il rischio di race condition rimane in caso di accesso simultaneo al singleton.
+
+### Factory pattern
+Il pattern **Factory** si occupa della creazione di oggetti, nascondendo la logica dietro un metodo/funzione. Un client chiede alla factory (solitamente una classe statica), di generare un oggetto, specificandone il tipo e poi sarà la factory a decidere internamente quale oggetto istanziare e restituire. Gli oggetti generati seguono un'interfaccia, per esempio l'ErrorFactory genererà sempre oggetti di tipo Error, quindi essi avranno attributi come statusCode, statusName e message. In base al tipo di errore che chiediamo, l'oggetto restituito avrà attributi differenti.
+
+### Installazione e avvio
+Per installare ed avviare il progetto basta seguire questi semplici passi:
+
+1) Clone della repository
+
+```bash
+git clone 
+```
