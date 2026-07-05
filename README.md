@@ -265,10 +265,10 @@ DB_PASSWORD=prog_pa
 ```
 ### 3) Generazione della chiave pubblica e privtata
 
-Procedere alla creazione della chiave pubblica e privata eseguendo il seguente comando dal terminale, posizionandosi nella root del progetto:
+Per procedere alla creazione della chiave pubblica e privata, assicurarsi di aver installato Node.js e poi eseguire il seguente comando dal terminale, posizionandosi nella root del progetto:
 
 ```powershell
-npm run generate-keys
+node ./backend/src/utils/GenerateCryptoKeys.ts
 ```
 
 ### 4) Avvio applicazione con Docker
