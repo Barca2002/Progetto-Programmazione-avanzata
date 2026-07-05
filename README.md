@@ -115,7 +115,7 @@ Una segnalazione può assumere uno dei seguenti stati:
 - `IN CORSO`
 - `RIENTRATA`
 
-Ogni segnalazione può coinvolgere una o più imbarcazioni responsabili delle violazioni che ne hanno determinato la generazione. La generazione avviene se in un arco temporale di 2 giorni dall'ultima violazione valida, ci sono 6 o più violazioni. Invece, se dall'ultima violazione valida vi sono 5 o meno violazioni, l'ultima segnalazione per quella geofeance area va in stato RIENTRATA. Se dall'ultima violazione valida viene registrata un'altra violazione che dista almeno 1 ora, allora questa sostituirà l'ultima violazione valida, spostando la finestra temporale.
+Ogni segnalazione può coinvolgere una o più imbarcazioni responsabili delle violazioni che ne hanno determinato la generazione. La generazione avviene se in un arco temporale di 2 giorni dall'ultima violazione valida, ci sono 6 o più violazioni. Invece, se dall'ultima violazione valida vi sono 5 o meno violazioni, l'ultima segnalazione per quella geofence area va in stato RIENTRATA. Se dall'ultima violazione valida viene registrata un'altra violazione che dista almeno 1 ora, allora questa sostituirà l'ultima violazione valida, spostando la finestra temporale.
 
 ### 🔗Imbarcazioni-Segnalazioni
 L'associazione tra segnalazioni ed imbarcazioni è realizzata mediante una tabella composta dai seguenti campi:
@@ -168,7 +168,7 @@ Il diagramma dei casi d'uso mostra 3 attori del sistema: Utente non autenticato,
 | `/geoarea/create` | **POST** | Admin | GeoJSON con `properties.name` (obbligatorio) e `properties.max_speed` (opzionale) | Crea una nuova geofence area |
 
 
-Dato il gran numero di messaggi di errore, essi sono stati sotituiti con dei messaggi generici tipo <<Errore...>>.
+Dato il gran numero di messaggi di errore, essi sono stati sostituiti con dei messaggi generici tipo <<Errore...>>.
 
 ### Rotta /register
 
@@ -176,19 +176,25 @@ Permette la registrazione di un utente inviando un username e un'email che non s
 
 <img src="./immagini/Rotta auth_register.png">
 
+Possibili errori: MISSING_EMAIL, INVALID_EMAIL, MISSING_PASSWORD, INVALID_PASSWORD, INCORRECT_DATA, INTERNAL_ERROR, MISSING_DATA, EMAIL_ALREADY_EXISTS, USERNAME_ALREADY_EXISTS, CREATE_ERROR
+
 ### Rotta /admin/imbarcazione/create
 
 Permette di creare un'imbarcazione specificando il codice mmsi, il nome, il tipo, la descrizione, la capacità massima di persone che può trasportare e l'id dell'utente a cui associarla.
 
 <img src="./immagini/Rotta admin_imbarcazione_create.png">
 
+Possibili errori: NOT_ADMIN, MISSING_MMSI, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INVALID_MMSI, MISSING_NAME, INVALID_NAME, MISSING_TYPE_IMBARCAZIONE, INVALID_TYPE, MISSING_DESCR, INVALID_DESCR, MISSING_MAX_CAPACITY, INVALID_MAX_CAPACITY, MISSING_USER_ID, INVALID_USERID, INCORRECT_DATA, INTERNAL_ERROR, USER_NOT_FOUND, IMBARCAZIONE_ALREADY_EXISTS, CREATE_ERROR.
+
 ### Rotta /user/sendStatus/
 
-Permette agli utenti di inviare i dati di posizione delle proprie imbarcazioni, specificano un punto geografico tramite longitudine e langitudine, la velocità e lo stato in cui si trova (IN NAVIGAZIONE, IN PESCA, STAZIONARIA).
+Permette agli utenti di inviare i dati di posizione delle proprie imbarcazioni, specificano un punto geografico tramite longitudine e longitudine, la velocità e lo stato in cui si trova (IN NAVIGAZIONE, IN PESCA, STAZIONARIA).
 Data la complessità della rotta, il diagramma è stato diviso in due foto.
 
 <img src="./immagini/Rotta user_sendStatus 1.png">
 <img src="./immagini/Rotta user_sendStatus 2.png">
+
+Possibili errori: NOT_USER, MISSING_AUTH_HEADER, JWT_TOKEN_INVALID, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID,USER_NOT_FOUND, INSUFFICIENT_TOKEN_BALANCE, MISSING_MMSI, INVALID_MMSI, MISSING_LONGITUDINE, INVALID_LONGITUDINE_DECIMALS, INVALID_LONGITUDINE, MISSING_LATITUDINE, INVALID_LATITUDINE_DECIMALS, INVALID_LATITUDINE, MISSING_VELOCITA_KMH, INVALID_VELOCITA, MISSING_STATO, INVALID_STATO, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, IMBARCAZIONE_OWNERSHIP_ERROR, CREATE_ERROR.
 
 ### Rotta /admin/imbarcazioni/get/positions/date
 
@@ -196,18 +202,23 @@ Permette ad un admin di ottenere tutte le posizioni di tutte le imbarcazioni in 
 
 <img src="./immagini/Rotta admin_get_positions_date.png">
 
-### Rotta admin/imbarcazioni/geoaree/link
+Possibili errori: NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, MISSING_START_DATE, INVALID_START_DATE, MISSING_END_DATE, MAX_END_DATE, INVALID_END_DATE, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, INVALID_DATE_RANGE.
+
+### Rotta /admin/imbarcazioni/geoaree/link
 
 Permette ad un admin di aggiungere una geofence area tra quelle autorizzate di un'imbarcazione.
 
 <img src="./immagini/Rotta admin_imbarcazioni_geoaree_link.png">
 
-### Rotta admin/imbarcazioni/segnalazioni/get/all
+Possibili errori: NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INVALID_PARAMS, INCORRECT_DATA, INTERNAL_ERROR, IMBARCAZIONE_NOT_FOUND, GEOAREA_NOT_FOUND, INVALID_ASSOCIATION, CREATE_ERROR.
+
+### Rotta /admin/imbarcazioni/segnalazioni/get/all
 
 Permette ad un admin di ottenere tutte le imbarcazioni con le relative segnalazioni, sia in corso che rientrate.
 
 <img src="./immagini/Rotta admin_imbarcazioni_segnalazioni_get_all.png">
 
+Possibili errori: NOT_ADMIN, MISSING_AUTH_HEADER, INVALID_AUTH_HEADER, JWT_TOKEN_EMPTY, JWT_TOKEN_EXPIRED, JWT_TOKEN_INVALID, INTERNAL_ERROR, IMBARCAZIONI_NOT_FOUND.
 
 ## 🧠Design pattern implementati
 
@@ -219,7 +230,7 @@ Il pattern **DAO** fornisce un'astrazione per l'accesso ai dati del database. La
 
 ### Pattern M(V)C - Model View Controller (senza View)
 
-Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni e la logica dell'applicazione, la View si occupa di prendere l'input dell'utente e visualizzare i dati dinamicamente, il Controller permette ai due compoenenti precedenti di comunicare, fungendo da mediatore. Nella versione senza view, il Model e Controller comunicano tra loro senza interpellare componenti per il rendenring delle informazioni.
+Il pattern M(V)C organizza l'applicazione in due strati logici separati. Nella versione completa, cioè MVC, il Model rappresenta le informazioni e la logica dell'applicazione, la View si occupa di prendere l'input dell'utente e visualizzare i dati dinamicamente, il Controller permette ai due componenti precedenti di comunicare, fungendo da mediatore. Nella versione senza view, il Model e Controller comunicano tra loro senza interpellare componenti per il rendering delle informazioni.
 
 
 ### Chain of Responsibility - CoR
