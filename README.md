@@ -294,4 +294,4 @@ Infine, se si vogliono effettuare ulteriori test, si può sfruttare <img src="./
 
 ## 🤓Autori
 [OperatoreNabla](https://github.com/SpectreCoded)\
-[Barca2002](https://github.com/Barca2002)
+[luke24-git](https://github.com/luke24-git)
